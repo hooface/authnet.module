@@ -119,3 +119,26 @@ function authnet_cim_profile_save(AuthorizeNetCustomer &$customerProfile) {
     authnet_error($response);
   }
 }
+
+/**
+ * Delete a customer profile from Authorize.net
+ *
+ * @param $customerProfileId
+ *   The id of the customer profile to be deleted.
+ */
+function authnet_cim_profile_delete($customerProfileId) {
+
+  // Include the Authorize.net SDK.
+  authnet_sdk_include();
+
+  // Create an Authorize.net request object.
+  $request = new AuthorizeNetCIM;
+
+  // Delete the profile.
+  $response = $request->deleteCustomerProfile($customerProfileId);
+
+  // If the request was unsuccessful, send it to authnet_error() for reporting.
+  if (!$response->isOk()) {
+    authnet_error($response);
+  }
+}
