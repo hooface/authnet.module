@@ -108,3 +108,30 @@ function authnet_error($response) {
     watchdog('authnet', $error);
   }
 }
+
+/**
+ * Recursively copies the contents of a SimpleXMLElement to another object.
+ * This is necessary because the Authorize.net SDK returns SimpleXML objects,
+ * rather than the specific AuthorizeNet* class that we need.
+ *
+ * @param $simplexml
+ *   The SimpleXMLElement to convert.
+ * @param &$object
+ *   The object to copy to, passed by reference.
+ *
+ * @see uc_cim_profile_load(), uc_cim_profile_save()
+ */
+function authnet_convert_simplexml($simplexml, &$object) {
+  if ($simplexml instanceof SimpleXMLElement) {
+    $vars = get_object_vars($simplexml);
+    foreach ($vars as $key => $var) {
+      /**
+       * @todo
+       * Need to be able to handle arrays. Not everything should become an object.
+       */
+      authnet_convert_simplexml($var, $object->$key);
+    }
+  } else {
+    $object = $simplexml;
+  }
+}
