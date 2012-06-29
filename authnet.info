@@ -1,0 +1,4 @@
+name = Authorize.net API
+description = Provides Authorize.net API functions for other modules to use.
+package = Authorize.net
+core = 6.x
