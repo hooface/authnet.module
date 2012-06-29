@@ -54,9 +54,12 @@ function authnet_cim_profile_load($customerProfileId) {
   // If the request was successful, return the profile.
   if ($response->isOK()) {
 
+    // Convert the profile from a SimpleXMLElement to an AuthorizeNetCustomer object.
+    $customerProfile = authnet_cim_profile_new();
+    authnet_convert_simplexml($response->xml->profile, $customerProfile);
+
     // Return the profile.
-    // Note that this is a SimpleXMLElement object, not an AuthorizeNetCustomer object.
-    return $response->xml->profile;
+    return $customerProfile;
   }
 
   // If the request was unsuccessful, send it to authnet_error() for reporting.
