@@ -5,3 +5,22 @@
  * Authorize.net API
  */
 
+/* ******************************************************************************
+ * Drupal hooks
+ * *****************************************************************************/
+
+/**
+ * Implementation of hook_menu().
+ */
+function authnet_menu() {
+  $items['admin/settings/authnet'] = array(
+    'title' => 'Authorize.net API',
+    'description' => 'Authorize.net API module settings.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('authnet_settings_form'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'authnet.pages.inc',
+  );
+  return $items;
+}
