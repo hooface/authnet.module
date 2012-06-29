@@ -82,3 +82,29 @@ function authnet_sdk_include() {
     $loaded = TRUE;
   }
 }
+
+/* ******************************************************************************
+ * Helper functions
+ * *****************************************************************************/
+
+/**
+ * Records error messages from an Authorize.net response to the screen and to the log.
+ *
+ * @param $response
+ *   An AuthorizeNetCIM_Response object.
+ */
+function authnet_error($response) {
+  if ($response->isError()) {
+
+    // Get the error message.
+    $error = $response->getErrorMessage();
+
+    // Print it to the screen, if Drupal's core error_level variable is greater than or equal to 1.
+    if (variable_get('error_level', 1) >= 1) {
+      drupal_set_message($error, 'error');
+    }
+
+    // Record it to watchdog.
+    watchdog('authnet', $error);
+  }
+}
