@@ -56,15 +56,15 @@ function authnet_cim_profile_load($customerProfileId) {
 
     // Convert the profile from a SimpleXMLElement to an AuthorizeNetCustomer object.
     $customerProfile = authnet_cim_profile_new();
-    authnet_convert_simplexml($response->xml->profile, $customerProfile);
+    _authnet_convert_simplexml($response->xml->profile, $customerProfile);
 
     // Return the profile.
     return $customerProfile;
   }
 
-  // If the request was unsuccessful, send it to authnet_error() for reporting.
+  // If the request was unsuccessful, send it to _authnet_error() for reporting.
   else {
-    authnet_error($response);
+    _authnet_error($response);
   }
 }
 
@@ -114,9 +114,9 @@ function authnet_cim_profile_save(AuthorizeNetCustomer &$customerProfile) {
     }
   }
 
-  // If the request was unsuccessful, send it to authnet_error() for reporting.
+  // If the request was unsuccessful, send it to _authnet_error() for reporting.
   if ($response->isError()) {
-    authnet_error($response);
+    _authnet_error($response);
   }
 }
 

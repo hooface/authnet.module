@@ -93,7 +93,7 @@ function authnet_sdk_include() {
  * @param $response
  *   An AuthorizeNetCIM_Response object.
  */
-function authnet_error($response) {
+function _authnet_error($response) {
   if ($response->isError()) {
 
     // Get the error message.
@@ -121,7 +121,7 @@ function authnet_error($response) {
  *
  * @see uc_cim_profile_load(), uc_cim_profile_save()
  */
-function authnet_convert_simplexml($simplexml, &$object) {
+function _authnet_convert_simplexml($simplexml, &$object) {
   if ($simplexml instanceof SimpleXMLElement) {
     $vars = get_object_vars($simplexml);
     foreach ($vars as $key => $var) {
@@ -129,7 +129,7 @@ function authnet_convert_simplexml($simplexml, &$object) {
        * @todo
        * Need to be able to handle arrays. Not everything should become an object.
        */
-      authnet_convert_simplexml($var, $object->$key);
+      _authnet_convert_simplexml($var, $object->$key);
     }
   } else {
     $object = $simplexml;
