@@ -70,6 +70,8 @@ function authnet_cim_profile_load($customerProfileId) {
 
 /**
  * Save a customer profile to Authorize.net.
+ * If the $customerProfile->customerProfileId propery is set, then the profile will be updated.
+ * Otherwise, a new one will be saved.
  *
  * @param AuthorizeNetCustomer $customerProfile
  *   The customer profile object to save be saved.
@@ -85,8 +87,15 @@ function authnet_cim_profile_save(AuthorizeNetCustomer $customerProfile) {
   // Create an Authorize.net request object.
   $request = new AuthorizeNetCIM;
 
-  // Create the new customer profile.
-  $response = $request->createCustomerProfile($customerProfile);
+  // If the $customerProfile->customerProfileId propery is set, then the profile will be updated.
+  if (isset($customerProfile->customerProfileId) && !empty($customerProfile->customerProfileId)) {
+    $response = $request->updateCustomerProfile($customerProfile->customerProfileId, $customerProfile);
+  }
+
+  // Otherwise, save a new customer profile.
+  else {
+    $response = $request->createCustomerProfile($customerProfile);
+  }
 
   // Return the response.
   return $response;
