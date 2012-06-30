@@ -58,6 +58,9 @@ function authnet_cim_profile_load($customerProfileId) {
     $customerProfile = authnet_cim_profile_new();
     _authnet_convert_simplexml($response->xml->profile, $customerProfile);
 
+    // Invoke hook_authnet_cim_profile_load and pass in the customer profile object.
+    module_invoke_all('authnet_cim_profile_load', $customerProfile);
+
     // Return the profile.
     return $customerProfile;
   }
@@ -109,6 +112,9 @@ function authnet_cim_profile_save(AuthorizeNetCustomer &$customerProfile) {
       // Load the full customer profile object with another call to Authorize.net.
       $customerProfile = authnet_cim_profile_load($customerProfileId);
 
+      // Invoke hook_authnet_cim_profile_save and pass in the customer profile object.
+      module_invoke_all('authnet_cim_profile_save', $customerProfile);
+
       // Return the profile.
       return $customerProfile;
     }
@@ -137,8 +143,13 @@ function authnet_cim_profile_delete($customerProfileId) {
   // Delete the profile.
   $response = $request->deleteCustomerProfile($customerProfileId);
 
-  // If the request was unsuccessful, send it to authnet_error() for reporting.
-  if (!$response->isOk()) {
-    authnet_error($response);
+  // If the request was successful, invoke hook_authnet_cim_profile_delete and pass in the customer profile id.
+  if ($response->isOk()) {
+    module_invoke_all('authnet_cim_profile_delete', $customerProfileId);
+  }
+
+  // If the request was unsuccessful, send it to _authnet_error() for reporting.
+  else {
+    _authnet_error($response);
   }
 }
