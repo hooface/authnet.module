@@ -32,6 +32,19 @@ function authnet_customer_profile_new($values=array()) {
   if (isset($values['email'])) {
     $customerProfile->email = $values['email'];
   }
+  if (isset($values['customerProfileId'])) {
+    $customerProfile->customerProfileId = $values['customerProfileId'];
+  }
+  if (isset($values['paymentProfiles']) && !empty($values['paymentProfiles'])) {
+    foreach ($values['paymentProfiles'] as $paymentProfile) {
+      $customerProfile->paymentProfiles[] = $paymentProfile;
+    }
+  }
+  if (isset($values['shipToList']) && !empty($values['shipToList'])) {
+    foreach ($values['shipToList'] as $shipToList) {
+      $customerProfile->shipToList[] = $shipToList;
+    }
+  }
 
   // Return the profile object.
   return $customerProfile;
