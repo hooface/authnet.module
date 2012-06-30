@@ -10,6 +10,11 @@
  * *****************************************************************************/
 
 /**
+ * Authorize.net object types
+ */
+require_once 'includes/authnet.types.inc';
+
+/**
  * Authorize.net CIM
  */
 require_once 'includes/authnet.cim.inc';

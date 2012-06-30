@@ -2,34 +2,12 @@
 
 /**
  * @file
- * Authorize.net API wrapper functions
+ * Authorize.net API CIM wrapper functions
  */
 
-/**
- * Returns a new initialized AuthorizeNetCustomer object, optionally with some initial values.
- *
- * @param $values
- *   An array of values to pre-populate the object with.
- *
- * @return
- *   Returns an initialized AuthorizeNetCustomer object.
- */
-function authnet_cim_profile_new($values=array()) {
-
-  // Include the Authorize.net SDK.
-  authnet_sdk_include();
-
-  // Create a new AuthorizeNetCustomer object.
-  $customerProfile = new AuthorizeNetCustomer;
-
-  // Initialize some properties, using the $values argument if it's available.
-  $customerProfile->description = isset($values['description']) ? $values['description'] : '';
-  $customerProfile->merchantCustomerId = isset($values['merchantCustomerId']) ? $values['merchantCustomerId'] : '';
-  $customerProfile->email = isset($values['email']) ? $values['email'] : '';
-
-  // Return the profile object.
-  return $customerProfile;
-}
+/* ******************************************************************************
+ * CIM customer profile wrapper functions
+ * *****************************************************************************/
 
 /**
  * Load an existing customer profile from Authorize.net.
@@ -55,7 +33,7 @@ function authnet_cim_profile_load($customerProfileId) {
   if ($response->isOK()) {
 
     // Convert the profile from a SimpleXMLElement to an AuthorizeNetCustomer object.
-    $customerProfile = authnet_cim_profile_new();
+    $customerProfile = authnet_customer_profile_new();
     _authnet_convert_simplexml($response->xml->profile, $customerProfile);
 
     // Invoke hook_authnet_cim_profile_load and pass in the customer profile object.
