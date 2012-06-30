@@ -23,9 +23,15 @@ function authnet_customer_profile_new($values=array()) {
   $customerProfile = new AuthorizeNetCustomer;
 
   // Initialize some properties, using the $values argument if it's available.
-  $customerProfile->description = isset($values['description']) ? $values['description'] : '';
-  $customerProfile->merchantCustomerId = isset($values['merchantCustomerId']) ? $values['merchantCustomerId'] : '';
-  $customerProfile->email = isset($values['email']) ? $values['email'] : '';
+  if (isset($values['description'])) {
+    $customerProfile->description = $values['description'];
+  }
+  if (isset($values['merchantCustomerId'])) {
+    $customerProfile->merchantCustomerId = $values['merchantCustomerId'];
+  }
+  if (isset($values['email'])) {
+    $customerProfile->email = $values['email'];
+  }
 
   // Return the profile object.
   return $customerProfile;
