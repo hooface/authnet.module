@@ -90,8 +90,8 @@ function authnet_cim_profile_save(AuthorizeNetCustomer &$customerProfile) {
       // Load the full customer profile object with another call to Authorize.net.
       $customerProfile = authnet_cim_profile_load($customerProfileId);
 
-      // Invoke hook_authnet_cim_profile_save and pass in the customer profile object.
-      module_invoke_all('authnet_cim_profile_save', $customerProfile);
+      // Invoke hook_authnet_cim_profile_insert and pass in the customer profile object.
+      module_invoke_all('authnet_cim_profile_insert', $customerProfile);
 
       // Return the profile.
       return $customerProfile;
