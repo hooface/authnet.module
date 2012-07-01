@@ -1,0 +1,12 @@
+<?php
+
+/**
+ * @file
+ * Authorize.net - Ubercart Integration
+ * A replacement for uc_authorizenet. Process payments using Authorize.net 
+ */
+
+/* ******************************************************************************
+ * Drupal hooks
+ * *****************************************************************************/
+
