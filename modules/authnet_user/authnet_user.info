@@ -1,0 +1,5 @@
+name = Authorize.net - User Integration
+description = User management for Authorize.net
+dependencies[] = authnet
+package = Authorize.net
+core = 6.x
