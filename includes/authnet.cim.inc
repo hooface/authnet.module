@@ -229,3 +229,28 @@ function authnet_cim_payment_profile_save($customerProfileId, AuthorizeNetPaymen
     _authnet_error($response);
   }
 }
+
+/**
+ * Delete a payment profile from Authorize.net
+ *
+ * @param $customerProfileId
+ *   The customer profile id.
+ * @param $customerPaymentProfileId
+ *   The id of the profile profile to be deleted.
+ */
+function authnet_cim_payment_profile_delete($customerProfileId, $customerPaymentProfileId) {
+
+  // Include the Authorize.net SDK.
+  authnet_sdk_include();
+
+  // Create an Authorize.net request object.
+  $request = new AuthorizeNetCIM;
+
+  // Delete the profile.
+  $response = $request->deleteCustomerPaymentProfile($customerProfileId, $customerPaymentProfileId);
+
+  // If the request was unsuccessful, send it to _authnet_error() for reporting.
+  if (!$response->isOk()) {
+    _authnet_error($response);
+  }
+}

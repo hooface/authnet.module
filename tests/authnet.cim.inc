@@ -183,3 +183,16 @@ authnet_cim_payment_profile_save($customerProfileId, $paymentProfile);
 dpm($paymentProfile);
 
 ?>
+
+<?php
+
+/**
+ * Delete an existing payment profile.
+ */
+
+$customerProfileId = XXXXXXXX;
+$paymentProfileId = XXXXXXXX;
+
+$paymentProfile = authnet_cim_payment_profile_delete($customerProfileId, $paymentProfileId);
+
+?>
