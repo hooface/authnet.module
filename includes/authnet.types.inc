@@ -248,3 +248,35 @@ function authnet_transaction_new($values=array()) {
   // Return the transaction object.
   return $transaction;
 }
+
+/**
+ * Returns a new initialized AuthorizeNetCreditCard object, optionally with some initial values.
+ *
+ * @param $values
+ *   An array of values to pre-populate the object with.
+ *
+ * @return
+ *   Returns an initialized AuthorizeNetCreditCard object.
+ */
+function authnet_credit_card_new($values=array()) {
+
+  // Include the Authorize.net SDK.
+  authnet_sdk_include();
+
+  // Create a new AuthorizeNetCreditCard object.
+  $card = new AuthorizeNetCreditCard;
+
+  // Initialize some properties, using the $values argument if it's available.
+  if (isset($values['cardNumber'])) {
+    $card->cardNumber = $values['cardNumber'];
+  }
+  if (isset($values['expirationDate'])) {
+    $card->expirationDate = $values['expirationDate'];
+  }
+  if (isset($values['cardCode'])) {
+    $card->cardCode = $values['cardCode'];
+  }
+
+  // Return the credit card object.
+  return $card;
+}
