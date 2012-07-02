@@ -254,3 +254,45 @@ function authnet_cim_payment_profile_delete($customerProfileId, $customerPayment
     _authnet_error($response);
   }
 }
+
+/* ******************************************************************************
+ * CIM shipping address wrapper functions
+ * *****************************************************************************/
+
+/**
+ * Load an existing customer shipping address from Authorize.net.
+ *
+ * @param $customerProfileId
+ *   The customer profile id.
+ * @param $customerAddressId
+ *   The customer address id id.
+ *
+ * @return
+ *   Returns an AuthorizeNetAddress object if available, NULL otherwise.
+ */
+function authnet_cim_shipping_address_load($customerProfileId, $customerAddressId) {
+
+  // Include the Authorize.net SDK.
+  authnet_sdk_include();
+
+  // Create an Authorize.net request object.
+  $request = new AuthorizeNetCIM;
+
+  // Retrieve the customer shipping address.
+  $response = $request->getCustomerShippingAddress($customerProfileId, $customerAddressId);
+
+  // If the request was successful, return the address.
+  if ($response->isOK()) {
+
+    // Convert the address from a SimpleXMLElement to an AuthorizeNetAddress object.
+    $address = authnet_address_new(_authnet_simplexml_to_array($response->xml->address));
+
+    // Return the address.
+    return $address;
+  }
+
+  // If the request was unsuccessful, send it to _authnet_error() for reporting.
+  else {
+    _authnet_error($response);
+  }
+}

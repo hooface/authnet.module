@@ -196,3 +196,18 @@ $paymentProfileId = XXXXXXXX;
 $paymentProfile = authnet_cim_payment_profile_delete($customerProfileId, $paymentProfileId);
 
 ?>
+
+<?php
+
+/**
+ * Load a shipping address.
+ */
+
+$customerProfileId = XXXXXXXX;
+$customerShippingAddressId = XXXXXXXX;
+
+$address = authnet_cim_shipping_address_load($customerProfileId, $customerShippingAddressId);
+
+dpm($address);
+
+?>
