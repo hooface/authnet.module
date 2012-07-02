@@ -250,6 +250,47 @@ function authnet_transaction_new($values=array()) {
 }
 
 /**
+ * Returns a new initialized AuthorizeNetLineItem object, optionally with some initial values.
+ *
+ * @param $values
+ *   An array of values to pre-populate the object with.
+ *
+ * @return
+ *   Returns an initialized AuthorizeNetLineItem object.
+ */
+function authnet_line_item_new($values=array()) {
+
+  // Include the Authorize.net SDK.
+  authnet_sdk_include();
+
+  // Create a new AuthorizeNetLineItem object.
+  $line_item = new AuthorizeNetLineItem;
+
+  // Initialize some properties, using the $values argument if it's available.
+  if (isset($values['itemId'])) {
+    $line_item->itemId = $values['itemId'];
+  }
+  if (isset($values['name'])) {
+    $line_item->name = $values['name'];
+  }
+  if (isset($values['description'])) {
+    $line_item->description = $values['description'];
+  }
+  if (isset($values['quantity'])) {
+    $line_item->quantity = $values['quantity'];
+  }
+  if (isset($values['unitPrice'])) {
+    $line_item->unitPrice = $values['unitPrice'];
+  }
+  if (isset($values['taxable'])) {
+    $line_item->taxable = $values['taxable'];
+  }
+
+  // Return the line item object.
+  return $line_item;
+}
+
+/**
  * Returns a new initialized AuthorizeNetCreditCard object, optionally with some initial values.
  *
  * @param $values
