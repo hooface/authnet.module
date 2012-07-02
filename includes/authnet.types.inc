@@ -280,3 +280,44 @@ function authnet_credit_card_new($values=array()) {
   // Return the credit card object.
   return $card;
 }
+
+/**
+ * Returns a new initialized AuthorizeNetBankAccount object, optionally with some initial values.
+ *
+ * @param $values
+ *   An array of values to pre-populate the object with.
+ *
+ * @return
+ *   Returns an initialized AuthorizeNetBankAccount object.
+ */
+function authnet_bank_account_new($values=array()) {
+
+  // Include the Authorize.net SDK.
+  authnet_sdk_include();
+
+  // Create a new AuthorizeNetBankAccount object.
+  $bank = new AuthorizeNetBankAccount;
+
+  // Initialize some properties, using the $values argument if it's available.
+  if (isset($values['accountType'])) {
+    $bank->accountType = $values['accountType'];
+  }
+  if (isset($values['routingNumber'])) {
+    $bank->routingNumber = $values['routingNumber'];
+  }
+  if (isset($values['accountNumber'])) {
+    $bank->accountNumber = $values['accountNumber'];
+  }
+  if (isset($values['nameOnAccount'])) {
+    $bank->nameOnAccount = $values['nameOnAccount'];
+  }
+  if (isset($values['echeckType'])) {
+    $bank->echeckType = $values['echeckType'];
+  }
+  if (isset($values['bankName'])) {
+    $bank->bankName = $values['bankName'];
+  }
+
+  // Return the bank account object.
+  return $bank;
+}
