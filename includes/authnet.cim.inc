@@ -175,3 +175,57 @@ function authnet_cim_payment_profile_load($customerProfileId, $customerPaymentPr
     _authnet_error($response);
   }
 }
+
+/**
+ * Save a payment profile to Authorize.net.
+ * If the $paymentProfile->customerPaymentProfileId propery is set, then the profile will be updated.
+ * Otherwise, a new one will be saved.
+ *
+ * @param $customerProfileId
+ *   The customer profile id.
+ * @param AuthorizeNetPaymentProfile &$paymentProfile
+ *   The payment profile object to be saved, passed by reference.
+ *
+ * @return
+ *   Returns an AuthorizeNetPaymentProfile object if available, NULL otherwise.
+ */
+function authnet_cim_payment_profile_save($customerProfileId, AuthorizeNetPaymentProfile &$paymentProfile) {
+
+  // Include the Authorize.net SDK.
+  authnet_sdk_include();
+
+  // Create an Authorize.net request object.
+  $request = new AuthorizeNetCIM;
+
+  // If the $paymentProfile->customerPaymentProfileId propery is set, then the profile will be updated.
+  if (isset($paymentProfile->customerPaymentProfileId) && !empty($paymentProfile->customerPaymentProfileId)) {
+
+    // Update the profile.
+    $response = $request->updateCustomerPaymentProfile($customerProfileId, $paymentProfile->customerPaymentProfileId, $paymentProfile);
+  }
+
+  // Otherwise, save a new payment profile.
+  else {
+
+    // Save the profile.
+    $response = $request->createCustomerPaymentProfile($customerProfileId, $paymentProfile);
+
+    // If the request was successful...
+    if ($response->isOk()) {
+
+      // Get the new profile id from the response.
+      $customerPaymentProfileId = $response->getPaymentProfileId();
+
+      // Load the full payment profile object with another call to Authorize.net.
+      $paymentProfile = authnet_cim_payment_profile_load($customerProfileId, $customerPaymentProfileId);
+
+      // Return the profile.
+      return $paymentProfile;
+    }
+  }
+
+  // If the request was unsuccessful, send it to _authnet_error() for reporting.
+  if ($response->isError()) {
+    _authnet_error($response);
+  }
+}

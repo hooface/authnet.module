@@ -93,3 +93,67 @@ $payment_profile = authnet_cim_payment_profile_load($customerProfileId, $custome
 dpm($payment_profile);
 
 ?>
+
+<?php
+
+/**
+ * Save a new payment profile.
+ */
+
+$customerProfileId = XXXXXXXX;
+
+$values = array(
+  'customerType' => 'individual',
+  'billTo' => array(
+    'firstName' => 'John',
+    'lastName' => 'Doe',
+    'company' => 'Company, Inc.',
+    'address' => '123 Fake Street',
+    'city' => 'Pleasantville',
+    'state' => 'CA',
+    'zip' => '123456',
+    'country' => 'USA',
+    'phoneNumber' => '123 456 7890',
+    'faxNumber' => '789 123 4567',
+  ),
+  'payment' => array(
+    'bankAccount' => array(
+      'accountType' => 'checking',
+      'routingNumber' => '123456789',
+      'accountNumber' => '987654321',
+      'nameOnAccount' => 'John Doe',
+      'bankName' => 'Bank, Inc.',
+    ),
+  ),
+);
+
+$paymentProfile = authnet_payment_profile_new($values);
+
+dpm($paymentProfile);
+
+authnet_cim_payment_profile_save($customerProfileId, $paymentProfile);
+
+dpm($paymentProfile);
+
+?>
+
+<?php
+
+/**
+ * Update an existing payment profile.
+ */
+
+$customerProfileId = XXXXXXXX;
+$paymentProfileId = XXXXXXXX;
+
+$paymentProfile = authnet_cim_payment_profile_load($customerProfileId, $paymentProfileId);
+
+dpm($paymentProfile);
+
+$paymentProfile->billTo->firstName = 'Mike';
+
+authnet_cim_payment_profile_save($customerProfileId, $paymentProfile);
+
+dpm($paymentProfile);
+
+?>
