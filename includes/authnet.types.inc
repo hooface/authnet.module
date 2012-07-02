@@ -105,3 +105,38 @@ function authnet_address_new($values=array()) {
   // Return the address object.
   return $address;
 }
+
+/**
+ * Returns a new initialized AuthorizeNetPaymentProfile object, optionally with some initial values.
+ *
+ * @param $values
+ *   An array of values to pre-populate the object with.
+ *
+ * @return
+ *   Returns an initialized AuthorizeNetPaymentProfile object.
+ */
+function authnet_payment_profile_new($values=array()) {
+
+  // Include the Authorize.net SDK.
+  authnet_sdk_include();
+
+  // Create a new AuthorizeNetPaymentProfile object.
+  $paymentProfile = new AuthorizeNetPaymentProfile;
+
+  // Initialize some properties, using the $values argument if it's available.
+  if (isset($values['customerPaymentProfileId'])) {
+    $paymentProfile->customerPaymentProfileId = $values['customerPaymentProfileId'];
+  }
+  if (isset($values['customerType'])) {
+    $paymentProfile->customerType = $values['customerType'];
+  }
+  if (isset($values['billTo'])) {
+    $paymentProfile->billTo = $values['billTo'];
+  }
+  if (isset($values['payment'])) {
+    $paymentProfile->payment = $values['payment'];
+  }
+
+  // Return the profile object.
+  return $paymentProfile;
+}
