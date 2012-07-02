@@ -134,8 +134,8 @@ function _authnet_simplexml_to_array($simplexml, $nonunique = array()) {
   $array = array();
   foreach ((array) $simplexml as $index => $node) {
 
-    // If the element is non-unique and there is only one of them, make sure it ends up in an array regardless.
-    if (in_array($index, $nonunique) && ($simplexml->$index->count() == 1)) {
+    // If the element is non-unique and there are less than 2 of them, make sure it ends up in an array regardless.
+    if (in_array($index, $nonunique) && ($simplexml->$index->count() < 2)) {
       $node = array($node);
     }
 
