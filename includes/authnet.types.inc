@@ -49,3 +49,59 @@ function authnet_customer_profile_new($values=array()) {
   // Return the profile object.
   return $customerProfile;
 }
+
+/**
+ * Returns a new initialized AuthorizeNetAddress object, optionally with some initial values.
+ *
+ * @param $values
+ *   An array of values to pre-populate the object with.
+ *
+ * @return
+ *   Returns an initialized AuthorizeNetAddress object.
+ */
+function authnet_address_new($values=array()) {
+
+  // Include the Authorize.net SDK.
+  authnet_sdk_include();
+
+  // Create a new AuthorizeNetAddress object.
+  $address = new AuthorizeNetAddress;
+
+  // Initialize some properties, using the $values argument if it's available.
+  if (isset($values['firstName'])) {
+    $address->firstName = $values['firstName'];
+  }
+  if (isset($values['lastName'])) {
+    $address->lastName = $values['lastName'];
+  }
+  if (isset($values['company'])) {
+    $address->company = $values['company'];
+  }
+  if (isset($values['address'])) {
+    $address->address = $values['address'];
+  }
+  if (isset($values['city'])) {
+    $address->city = $values['city'];
+  }
+  if (isset($values['state'])) {
+    $address->state = $values['state'];
+  }
+  if (isset($values['zip'])) {
+    $address->zip = $values['zip'];
+  }
+  if (isset($values['country'])) {
+    $address->country = $values['country'];
+  }
+  if (isset($values['phoneNumber'])) {
+    $address->phoneNumber = $values['phoneNumber'];
+  }
+  if (isset($values['faxNumber'])) {
+    $address->faxNumber = $values['faxNumber'];
+  }
+  if (isset($values['customerAddressId'])) {
+    $address->customerAddressId = $values['customerAddressId'];
+  }
+
+  // Return the address object.
+  return $address;
+}
