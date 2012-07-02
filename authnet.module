@@ -115,28 +115,32 @@ function _authnet_error($response) {
 }
 
 /**
- * Recursively copies the contents of a SimpleXMLElement to another object.
- * This is necessary because the Authorize.net SDK returns SimpleXML objects,
- * rather than the specific AuthorizeNet* class that we need.
+ * Recursivley converts a SimpleXMLElement object to an array of keyed values,
+ * with an optional ability to define non-unique properties that may exist in the XML and
+ * ensure that they end up in arrays.
  *
  * @param $simplexml
- *   The SimpleXMLElement to convert.
- * @param &$object
- *   The object to copy to, passed by reference.
+ *   The SimpleXMLElement to copy from.
+ * @param $nonunique
+ *   An array of non-unique element indices. If a property is found in the $simplexml parameter with a non-unique index,
+ *   this function will make sure that it is copied into an array so that the output is consistent whether or not one or many elements are included.
  *
- * @see uc_cim_profile_load(), uc_cim_profile_save()
+ * @return
+ *   Returns an array that the SimpleXMLElement values were copied to.
+ *
+ * @see uc_cim_profile_load()
  */
-function _authnet_convert_simplexml($simplexml, &$object) {
-  if ($simplexml instanceof SimpleXMLElement) {
-    $vars = get_object_vars($simplexml);
-    foreach ($vars as $key => $var) {
-      /**
-       * @todo
-       * Need to be able to handle arrays. Not everything should become an object.
-       */
-      _authnet_convert_simplexml($var, $object->$key);
+function _authnet_simplexml_to_array($simplexml, $nonunique = array()) {
+  $array = array();
+  foreach ((array) $simplexml as $index => $node) {
+
+    // If the element is non-unique and there is only one of them, make sure it ends up in an array regardless.
+    if (in_array($index, $nonunique) && ($simplexml->$index->count() == 1)) {
+      $node = array($node);
     }
-  } else {
-    $object = $simplexml;
+
+    // Assign the element to the array. If the element is an object, recurse into it.
+    $array[$index] = (is_object($node) || is_array($node)) ? _authnet_simplexml_to_array($node) : $node;
   }
+  return $array;
 }

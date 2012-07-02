@@ -32,9 +32,11 @@ function authnet_cim_profile_load($customerProfileId) {
   // If the request was successful, return the profile.
   if ($response->isOK()) {
 
+    // Define the non-unique indices to look for (paymentProfiles and shipToList)
+    $nonqunique = array('paymentProfiles', 'shipToList');
+
     // Convert the profile from a SimpleXMLElement to an AuthorizeNetCustomer object.
-    $customerProfile = authnet_customer_profile_new();
-    _authnet_convert_simplexml($response->xml->profile, $customerProfile);
+    $customerProfile = authnet_customer_profile_new(_authnet_simplexml_to_array($response->xml->profile, $nonqunique));
 
     // Invoke hook_authnet_cim_profile_load and pass in the customer profile object.
     module_invoke_all('authnet_cim_profile_load', $customerProfile);
