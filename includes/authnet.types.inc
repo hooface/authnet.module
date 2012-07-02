@@ -140,3 +140,32 @@ function authnet_payment_profile_new($values=array()) {
   // Return the profile object.
   return $paymentProfile;
 }
+
+/**
+ * Returns a new initialized AuthorizeNetPayment object, optionally with some initial values.
+ *
+ * @param $values
+ *   An array of values to pre-populate the object with.
+ *
+ * @return
+ *   Returns an initialized AuthorizeNetPayment object.
+ */
+function authnet_payment_new($values=array()) {
+
+  // Include the Authorize.net SDK.
+  authnet_sdk_include();
+
+  // Create a new AuthorizeNetPayment object.
+  $payment = new AuthorizeNetPayment;
+
+  // Initialize some properties, using the $values argument if it's available.
+  if (isset($values['creditCard'])) {
+    $payment->creditCard = $values['creditCard'];
+  }
+  if (isset($values['bankAccount'])) {
+    $payment->bankAccount = $values['bankAccount'];
+  }
+
+  // Return the payment object.
+  return $payment;
+}
