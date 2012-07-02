@@ -192,13 +192,13 @@ function authnet_transaction_new($values=array()) {
     $transaction->amount = $values['amount'];
   }
   if (isset($values['tax'])) {
-    $transaction->tax = $values['tax'];
+    $transaction->tax = (object) $values['tax'];
   }
   if (isset($values['shipping'])) {
-    $transaction->shipping = $values['shipping'];
+    $transaction->shipping = (object) $values['shipping'];
   }
   if (isset($values['duty'])) {
-    $transaction->duty = $values['duty'];
+    $transaction->duty = (object) $values['duty'];
   }
   if (isset($values['lineItems']) && !empty($values['lineItems'])) {
     foreach ($values['lineItems'] as $lineItem) {
@@ -224,7 +224,7 @@ function authnet_transaction_new($values=array()) {
     $transaction->bankAccountNumberMasked = $values['bankAccountNumberMasked'];
   }
   if (isset($values['order'])) {
-    $transaction->order = $values['order'];
+    $transaction->order = (object) $values['order'];
   }
   if (isset($values['taxExempt'])) {
     $transaction->taxExempt = $values['taxExempt'];
