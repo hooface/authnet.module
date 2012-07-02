@@ -169,3 +169,82 @@ function authnet_payment_new($values=array()) {
   // Return the payment object.
   return $payment;
 }
+
+/**
+ * Returns a new initialized AuthorizeNetTransaction object, optionally with some initial values.
+ *
+ * @param $values
+ *   An array of values to pre-populate the object with.
+ *
+ * @return
+ *   Returns an initialized AuthorizeNetTransaction object.
+ */
+function authnet_transaction_new($values=array()) {
+
+  // Include the Authorize.net SDK.
+  authnet_sdk_include();
+
+  // Create a new AuthorizeNetTransaction object.
+  $transaction = new AuthorizeNetTransaction;
+
+  // Initialize some properties, using the $values argument if it's available.
+  if (isset($values['amount'])) {
+    $transaction->amount = $values['amount'];
+  }
+  if (isset($values['tax'])) {
+    $transaction->tax = $values['tax'];
+  }
+  if (isset($values['shipping'])) {
+    $transaction->shipping = $values['shipping'];
+  }
+  if (isset($values['duty'])) {
+    $transaction->duty = $values['duty'];
+  }
+  if (isset($values['lineItems']) && !empty($values['lineItems'])) {
+    foreach ($values['lineItems'] as $lineItem) {
+      $transaction->lineItems[] = $lineItem;
+    }
+  }
+  if (isset($values['customerProfileId'])) {
+    $transaction->customerProfileId = $values['customerProfileId'];
+  }
+  if (isset($values['customerPaymentProfileId'])) {
+    $transaction->customerPaymentProfileId = $values['customerPaymentProfileId'];
+  }
+  if (isset($values['customerShippingAddressId'])) {
+    $transaction->customerShippingAddressId = $values['customerShippingAddressId'];
+  }
+  if (isset($values['creditCardNumberMasked'])) {
+    $transaction->creditCardNumberMasked = $values['creditCardNumberMasked'];
+  }
+  if (isset($values['bankRoutingNumberMasked'])) {
+    $transaction->bankRoutingNumberMasked = $values['bankRoutingNumberMasked'];
+  }
+  if (isset($values['bankAccountNumberMasked'])) {
+    $transaction->bankAccountNumberMasked = $values['bankAccountNumberMasked'];
+  }
+  if (isset($values['order'])) {
+    $transaction->order = $values['order'];
+  }
+  if (isset($values['taxExempt'])) {
+    $transaction->taxExempt = $values['taxExempt'];
+  }
+  if (isset($values['recurringBilling'])) {
+    $transaction->recurringBilling = $values['recurringBilling'];
+  }
+  if (isset($values['cardCode'])) {
+    $transaction->cardCode = $values['cardCode'];
+  }
+  if (isset($values['splitTenderId'])) {
+    $transaction->splitTenderId = $values['splitTenderId'];
+  }
+  if (isset($values['approvalCode'])) {
+    $transaction->approvalCode = $values['approvalCode'];
+  }
+  if (isset($values['transId'])) {
+    $transaction->transId = $values['transId'];
+  }
+
+  // Return the transaction object.
+  return $transaction;
+}
