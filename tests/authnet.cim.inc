@@ -26,7 +26,33 @@ if (function_exists('content_profile_load')) {
 $values = array(
   'merchantCustomerId' => $user->uid,
   'description' => $description,
-  'email' => $user->mail
+  'email' => $user->mail,
+  'paymentProfiles' => array(
+    array(
+      'customerType' => 'individual',
+      'billTo' => array(
+        'firstName' => 'John',
+        'lastName' => 'Doe',
+        'company' => 'Company, Inc.',
+        'address' => '123 Fake Street',
+        'city' => 'Pleasantville',
+        'state' => 'CA',
+        'zip' => '123456',
+        'country' => 'USA',
+        'phoneNumber' => '123 456 7890',
+        'faxNumber' => '789 123 4567',
+      ),
+      'payment' => array(
+        'bankAccount' => array(
+          'accountType' => 'checking',
+          'routingNumber' => '123456789',
+          'accountNumber' => '987654321',
+          'nameOnAccount' => 'John Doe',
+          'bankName' => 'Bank, Inc.',
+        ),
+      ),
+    ),
+  ),
 );
 $cim_profile = authnet_cim_profile_new($values);
 dpm($cim_profile);
