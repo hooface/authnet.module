@@ -133,3 +133,45 @@ function authnet_cim_profile_delete($customerProfileId) {
     _authnet_error($response);
   }
 }
+
+/* ******************************************************************************
+ * CIM payment profile wrapper functions
+ * *****************************************************************************/
+
+/**
+ * Load an existing customer payment profile from Authorize.net.
+ *
+ * @param $customerProfileId
+ *   The customer profile id.
+ * @param $customerPaymentProfileId
+ *   The customer payment profile id.
+ *
+ * @return
+ *   Returns an AuthorizeNetPaymentProfile object if available, NULL otherwise.
+ */
+function authnet_cim_payment_profile_load($customerProfileId, $customerPaymentProfileId) {
+
+  // Include the Authorize.net SDK.
+  authnet_sdk_include();
+
+  // Create an Authorize.net request object.
+  $request = new AuthorizeNetCIM;
+
+  // Retrieve the customer profile.
+  $response = $request->getCustomerPaymentProfile($customerProfileId, $customerPaymentProfileId);
+
+  // If the request was successful, return the profile.
+  if ($response->isOK()) {
+
+    // Convert the payment profile from a SimpleXMLElement to an AuthorizeNetPaymentProfile object.
+    $paymentProfile = authnet_payment_profile_new(_authnet_simplexml_to_array($response->xml->paymentProfile));
+
+    // Return the profile.
+    return $paymentProfile;
+  }
+
+  // If the request was unsuccessful, send it to _authnet_error() for reporting.
+  else {
+    _authnet_error($response);
+  }
+}

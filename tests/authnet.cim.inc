@@ -78,3 +78,18 @@ $customerProfileId = XXXXXXXX;
 authnet_cim_profile_delete($customerProfileId);
 
 ?>
+
+<?php
+
+/**
+ * Load a payment profile.
+ */
+
+$customerProfileId = XXXXXXXX;
+$customerPaymentProfileId = XXXXXXXX;
+
+$payment_profile = authnet_cim_payment_profile_load($customerProfileId, $customerPaymentProfileId);
+
+dpm($payment_profile);
+
+?>
