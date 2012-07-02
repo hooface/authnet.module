@@ -37,12 +37,12 @@ function authnet_customer_profile_new($values=array()) {
   }
   if (isset($values['paymentProfiles']) && !empty($values['paymentProfiles'])) {
     foreach ($values['paymentProfiles'] as $paymentProfile) {
-      $customerProfile->paymentProfiles[] = $paymentProfile;
+      $customerProfile->paymentProfiles[] = authnet_payment_profile_new($paymentProfile);
     }
   }
   if (isset($values['shipToList']) && !empty($values['shipToList'])) {
     foreach ($values['shipToList'] as $shipToList) {
-      $customerProfile->shipToList[] = $shipToList;
+      $customerProfile->shipToList[] = authnet_address_new($shipToList);
     }
   }
 
@@ -131,10 +131,10 @@ function authnet_payment_profile_new($values=array()) {
     $paymentProfile->customerType = $values['customerType'];
   }
   if (isset($values['billTo'])) {
-    $paymentProfile->billTo = $values['billTo'];
+    $paymentProfile->billTo = authnet_address_new($values['billTo']);
   }
   if (isset($values['payment'])) {
-    $paymentProfile->payment = $values['payment'];
+    $paymentProfile->payment = authnet_payment_new($values['payment']);
   }
 
   // Return the profile object.
@@ -160,10 +160,10 @@ function authnet_payment_new($values=array()) {
 
   // Initialize some properties, using the $values argument if it's available.
   if (isset($values['creditCard'])) {
-    $payment->creditCard = $values['creditCard'];
+    $payment->creditCard = authnet_credit_card_new($values['creditCard']);
   }
   if (isset($values['bankAccount'])) {
-    $payment->bankAccount = $values['bankAccount'];
+    $payment->bankAccount = authnet_bank_account_new($values['bankAccount']);
   }
 
   // Return the payment object.
@@ -202,7 +202,7 @@ function authnet_transaction_new($values=array()) {
   }
   if (isset($values['lineItems']) && !empty($values['lineItems'])) {
     foreach ($values['lineItems'] as $lineItem) {
-      $transaction->lineItems[] = $lineItem;
+      $transaction->lineItems[] = authnet_line_item_new($lineItem);
     }
   }
   if (isset($values['customerProfileId'])) {
