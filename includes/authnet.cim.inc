@@ -296,3 +296,57 @@ function authnet_cim_shipping_address_load($customerProfileId, $customerAddressI
     _authnet_error($response);
   }
 }
+
+/**
+ * Save a shipping address to Authorize.net.
+ * If the $address->customerAddressId propery is set, then the address will be updated.
+ * Otherwise, a new one will be saved.
+ *
+ * @param $customerProfileId
+ *   The customer profile id.
+ * @param AuthorizeNetAddress &$address
+ *   The address object to be saved, passed by reference.
+ *
+ * @return
+ *   Returns an AuthorizeNetAddress object if available, NULL otherwise.
+ */
+function authnet_cim_shipping_address_save($customerProfileId, AuthorizeNetAddress &$address) {
+
+  // Include the Authorize.net SDK.
+  authnet_sdk_include();
+
+  // Create an Authorize.net request object.
+  $request = new AuthorizeNetCIM;
+
+  // If the $address->customerAddressId propery is set, then the profile will be updated.
+  if (isset($address->customerAddressId) && !empty($address->customerAddressId)) {
+
+    // Update the profile.
+    $response = $request->updateCustomerShippingAddress($customerProfileId, $address->customerAddressId, $address);
+  }
+
+  // Otherwise, save a new address.
+  else {
+
+    // Save the address.
+    $response = $request->createCustomerShippingAddress($customerProfileId, $address);
+
+    // If the request was successful...
+    if ($response->isOk()) {
+
+      // Get the new address id from the response.
+      $customerAddressId = $response->getCustomerAddressId();
+
+      // Load the full address object with another call to Authorize.net.
+      $address = authnet_cim_shipping_address_load($customerProfileId, $customerAddressId);
+
+      // Return the address.
+      return $address;
+    }
+  }
+
+  // If the request was unsuccessful, send it to _authnet_error() for reporting.
+  if ($response->isError()) {
+    _authnet_error($response);
+  }
+}

@@ -211,3 +211,55 @@ $address = authnet_cim_shipping_address_load($customerProfileId, $customerShippi
 dpm($address);
 
 ?>
+
+<?php
+
+/**
+ * Save a new shipping address.
+ */
+
+$customerProfileId = XXXXXXXX;
+
+$values = array(
+  'firstName' => 'John',
+  'lastName' => 'Doe',
+  'company' => 'Company, Inc.',
+  'address' => '123 Fake Street',
+  'city' => 'Pleasantville',
+  'state' => 'CA',
+  'zip' => '123456',
+  'country' => 'USA',
+  'phoneNumber' => '123 456 7890',
+  'faxNumber' => '789 123 4567',
+);
+
+$address = authnet_address_new($values);
+
+dpm($address);
+
+authnet_cim_shipping_address_save($customerProfileId, $address);
+
+dpm($address);
+
+?>
+
+<?php
+
+/**
+ * Update an existing shipping address.
+ */
+
+$customerProfileId = XXXXXXXX;
+$customerAddressId = XXXXXXXX;
+
+$address = authnet_cim_shipping_address_load($customerProfileId, $customerAddressId);
+
+dpm($address);
+
+$address->firstName = 'Mike';
+
+authnet_cim_shipping_address_save($customerProfileId, $address);
+
+dpm($address);
+
+?>
