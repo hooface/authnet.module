@@ -32,3 +32,14 @@ function authnet_requirements($phase) {
 
   return $requirements;
 }
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function authnet_uninstall() {
+
+  // Delete module variables.
+  variable_del('authnet_login_id');
+  variable_del('authnet_transaction_key');
+  variable_del('authnet_validation_mode');
+}
