@@ -25,7 +25,7 @@ function authnet_requirements($phase) {
       $requirements['authnet_sdk'] = array(
         'title' => $t('Authorize.net SDK'),
         'severity' => REQUIREMENT_ERROR,
-        'value' => $t('Authorize.net SDK not installed. You need to download the !authorizenet it and put it in your %path directory.', array('!authorizenet' => l(t('Authorize.net SDK Library'), 'http://developer.authorize.net/downloads/'), '%path' => authnet_sdk_path())),
+        'value' => $t('Authorize.net SDK not installed. You need to download the !authorizenet and put it in your %path directory.', array('!authorizenet' => l(t('Authorize.net SDK Library'), 'http://developer.authorize.net/downloads/'), '%path' => authnet_sdk_path())),
       );
     }
   }
