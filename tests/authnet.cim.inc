@@ -276,3 +276,28 @@ $customerAddressId = XXXXXXXX;
 authnet_cim_shipping_address_delete($customerProfileId, $customerAddressId);
 
 ?>
+
+<?php
+
+/**
+ * Create a new transaction.
+ */
+
+$customerProfileId = XXXXXXXX;
+$customerPaymentProfileId = XXXXXXXX;
+
+$values = array(
+  'amount' => '100.00',
+  'customerProfileId' => $customerProfileId,
+  'customerPaymentProfileId' => $customerPaymentProfileId,
+);
+
+$transaction = authnet_transaction_new($values);
+
+dpm($transaction);
+
+$transaction_id = authnet_cim_transaction('AuthOnly', $transaction);
+
+dpm($transaction_id);
+
+?>

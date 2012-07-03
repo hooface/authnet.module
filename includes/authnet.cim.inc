@@ -391,3 +391,42 @@ function authnet_cim_shipping_address_delete($customerProfileId, $customerAddres
     _authnet_error($response);
   }
 }
+
+/* ******************************************************************************
+ * CIM transaction wrapper functions
+ * *****************************************************************************/
+
+/**
+ * Send a new transaction to Authorize.net.
+ *
+ * @param $transactionType
+ *   The type of transaction to perform. Must be one of: AuthOnly, AuthCapture, CaptureOnly, PriorAuthCapture, Refund, Void
+ * @param $transaction
+ *   The AuthorizeNetTransaction object that contains all of the transaction data.
+ */
+function authnet_cim_transaction($transactionType, AuthorizeNetTransaction $transaction) {
+
+  // Include the Authorize.net SDK.
+  authnet_sdk_include();
+
+  // Create an Authorize.net request object.
+  $request = new AuthorizeNetCIM;
+
+  // Send the transaction to Authorize.net.
+  $response = $request->createCustomerProfileTransaction($transactionType, $transaction);
+
+  // If the request was successful, return the transaction id.
+  if ($response->isOk()) {
+
+    // Load the transaction response.
+    $transactionResponse = $response->getTransactionResponse();
+
+    // Return the transaction response.
+    return $transactionResponse;
+  }
+
+  // If the request was unsuccessful, send it to _authnet_error() for reporting.
+  else {
+    _authnet_error($response);
+  }
+}
