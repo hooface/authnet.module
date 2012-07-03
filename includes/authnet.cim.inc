@@ -70,18 +70,26 @@ function authnet_cim_profile_save(AuthorizeNetCustomer &$customerProfile) {
   // Create an Authorize.net request object.
   $request = new AuthorizeNetCIM;
 
+  // Determine the validation mode.
+  $validation = variable_get('authnet_validation_mode', 'none');
+  /**
+   * @todo
+   * The validation mode is currently passed in, but the module doesn't handle the validation responses yet.
+   * Use $response->getValidationResponses() to retrieve validation responses, and then parse/display them.
+   */
+
   // If the $customerProfile->customerProfileId propery is set, then the profile will be updated.
   if (isset($customerProfile->customerProfileId) && !empty($customerProfile->customerProfileId)) {
 
     // Update the profile.
-    $response = $request->updateCustomerProfile($customerProfile->customerProfileId, $customerProfile);
+    $response = $request->updateCustomerProfile($customerProfile->customerProfileId, $customerProfile, $validation);
   }
 
   // Otherwise, save a new customer profile.
   else {
 
     // Save the profile.
-    $response = $request->createCustomerProfile($customerProfile);
+    $response = $request->createCustomerProfile($customerProfile, $validation);
 
     // If the request was successful...
     if ($response->isOk()) {
@@ -197,18 +205,26 @@ function authnet_cim_payment_profile_save($customerProfileId, AuthorizeNetPaymen
   // Create an Authorize.net request object.
   $request = new AuthorizeNetCIM;
 
+  // Determine the validation mode.
+  $validation = variable_get('authnet_validation_mode', 'none');
+  /**
+   * @todo
+   * The validation mode is currently passed in, but the module doesn't handle the validation responses yet.
+   * Use $response->getValidationResponses() to retrieve validation responses, and then parse/display them.
+   */
+
   // If the $paymentProfile->customerPaymentProfileId propery is set, then the profile will be updated.
   if (isset($paymentProfile->customerPaymentProfileId) && !empty($paymentProfile->customerPaymentProfileId)) {
 
     // Update the profile.
-    $response = $request->updateCustomerPaymentProfile($customerProfileId, $paymentProfile->customerPaymentProfileId, $paymentProfile);
+    $response = $request->updateCustomerPaymentProfile($customerProfileId, $paymentProfile->customerPaymentProfileId, $paymentProfile, $validation);
   }
 
   // Otherwise, save a new payment profile.
   else {
 
     // Save the profile.
-    $response = $request->createCustomerPaymentProfile($customerProfileId, $paymentProfile);
+    $response = $request->createCustomerPaymentProfile($customerProfileId, $paymentProfile, $validation);
 
     // If the request was successful...
     if ($response->isOk()) {
