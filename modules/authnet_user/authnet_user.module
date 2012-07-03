@@ -10,6 +10,24 @@
  * *****************************************************************************/
 
 /* ******************************************************************************
+ * Authnet hooks
+ * *****************************************************************************/
+
+/**
+ * Implementation of hook_authnet_cim_profile_insert().
+ */
+function authnet_user_authnet_cim_profile_insert($customerProfile) {
+  authnet_user_profile_id_save($customerProfile->merchantCustomerId, $customerProfile->customerProfileId);
+}
+
+/**
+ * Implementation of hook_authnet_cim_profile_delete().
+ */
+function authnet_user_authnet_cim_profile_delete($customerProfileId) {
+  authnet_user_profile_id_delete($customerProfileId);
+}
+
+/* ******************************************************************************
  * User profile id functions
  * *****************************************************************************/
 
