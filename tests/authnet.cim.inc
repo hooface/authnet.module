@@ -54,7 +54,7 @@ $values = array(
     ),
   ),
 );
-$cim_profile = authnet_cim_profile_new($values);
+$cim_profile = authnet_customer_profile_new($values);
 dpm($cim_profile);
 authnet_cim_profile_save($cim_profile);
 dpm($cim_profile);
