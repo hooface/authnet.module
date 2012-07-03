@@ -350,3 +350,28 @@ function authnet_cim_shipping_address_save($customerProfileId, AuthorizeNetAddre
     _authnet_error($response);
   }
 }
+
+/**
+ * Delete a shipping address from Authorize.net
+ *
+ * @param $customerProfileId
+ *   The customer profile id.
+ * @param $customerAddressId
+ *   The customer address id.
+ */
+function authnet_cim_shipping_address_delete($customerProfileId, $customerAddressId) {
+
+  // Include the Authorize.net SDK.
+  authnet_sdk_include();
+
+  // Create an Authorize.net request object.
+  $request = new AuthorizeNetCIM;
+
+  // Delete the address.
+  $response = $request->deleteCustomerShippingAddress($customerProfileId, $customerAddressId);
+
+  // If the request was unsuccessful, send it to _authnet_error() for reporting.
+  if (!$response->isOk()) {
+    _authnet_error($response);
+  }
+}

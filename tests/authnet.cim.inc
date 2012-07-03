@@ -263,3 +263,16 @@ authnet_cim_shipping_address_save($customerProfileId, $address);
 dpm($address);
 
 ?>
+
+<?php
+
+/**
+ * Delete a shipping address.
+ */
+
+$customerProfileId = XXXXXXXX;
+$customerAddressId = XXXXXXXX;
+
+authnet_cim_shipping_address_delete($customerProfileId, $customerAddressId);
+
+?>
