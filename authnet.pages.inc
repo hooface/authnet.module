@@ -11,21 +11,24 @@
 function authnet_settings_form() {
 
   // Authorize.net Login ID and Transaction Key
-  $form['authnet_login_id'] = array(
+  $form['api'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('API Login ID and Transaction Key'),
+    '#description' => t('The Authorize.net Login ID and Transaction Key is provided to you when you sign up for an account with Authorize.net. These are necessary for connecting to the Authorize.net API.'),
+  );
+  $form['api']['authnet_login_id'] = array(
     '#type' => 'textfield',
     '#title' => t('Login ID'),
     '#default_value' => variable_get('authnet_login_id', ''),
     '#required' => TRUE,
   );
-  $form['authnet_transaction_key'] = array(
+  $form['api']['authnet_transaction_key'] = array(
     '#type' => 'textfield',
     '#title' => t('Transaction Key'),
     '#default_value' => variable_get('authnet_transaction_key', ''),
     '#required' => TRUE,
   );
-
-  // Sandbox mode toggle
-  $form['authnet_sandbox'] = array(
+  $form['api']['authnet_sandbox'] = array(
     '#type' => 'radios',
     '#title' => t('Sandbox mode'),
     '#description' => t('If sandbox mode is turned on, transactions will be posted to the Authorize.Net test server. Otherwise, they will be posted directly to the live Authorize.Net gateway'),
