@@ -1,0 +1,57 @@
+<?php
+
+/**
+ * @file
+ * Authorize.net CIM Entity - Install file
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function authnet_cim_entity_install() {
+
+  // Install the schema.
+  drupal_install_schema('authnet_cim_entity');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function authnet_cim_entity_uninstall() {
+
+  // Uninstall the schema.
+  drupal_uninstall_schema('authnet_cim_entity');
+}
+
+/**
+ * Implementation of hook_schema().
+ */
+function authnet_cim_entity_schema() {
+  $schema['authnet_cim_entity'] = array(
+    'description' => t('Authorize.net entity customer profile id relationships.'),
+    'fields' => array(
+      'type' => array(
+        'description' => t('Drupal entity type'),
+        'type' => 'varchar',
+        'length' => '128',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'id' => array(
+        'description' => t('Drupal entity id'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'customer_profile_id' => array(
+        'description' => t('Authorize.net customer profile id'),
+        'type' => 'varchar',
+        'length' => '11',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+    ),
+    'primary key' => array('type', 'id'),
+  );
+  return $schema;
+}

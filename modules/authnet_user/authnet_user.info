@@ -1,5 +1,0 @@
-name = Authorize.net - User Integration
-description = Maintains a connection between Drupal users and Authorize.net CIM customer profiles.
-dependencies[] = authnet
-package = Authorize.net
-core = 6.x

@@ -1,0 +1,97 @@
+<?php
+
+/**
+ * @file
+ * Authorize.net CIM Entity
+ */
+
+/* ******************************************************************************
+ * Authnet hooks
+ * *****************************************************************************/
+
+/**
+ * Implementation of hook_authnet_cim_profile_insert().
+ */
+function authnet_cim_entity_authnet_cim_profile_insert($customerProfile) {
+
+  // If a mechant customer id was set...
+  if (!empty($customerProfile->merchantCustomerId)) {
+
+    // Split the merchant customer id into a type and id, based on the expected format: "[type]:[id]" (ie: "user:1")
+    $data = explode(':', $customerProfile->merchantCustomerId);
+    if (count($data) == 2) {
+
+      // Get the entity type and id.
+      $type = $data[0];
+      $id = $data[1];
+
+      // If a type and id are set, save the association.
+      if (!empty($type) && !empty($id)) {
+        authnet_cim_entity_profile_id_save($type, $id, $customerProfile->customerProfileId);
+      }
+    }
+  }
+}
+
+/**
+ * Implementation of hook_authnet_cim_profile_delete().
+ */
+function authnet_cim_entity_authnet_cim_profile_delete($customerProfileId) {
+  authnet_cim_entity_profile_id_delete($customerProfileId);
+}
+
+/* ******************************************************************************
+ * Entity profile id functions
+ * *****************************************************************************/
+
+/**
+ * Get a customer profile id, based on an entity id.
+ *
+ * @param $type
+ *   The Drupal entity type.
+ * @param $id
+ *   The Drupal entity id.
+ *
+ * @return
+ *   Returns the Authorize.net customer profile id for the given entity id, if available. FALSE otherwise.
+ */
+function authnet_cim_entity_profile_id_load($type, $id) {
+
+  // Look up the customer profile id.
+  return db_result(db_query('SELECT customer_profile_id FROM {authnet_cim_entity} WHERE type="%s" AND id=%d', array($type, $id)));
+}
+
+/**
+ * Save an entity's customer profile id to the database.
+ *
+ * @param $type
+ *   The Drupal entity type.
+ * @param $id
+ *   The Drupal entity id.
+ * @param $customer_profile_id
+ *   The Authorize.net customer profile id.
+ */
+function authnet_cim_entity_profile_id_save($type, $id, $customer_profile_id) {
+
+  // Build the record.
+  $record = array(
+    'type' => $type,
+    'id' => $id,
+    'customer_profile_id' => $customer_profile_id,
+  );
+
+  // Write the record.
+  drupal_write_record('authnet_cim_entity', $record);
+}
+
+/**
+ * Delete a customer profile id from the database.
+ *
+ * @param $customer_profile_id
+ *   The Authorize.net customer profile id.
+ */
+function authnet_cim_entity_profile_id_delete($customer_profile_id) {
+
+  // Delete the profile id.
+  db_query('DELETE FROM {authnet_cim_entity} WHERE customer_profile_id=%d', $customer_profile_id);
+}
