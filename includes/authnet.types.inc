@@ -6,6 +6,38 @@
  */
 
 /**
+ * Returns a new initialized AuthorizeNet request object.
+ *
+ * @param $type
+ *   The type of AuthorizeNet request object to create (AIM, CIM, etc).
+ *
+ * @return
+ *   Returns an AuthorizeNet request object.
+ */
+function authnet_request_new($type) {
+
+  // Include the Authorize.net SDK.
+  authnet_sdk_include();
+
+  // Define the available types.
+  $types = array(
+    'AIM' => 'AuthorizeNetAIM',
+    'CIM' => 'AuthorizeNetCIM',
+  );
+
+  // Create an Authorize.net request object.
+  $request = new $types[$type](variable_get('authnet_login_id', ''), variable_get('authnet_transaction_key', ''));
+
+  // Enable sandbox mode, if the setting is set.
+  if (variable_get('authnet_sandbox', 1)) {
+    $request->setSandbox(TRUE);
+  }
+
+  // Return the request object.
+  return $request;
+}
+
+/**
  * Returns a new initialized AuthorizeNetCustomer object, optionally with some initial values.
  *
  * @param $values

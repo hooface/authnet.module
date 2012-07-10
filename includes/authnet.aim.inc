@@ -27,16 +27,8 @@
  */
 function authnet_aim_transaction($sale, $method = AUTHNET_METHOD_AUTH_CAPTURE) {
 
-  // Include the Authorize.net SDK.
-  authnet_sdk_include();
-
-  // Create an Authorize.net AIM request object.
-  $request = new AuthorizeNetAIM;
-
-  // Enable sandbox mode, if the setting is set.
-  if (variable_get('authnet_sandbox', 0)) {
-    $request->_sandbox = TRUE;
-  }
+  // Create an Authorize.net request object.
+  $request = authnet_request_new('AIM');
 
   // Set up the fields on the AIM request object.
   $request->setFields($sale);
