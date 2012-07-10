@@ -41,5 +41,5 @@ function authnet_uninstall() {
   // Delete module variables.
   variable_del('authnet_login_id');
   variable_del('authnet_transaction_key');
-  variable_del('authnet_validation_mode');
+  variable_del('authnet_cim_validation_mode');
 }

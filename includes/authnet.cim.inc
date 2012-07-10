@@ -71,7 +71,7 @@ function authnet_cim_profile_save(AuthorizeNetCustomer &$customerProfile) {
   $request = new AuthorizeNetCIM;
 
   // Determine the validation mode.
-  $validation = variable_get('authnet_validation_mode', 'none');
+  $validation = variable_get('authnet_cim_validation_mode', 'none');
   /**
    * @todo
    * The validation mode is currently passed in, but the module doesn't handle the validation responses yet.
@@ -206,7 +206,7 @@ function authnet_cim_payment_profile_save($customerProfileId, AuthorizeNetPaymen
   $request = new AuthorizeNetCIM;
 
   // Determine the validation mode.
-  $validation = variable_get('authnet_validation_mode', 'none');
+  $validation = variable_get('authnet_cim_validation_mode', 'none');
   /**
    * @todo
    * The validation mode is currently passed in, but the module doesn't handle the validation responses yet.
