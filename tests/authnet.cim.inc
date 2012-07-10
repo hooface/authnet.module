@@ -296,7 +296,7 @@ $transaction = authnet_transaction_new($values);
 
 dpm($transaction);
 
-$transaction_id = authnet_cim_transaction('AuthOnly', $transaction);
+$transaction_id = authnet_cim_transaction($transaction, AUTHNET_METHOD_AUTH_ONLY);
 
 dpm($transaction_id);
 

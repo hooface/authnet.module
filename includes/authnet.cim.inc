@@ -399,18 +399,41 @@ function authnet_cim_shipping_address_delete($customerProfileId, $customerAddres
 /**
  * Send a new transaction to Authorize.net.
  *
- * @param $transactionType
- *   The type of transaction to perform. Must be one of: AuthOnly, AuthCapture, CaptureOnly, PriorAuthCapture, Refund, Void
  * @param $transaction
  *   The AuthorizeNetTransaction object that contains all of the transaction data.
+ * @param $method
+ *   The method of transaction to perform. Must be one of the defined AUTHNET_METHOD_* constants (see authnet.module).
  */
-function authnet_cim_transaction($transactionType, AuthorizeNetTransaction $transaction) {
+function authnet_cim_transaction(AuthorizeNetTransaction $transaction, $method = AUTHNET_METHOD_AUTH_CAPTURE) {
 
   // Include the Authorize.net SDK.
   authnet_sdk_include();
 
   // Create an Authorize.net request object.
   $request = new AuthorizeNetCIM;
+
+  // Translate the transaction method.
+  switch ($method) {
+    case AUTHNET_METHOD_AUTH_CAPTURE:
+      $transactionType = 'AuthCapture';
+      break;
+    case AUTHNET_METHOD_PRIOR_AUTH_CAPTURE:
+      $transactionType = 'PriorAuthCapture';
+      break;
+    case AUTHNET_METHOD_AUTH_ONLY:
+      $transactionType = 'AuthOnly';
+      break;
+    case AUTHNET_METHOD_CAPTURE_ONLY:
+      $transactionType = 'CaptureOnly';
+      break;
+    case AUTHNET_METHOD_CREDIT:
+      $transactionType = 'Refund';
+      break;
+    case AUTHNET_METHOD_VOID:
+    default:
+      $transactionType = 'Void';
+      break;
+  }
 
   // Send the transaction to Authorize.net.
   $response = $request->createCustomerProfileTransaction($transactionType, $transaction);
