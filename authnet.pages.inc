@@ -24,16 +24,16 @@ function authnet_settings_form() {
     '#required' => TRUE,
   );
 
-  // AIM sandbox mode toggle
-  $form['authnet_aim_sandbox'] = array(
+  // Sandbox mode toggle
+  $form['authnet_sandbox'] = array(
     '#type' => 'radios',
-    '#title' => t('AIM sandbox'),
-    '#description' => t('If sandbox mode is turned on, AIM transactions will be posted to the Authorize.Net test server. Otherwise, they will be posted directly to the live Authorize.Net gateway'),
+    '#title' => t('Sandbox mode'),
+    '#description' => t('If sandbox mode is turned on, transactions will be posted to the Authorize.Net test server. Otherwise, they will be posted directly to the live Authorize.Net gateway'),
     '#options' => array(
       t('Off'),
       t('On'),
     ),
-    '#default_value' => variable_get('authnet_aim_sandbox', 0),
+    '#default_value' => variable_get('authnet_sandbox', 0),
   );
 
   // CIM validation mode toggle
