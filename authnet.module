@@ -6,6 +6,20 @@
  */
 
 /* ******************************************************************************
+ * Constants
+ * *****************************************************************************/
+
+/**
+ * Authorize.net transaction methods.
+ */
+define('AUTHNET_METHOD_AUTH_CAPTURE', 'AUTH_CAPTURE');
+define('AUTHNET_METHOD_PRIOR_AUTH_CAPTURE', 'PRIOR_AUTH_CAPTURE');
+define('AUTHNET_METHOD_AUTH_ONLY', 'AUTH_ONLY');
+define('AUTHNET_METHOD_CAPTURE_ONLY', 'CAPTURE_ONLY');
+define('AUTHNET_METHOD_CREDIT', 'CREDIT');
+define('AUTHNET_METHOD_VOID', 'VOID');
+
+/* ******************************************************************************
  * Includes
  * *****************************************************************************/
 
@@ -80,8 +94,8 @@ function authnet_sdk_include() {
     require_once(authnet_sdk_path(TRUE));
 
     // Set the login id and transaction key as constants.
-    define("AUTHORIZENET_API_LOGIN_ID", variable_get('authnet_login_id', ''));
-    define("AUTHORIZENET_TRANSACTION_KEY", variable_get('authnet_transaction_key', ''));
+    define('AUTHORIZENET_API_LOGIN_ID', variable_get('authnet_login_id', ''));
+    define('AUTHORIZENET_TRANSACTION_KEY', variable_get('authnet_transaction_key', ''));
 
     // Remember that we loaded it already.
     $loaded = TRUE;
