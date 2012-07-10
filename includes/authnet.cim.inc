@@ -26,6 +26,11 @@ function authnet_cim_profile_load($customerProfileId) {
   // Create an Authorize.net request object.
   $request = new AuthorizeNetCIM;
 
+  // Enable sandbox mode, if the setting is set.
+  if (variable_get('authnet_sandbox', 0)) {
+    $request->_sandbox = TRUE;
+  }
+
   // Retrieve the customer profile.
   $response = $request->getCustomerProfile($customerProfileId);
 
@@ -69,6 +74,11 @@ function authnet_cim_profile_save(AuthorizeNetCustomer &$customerProfile) {
 
   // Create an Authorize.net request object.
   $request = new AuthorizeNetCIM;
+
+  // Enable sandbox mode, if the setting is set.
+  if (variable_get('authnet_sandbox', 0)) {
+    $request->_sandbox = TRUE;
+  }
 
   // Determine the validation mode.
   $validation = variable_get('authnet_cim_validation_mode', 'none');
@@ -128,6 +138,11 @@ function authnet_cim_profile_delete($customerProfileId) {
   // Create an Authorize.net request object.
   $request = new AuthorizeNetCIM;
 
+  // Enable sandbox mode, if the setting is set.
+  if (variable_get('authnet_sandbox', 0)) {
+    $request->_sandbox = TRUE;
+  }
+
   // Delete the profile.
   $response = $request->deleteCustomerProfile($customerProfileId);
 
@@ -164,6 +179,11 @@ function authnet_cim_payment_profile_load($customerProfileId, $customerPaymentPr
 
   // Create an Authorize.net request object.
   $request = new AuthorizeNetCIM;
+
+  // Enable sandbox mode, if the setting is set.
+  if (variable_get('authnet_sandbox', 0)) {
+    $request->_sandbox = TRUE;
+  }
 
   // Retrieve the customer profile.
   $response = $request->getCustomerPaymentProfile($customerProfileId, $customerPaymentProfileId);
@@ -204,6 +224,11 @@ function authnet_cim_payment_profile_save($customerProfileId, AuthorizeNetPaymen
 
   // Create an Authorize.net request object.
   $request = new AuthorizeNetCIM;
+
+  // Enable sandbox mode, if the setting is set.
+  if (variable_get('authnet_sandbox', 0)) {
+    $request->_sandbox = TRUE;
+  }
 
   // Determine the validation mode.
   $validation = variable_get('authnet_cim_validation_mode', 'none');
@@ -262,6 +287,11 @@ function authnet_cim_payment_profile_delete($customerProfileId, $customerPayment
   // Create an Authorize.net request object.
   $request = new AuthorizeNetCIM;
 
+  // Enable sandbox mode, if the setting is set.
+  if (variable_get('authnet_sandbox', 0)) {
+    $request->_sandbox = TRUE;
+  }
+
   // Delete the profile.
   $response = $request->deleteCustomerPaymentProfile($customerProfileId, $customerPaymentProfileId);
 
@@ -293,6 +323,11 @@ function authnet_cim_shipping_address_load($customerProfileId, $customerAddressI
 
   // Create an Authorize.net request object.
   $request = new AuthorizeNetCIM;
+
+  // Enable sandbox mode, if the setting is set.
+  if (variable_get('authnet_sandbox', 0)) {
+    $request->_sandbox = TRUE;
+  }
 
   // Retrieve the customer shipping address.
   $response = $request->getCustomerShippingAddress($customerProfileId, $customerAddressId);
@@ -333,6 +368,11 @@ function authnet_cim_shipping_address_save($customerProfileId, AuthorizeNetAddre
 
   // Create an Authorize.net request object.
   $request = new AuthorizeNetCIM;
+
+  // Enable sandbox mode, if the setting is set.
+  if (variable_get('authnet_sandbox', 0)) {
+    $request->_sandbox = TRUE;
+  }
 
   // If the $address->customerAddressId propery is set, then the profile will be updated.
   if (isset($address->customerAddressId) && !empty($address->customerAddressId)) {
@@ -383,6 +423,11 @@ function authnet_cim_shipping_address_delete($customerProfileId, $customerAddres
   // Create an Authorize.net request object.
   $request = new AuthorizeNetCIM;
 
+  // Enable sandbox mode, if the setting is set.
+  if (variable_get('authnet_sandbox', 0)) {
+    $request->_sandbox = TRUE;
+  }
+
   // Delete the address.
   $response = $request->deleteCustomerShippingAddress($customerProfileId, $customerAddressId);
 
@@ -414,6 +459,11 @@ function authnet_cim_transaction(AuthorizeNetTransaction $transaction, $method =
 
   // Create an Authorize.net request object.
   $request = new AuthorizeNetCIM;
+
+  // Enable sandbox mode, if the setting is set.
+  if (variable_get('authnet_sandbox', 0)) {
+    $request->_sandbox = TRUE;
+  }
 
   // Translate the transaction method.
   switch ($method) {
