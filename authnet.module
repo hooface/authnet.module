@@ -115,13 +115,34 @@ function authnet_sdk_include() {
  * Records error messages from an Authorize.net response to the screen and to the log.
  *
  * @param $response
- *   An AuthorizeNetCIM_Response object.
+ *   An Authorize.net response object.
  */
 function _authnet_error($response) {
-  if ($response->isError()) {
 
-    // Get the error message.
-    $error = $response->getErrorMessage();
+  // If the response object is an instance of AuthorizeNetCIM_Response...
+  if ($response instanceof AuthorizeNetCIM_Response) {
+
+    // If the response is an error...
+    if ($response->isError()) {
+
+      // Get the error message.
+      $error = $response->getErrorMessage();
+    }
+  }
+
+  // Or, if the response object is an instance of AuthorizeNetAIM_Response...
+  elseif ($response instanceof AuthorizeNetAIM_Response) {
+
+    // If the response is an error...
+    if ($response->error) {
+
+      // Get the error message.
+      $error = $response->error_message;
+    }
+  }
+
+  // If an error was found, record it.
+  if (isset($error)) {
 
     // Print it to the screen, if Drupal's core error_level variable is greater than or equal to 1.
     if (variable_get('error_level', 1) >= 1) {
