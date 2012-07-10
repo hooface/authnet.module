@@ -6,6 +6,15 @@
  */
 
 /**
+ * @todo
+ * The following AIM features still needs to be implemented:
+ *   -Adding line items: AuthorizeNetAIM::addLineItem()
+ *   -Setting custom fields: AuthorizeNetAIM::setCustomField()
+ *   -eChecks: AuthorizeNetAIM::setECheck()
+ *   -Partial authorization transactions.
+ */
+
+/**
  * Send a new transaction to Authorize.net.
  *
  * @param $sale
