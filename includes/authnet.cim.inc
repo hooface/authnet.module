@@ -403,6 +403,9 @@ function authnet_cim_shipping_address_delete($customerProfileId, $customerAddres
  *   The AuthorizeNetTransaction object that contains all of the transaction data.
  * @param $method
  *   The method of transaction to perform. Must be one of the defined AUTHNET_METHOD_* constants (see authnet.module).
+ *
+ * @return
+ *   Returns the Authorize.net transaction response if successful, NULL otherwise.
  */
 function authnet_cim_transaction(AuthorizeNetTransaction $transaction, $method = AUTHNET_METHOD_AUTH_CAPTURE) {
 
