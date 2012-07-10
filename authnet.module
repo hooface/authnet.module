@@ -29,6 +29,11 @@ define('AUTHNET_METHOD_VOID', 'VOID');
 require_once 'includes/authnet.types.inc';
 
 /**
+ * Authorize.net AIM
+ */
+require_once 'includes/authnet.aim.inc';
+
+/**
  * Authorize.net CIM
  */
 require_once 'includes/authnet.cim.inc';
