@@ -117,6 +117,43 @@ function authnet_log_response($response) {
 
   // Add the response to the static cache in authnet_get_response().
   authnet_get_response($response);
+
+  // Create a message container.
+  $message = '';
+
+  // If the response object is an instance of AuthorizeNetCIM_Response...
+  if ($response instanceof AuthorizeNetCIM_Response) {
+
+    // If the response is an error...
+    if ($response->isError()) {
+
+      // Get the error message.
+      $message = $response->getErrorMessage();
+    }
+  }
+
+  // Or, if the response object is an instance of AuthorizeNetAIM_Response...
+  elseif ($response instanceof AuthorizeNetAIM_Response) {
+
+    // If the response is an error...
+    if ($response->error) {
+
+      // Get the error message.
+      $message = $response->error_message;
+    }
+  }
+
+  // If a message is available...
+  if (!empty($message)) {
+
+    // Print it to the screen, if Drupal's core error_level variable is greater than or equal to 1.
+    if (variable_get('error_level', 1) >= 1) {
+      drupal_set_message($message, 'error');
+    }
+
+    // Record it to watchdog.
+    watchdog('authnet', $message);
+  }
 }
 
 /**
@@ -135,49 +172,6 @@ function authnet_get_response($response = NULL) {
   // Otherwise, shift the first item off of the array and return it.
   else {
     return array_shift($responses);
-  }
-}
-
-/**
- * Records error messages from an Authorize.net response to the screen and to the log.
- *
- * @param $response
- *   An Authorize.net response object.
- */
-function _authnet_error($response) {
-
-  // If the response object is an instance of AuthorizeNetCIM_Response...
-  if ($response instanceof AuthorizeNetCIM_Response) {
-
-    // If the response is an error...
-    if ($response->isError()) {
-
-      // Get the error message.
-      $error = $response->getErrorMessage();
-    }
-  }
-
-  // Or, if the response object is an instance of AuthorizeNetAIM_Response...
-  elseif ($response instanceof AuthorizeNetAIM_Response) {
-
-    // If the response is an error...
-    if ($response->error) {
-
-      // Get the error message.
-      $error = $response->error_message;
-    }
-  }
-
-  // If an error was found, record it.
-  if (isset($error)) {
-
-    // Print it to the screen, if Drupal's core error_level variable is greater than or equal to 1.
-    if (variable_get('error_level', 1) >= 1) {
-      drupal_set_message($error, 'error');
-    }
-
-    // Record it to watchdog.
-    watchdog('authnet', $error);
   }
 }
 

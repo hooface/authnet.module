@@ -23,7 +23,7 @@
  *   The method of transaction to perform. Must be one of the defined AUTHNET_METHOD_* constants (see authnet.module).
  *
  * @return
- *   Returns the AuthorizeNetAIM_Response object, NULL if an invalid method is specified.
+ *   Returns TRUE if the transaction was approved, FALSE otherwise.
  */
 function authnet_aim_transaction($sale, $method = AUTHNET_METHOD_AUTH_CAPTURE) {
 
@@ -52,12 +52,12 @@ function authnet_aim_transaction($sale, $method = AUTHNET_METHOD_AUTH_CAPTURE) {
     // Log the response object.
     authnet_log_response($response);
 
-    // If the request was unsuccessful, send it to _authnet_error() for reporting.
-    if (!$request->approved) {
-      _authnet_error($response);
+    // If the request was successful, return TRUE.
+    if ($request->approved) {
+      return TRUE;
     }
-
-    // Return the response object.
-    return $response;
   }
+
+  // Return FALSE if the above didn't return anything else.
+  return FALSE;
 }
