@@ -382,47 +382,38 @@ function authnet_cim_shipping_address_delete($customerProfileId, $customerAddres
  */
 function authnet_cim_transaction(AuthorizeNetTransaction $transaction, $method = AUTHNET_METHOD_AUTH_CAPTURE) {
 
-  // Create an Authorize.net request object.
-  $request = authnet_request_new('CIM');
+  // Define the available transaction methods.
+  $methods = array(
+    AUTHNET_METHOD_AUTH_CAPTURE => 'AuthCapture',
+    AUTHNET_METHOD_PRIOR_AUTH_CAPTURE => 'PriorAuthCapture',
+    AUTHNET_METHOD_AUTH_ONLY => 'AuthOnly',
+    AUTHNET_METHOD_CAPTURE_ONLY => 'CaptureOnly',
+    AUTHNET_METHOD_CREDIT => 'Refund',
+    AUTHNET_METHOD_VOID => 'Void',
+  );
 
-  // Translate the transaction method.
-  switch ($method) {
-    case AUTHNET_METHOD_AUTH_CAPTURE:
-      $transactionType = 'AuthCapture';
-      break;
-    case AUTHNET_METHOD_PRIOR_AUTH_CAPTURE:
-      $transactionType = 'PriorAuthCapture';
-      break;
-    case AUTHNET_METHOD_AUTH_ONLY:
-      $transactionType = 'AuthOnly';
-      break;
-    case AUTHNET_METHOD_CAPTURE_ONLY:
-      $transactionType = 'CaptureOnly';
-      break;
-    case AUTHNET_METHOD_CREDIT:
-      $transactionType = 'Refund';
-      break;
-    case AUTHNET_METHOD_VOID:
-    default:
-      $transactionType = 'Void';
-      break;
-  }
+  // If a valid method is set...
+  if (isset($methods[$method])) {
 
-  // Send the transaction to Authorize.net.
-  $response = $request->createCustomerProfileTransaction($transactionType, $transaction);
+    // Create an Authorize.net request object.
+    $request = authnet_request_new('CIM');
 
-  // If the request was successful, return the transaction id.
-  if ($response->isOk()) {
+    // Send the transaction to Authorize.net.
+    $response = $request->createCustomerProfileTransaction($methods[$method], $transaction);
 
-    // Load the transaction response.
-    $transactionResponse = $response->getTransactionResponse();
+    // If the request was successful, return the transaction id.
+    if ($response->isOk()) {
 
-    // Return the transaction response.
-    return $transactionResponse;
-  }
+      // Load the transaction response.
+      $transactionResponse = $response->getTransactionResponse();
 
-  // If the request was unsuccessful, send it to _authnet_error() for reporting.
-  else {
-    _authnet_error($response);
+      // Return the transaction response.
+      return $transactionResponse;
+    }
+
+    // If the request was unsuccessful, send it to _authnet_error() for reporting.
+    else {
+      _authnet_error($response);
+    }
   }
 }

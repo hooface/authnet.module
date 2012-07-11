@@ -23,49 +23,38 @@
  *   The method of transaction to perform. Must be one of the defined AUTHNET_METHOD_* constants (see authnet.module).
  *
  * @return
- *   Returns the AuthorizeNetAIM_Response object.
+ *   Returns the AuthorizeNetAIM_Response object, NULL if an invalid method is specified.
  */
 function authnet_aim_transaction($sale, $method = AUTHNET_METHOD_AUTH_CAPTURE) {
 
-  // Create an Authorize.net request object.
-  $request = authnet_request_new('AIM');
+  // Define the available transaction methods.
+  $methods = array(
+    AUTHNET_METHOD_AUTH_CAPTURE => 'authorizeAndCapture',
+    AUTHNET_METHOD_PRIOR_AUTH_CAPTURE => 'priorAuthCapture',
+    AUTHNET_METHOD_AUTH_ONLY => 'authorizeOnly',
+    AUTHNET_METHOD_CAPTURE_ONLY => 'captureOnly',
+    AUTHNET_METHOD_CREDIT => 'credit',
+    AUTHNET_METHOD_VOID => 'void',
+  );
 
-  // Set up the fields on the AIM request object.
-  $request->setFields($sale);
+  // If a valid method is set...
+  if (isset($methods[$method])) {
 
-  // Perform the request based on the method.
-  switch ($method) {
+    // Create an Authorize.net request object.
+    $request = authnet_request_new('AIM');
 
-    case AUTHNET_METHOD_AUTH_CAPTURE:
-      $function = 'authorizeAndCapture';
-      break;
-    case AUTHNET_METHOD_PRIOR_AUTH_CAPTURE:
-      $function = 'priorAuthCapture';
-      break;
-    case AUTHNET_METHOD_AUTH_ONLY:
-      $function = 'authorizeOnly';
-      break;
-    case AUTHNET_METHOD_CAPTURE_ONLY:
-      $function = 'captureOnly';
-      break;
-    case AUTHNET_METHOD_CREDIT:
-      $function = 'credit';
-      break;
-    case AUTHNET_METHOD_VOID:
-      $function = 'void';
-      break;
+    // Set up the fields on the AIM request object.
+    $request->setFields($sale);
+
+    // Send the request to Authorize.net
+    $response = $request->$methods[$method]();
+
+    // If the request was unsuccessful, send it to _authnet_error() for reporting.
+    if (!$request->approved) {
+      _authnet_error($response);
+    }
+
+    // Return the response object.
+    return $response;
   }
-
-  // If a function is set, send the request to Authorize.net
-  if (isset($function)) {
-    $response = $request->$function();
-  }
-
-  // If the request was unsuccessful, send it to _authnet_error() for reporting.
-  if (!$request->approved) {
-    _authnet_error($response);
-  }
-
-  // Return the response object.
-  return $response;
 }
