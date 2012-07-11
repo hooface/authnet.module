@@ -53,7 +53,7 @@ function authnet_aim_transaction($sale, $method = AUTHNET_METHOD_AUTH_CAPTURE) {
     authnet_log_response($response);
 
     // If the request was successful, return TRUE.
-    if ($request->approved) {
+    if ($response->approved) {
       return TRUE;
     }
   }
