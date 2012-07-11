@@ -1,7 +1,7 @@
 name = Authorize.net - Ubercart Integration
 description = A replacement for uc_authorizenet. Process payments using Authorize.net 
 dependencies[] = authnet
-dependencies[] = authnet_user
+dependencies[] = authnet_cim_entity
 dependencies[] = uc_payment
 dependencies[] = uc_credit
 package = Authorize.net
