@@ -108,6 +108,37 @@ function authnet_sdk_include() {
  * *****************************************************************************/
 
 /**
+ * Logs Authorize.net response objects.
+ *
+ * @param $response
+ *   An Authorize.net response object.
+ */
+function authnet_log_response($response) {
+
+  // Add the response to the static cache in authnet_get_response().
+  authnet_get_response($response);
+}
+
+/**
+ * Retrieves a statically-cached Authorize.net response object.
+ */
+function authnet_get_response($response = NULL) {
+
+  // Create a static response cache.
+  static $responses = array();
+
+  // If a response is passed in, add it to the front of the array.
+  if ($response) {
+    array_unshift($responses, $response);
+  }
+
+  // Otherwise, shift the first item off of the array and return it.
+  else {
+    return array_shift($responses);
+  }
+}
+
+/**
  * Records error messages from an Authorize.net response to the screen and to the log.
  *
  * @param $response

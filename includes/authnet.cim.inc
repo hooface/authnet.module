@@ -26,6 +26,9 @@ function authnet_cim_profile_load($customerProfileId) {
   // Retrieve the customer profile.
   $response = $request->getCustomerProfile($customerProfileId);
 
+  // Log the response object.
+  authnet_log_response($response);
+
   // If the request was successful, return the profile.
   if ($response->isOK()) {
 
@@ -102,6 +105,9 @@ function authnet_cim_profile_save(AuthorizeNetCustomer &$customerProfile) {
     }
   }
 
+  // Log the response object.
+  authnet_log_response($response);
+
   // If the request was unsuccessful, send it to _authnet_error() for reporting.
   if ($response->isError()) {
     _authnet_error($response);
@@ -121,6 +127,9 @@ function authnet_cim_profile_delete($customerProfileId) {
 
   // Delete the profile.
   $response = $request->deleteCustomerProfile($customerProfileId);
+
+  // Log the response object.
+  authnet_log_response($response);
 
   // If the request was successful, invoke hook_authnet_cim_profile_delete and pass in the customer profile id.
   if ($response->isOk()) {
@@ -155,6 +164,9 @@ function authnet_cim_payment_profile_load($customerProfileId, $customerPaymentPr
 
   // Retrieve the customer profile.
   $response = $request->getCustomerPaymentProfile($customerProfileId, $customerPaymentProfileId);
+
+  // Log the response object.
+  authnet_log_response($response);
 
   // If the request was successful, return the profile.
   if ($response->isOK()) {
@@ -225,6 +237,9 @@ function authnet_cim_payment_profile_save($customerProfileId, AuthorizeNetPaymen
     }
   }
 
+  // Log the response object.
+  authnet_log_response($response);
+
   // If the request was unsuccessful, send it to _authnet_error() for reporting.
   if ($response->isError()) {
     _authnet_error($response);
@@ -246,6 +261,9 @@ function authnet_cim_payment_profile_delete($customerProfileId, $customerPayment
 
   // Delete the profile.
   $response = $request->deleteCustomerPaymentProfile($customerProfileId, $customerPaymentProfileId);
+
+  // Log the response object.
+  authnet_log_response($response);
 
   // If the request was unsuccessful, send it to _authnet_error() for reporting.
   if (!$response->isOk()) {
@@ -275,6 +293,9 @@ function authnet_cim_shipping_address_load($customerProfileId, $customerAddressI
 
   // Retrieve the customer shipping address.
   $response = $request->getCustomerShippingAddress($customerProfileId, $customerAddressId);
+
+  // Log the response object.
+  authnet_log_response($response);
 
   // If the request was successful, return the address.
   if ($response->isOK()) {
@@ -337,6 +358,9 @@ function authnet_cim_shipping_address_save($customerProfileId, AuthorizeNetAddre
     }
   }
 
+  // Log the response object.
+  authnet_log_response($response);
+
   // If the request was unsuccessful, send it to _authnet_error() for reporting.
   if ($response->isError()) {
     _authnet_error($response);
@@ -358,6 +382,9 @@ function authnet_cim_shipping_address_delete($customerProfileId, $customerAddres
 
   // Delete the address.
   $response = $request->deleteCustomerShippingAddress($customerProfileId, $customerAddressId);
+
+  // Log the response object.
+  authnet_log_response($response);
 
   // If the request was unsuccessful, send it to _authnet_error() for reporting.
   if (!$response->isOk()) {
@@ -400,6 +427,9 @@ function authnet_cim_transaction(AuthorizeNetTransaction $transaction, $method =
 
     // Send the transaction to Authorize.net.
     $response = $request->createCustomerProfileTransaction($methods[$method], $transaction);
+
+    // Log the response object.
+    authnet_log_response($response);
 
     // If the request was successful, return the transaction id.
     if ($response->isOk()) {

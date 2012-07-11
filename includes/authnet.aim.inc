@@ -49,6 +49,9 @@ function authnet_aim_transaction($sale, $method = AUTHNET_METHOD_AUTH_CAPTURE) {
     // Send the request to Authorize.net
     $response = $request->$methods[$method]();
 
+    // Log the response object.
+    authnet_log_response($response);
+
     // If the request was unsuccessful, send it to _authnet_error() for reporting.
     if (!$request->approved) {
       _authnet_error($response);
