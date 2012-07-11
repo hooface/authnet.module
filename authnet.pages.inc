@@ -10,11 +10,11 @@
  */
 function authnet_settings_form() {
 
-  // Authorize.net Login ID and Transaction Key
+  // General API settings
   $form['api'] = array(
     '#type' => 'fieldset',
     '#title' => t('API Login ID and Transaction Key'),
-    '#description' => t('The Authorize.net Login ID and Transaction Key is provided to you when you sign up for an account with Authorize.net. These are necessary for connecting to the Authorize.net API.'),
+    '#description' => t('The Authorize.net Login ID and Transaction Key is provided to you when you sign up for an account with Authorize.net. This information is required to interact with Authorize.net.  It is different from your login ID and password and may be found through your account settings page.'),
   );
   $form['api']['authnet_login_id'] = array(
     '#type' => 'textfield',
@@ -29,17 +29,13 @@ function authnet_settings_form() {
     '#required' => TRUE,
   );
   $form['api']['authnet_sandbox'] = array(
-    '#type' => 'radios',
+    '#type' => 'checkbox',
     '#title' => t('Sandbox mode'),
-    '#description' => t('If sandbox mode is turned on, transactions will be posted to the Authorize.Net test server. Otherwise, they will be posted directly to the live Authorize.Net gateway'),
-    '#options' => array(
-      t('Off'),
-      t('On'),
-    ),
-    '#default_value' => variable_get('authnet_sandbox', 0),
+    '#description' => t('If sandbox mode is turned on, transactions will be posted to the Authorize.Net test server. Otherwise, they will be posted directly to the live Authorize.Net gateway.'),
+    '#default_value' => variable_get('authnet_sandbox', FALSE),
   );
 
-  // CIM settings fieldset
+  // CIM settings
   $form['cim_settings'] = array(
     '#type' => 'fieldset',
     '#title' => t('CIM settings'),
