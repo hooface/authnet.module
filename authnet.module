@@ -118,41 +118,68 @@ function authnet_log_response($response) {
   // Add the response to the static cache in authnet_get_response().
   authnet_get_response($response);
 
-  // Create a message container.
+  // Create a message container and error flag.
   $message = '';
+  $error = FALSE;
 
   // If the response object is an instance of AuthorizeNetCIM_Response...
   if ($response instanceof AuthorizeNetCIM_Response) {
+
+    // Prepend the Authorize.net request type to the message.
+    $message = 'Authorize.net CIM';
 
     // If the response is an error...
     if ($response->isError()) {
 
       // Get the error message.
-      $message = $response->getErrorMessage();
+      $message .= $response->getErrorMessage();
+
+      // Set the error flag.
+      $error = TRUE;
+    }
+
+    // Otherwise, generate the normal message text.
+    else {
+      $message .= 'Success: ' . $response->getResultCode() . ' Message: ' . $response->getMessageText() . ' ' . $response->getMessageCode();
     }
   }
 
   // Or, if the response object is an instance of AuthorizeNetAIM_Response...
   elseif ($response instanceof AuthorizeNetAIM_Response) {
 
+    // Prepend the Authorize.net request type to the message.
+    $message = 'Authorize.net AIM';
+
     // If the response is an error...
     if ($response->error) {
 
       // Get the error message.
-      $message = $response->error_message;
+      $message .= $response->error_message;
+
+      // Set the error flag.
+      $error = TRUE;
+    }
+
+    // Otherwise, generate the normal message text.
+    else {
+      $message .= ' Success: Response Code: ' . $response->response_code . ' Response Subcode: ' . $response->response_subcode . ' Response Reason Code: ' . $response->response_reason_code . ' Response Reason Text: ' . $response->response_reason_text;
     }
   }
 
   // If a message is available...
   if (!empty($message)) {
 
-    // Print it to the screen, if Drupal's core error_level variable is greater than or equal to 1.
-    if (variable_get('error_level', 1) >= 1) {
-      drupal_set_message($message, 'error');
-    }
+    // Process the message if it's an error, or if debug mode is on.
+    if ($error || variable_get('authnet_debug', FALSE)) {
 
-    // Record it to watchdog.
-    watchdog('authnet', $message);
+      // Print errors to the screen, if Drupal's core error_level variable is greater than or equal to 1.
+      if ($error && variable_get('error_level', 1) >= 1) {
+        drupal_set_message($message, 'error');
+      }
+
+      // Log the message to watchdog.
+      watchdog('authnet', $message);
+    }
   }
 }
 

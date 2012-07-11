@@ -34,6 +34,12 @@ function authnet_settings_form() {
     '#description' => t('If sandbox mode is turned on, transactions will be posted to the Authorize.Net test server. Otherwise, they will be posted directly to the live Authorize.Net gateway.'),
     '#default_value' => variable_get('authnet_sandbox', FALSE),
   );
+  $form['api']['authnet_debug'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Debug mode'),
+    '#description' => t('Log full API response messages from Authorize.net to watchdog for debugging.'),
+    '#default_value' => variable_get('authnet_debug', FALSE),
+  );
 
   // CIM settings
   $form['cim_settings'] = array(
