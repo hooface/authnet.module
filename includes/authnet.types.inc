@@ -29,7 +29,7 @@ function authnet_request_new($type) {
   $request = new $types[$type](variable_get('authnet_login_id', ''), variable_get('authnet_transaction_key', ''));
 
   // Enable sandbox mode, if the setting is set.
-  if (variable_get('authnet_sandbox', 1)) {
+  if (variable_get('authnet_sandbox', FALSE)) {
     $request->setSandbox(TRUE);
   }
 
