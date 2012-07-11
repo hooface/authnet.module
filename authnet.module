@@ -98,10 +98,6 @@ function authnet_sdk_include() {
     // Load the library file.
     require_once(authnet_sdk_path(TRUE));
 
-    // Set the login id and transaction key as constants.
-    define('AUTHORIZENET_API_LOGIN_ID', variable_get('authnet_login_id', ''));
-    define('AUTHORIZENET_TRANSACTION_KEY', variable_get('authnet_transaction_key', ''));
-
     // Remember that we loaded it already.
     $loaded = TRUE;
   }
