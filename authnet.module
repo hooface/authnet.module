@@ -191,22 +191,15 @@ function authnet_get_response() {
 }
 
 /**
- * Stores Authorize.net response objects in a static cache.
+ * Stores last Authorize.net response object in a static cache.
  */
 function authnet_set_response($response = NULL) {
+  static $last_response = NULL;
 
-  // Create a static response cache.
-  static $responses = array();
+  // If a response is passed in, cache it
+  if ($response) $last_response = $response);
 
-  // If a response is passed in, add it to the front of the array.
-  if ($response) {
-    array_unshift($responses, $response);
-  }
-
-  // Otherwise, shift the first item off of the array and return it.
-  else {
-    return array_shift($responses);
-  }
+  return $last_response;
 }
 
 /**
