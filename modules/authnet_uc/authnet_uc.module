@@ -7,20 +7,6 @@
  */
 
 /* ******************************************************************************
- * Drupal hooks
- * *****************************************************************************/
-
-/**
- * Implementation of hook_form_alter().
- */
-function authnet_uc_form_alter(&$form, $form_state, $form_id) {
-  if ($form_id == 'uc_payment_gateways_form') {
-    //
-    $form['#submit'][] = 'authnet_uc_payment_gateway_settings_submit';
-  }
-}
-
-/* ******************************************************************************
  * Ubercart hooks
  * *****************************************************************************/
 
@@ -50,25 +36,6 @@ function authnet_uc_payment_gateway() {
 function authnet_uc_settings_form() {
   module_load_include('inc', 'authnet_uc', 'includes/authnet_uc.pages');
   return _authnet_uc_settings_form();
-}
-
-/**
- * Submit handler for payment gateway settings form to encrypt fields.
- */
-function authnet_uc_payment_gateway_settings_submit($form, &$form_state) {
-  // If CC encryption has been configured properly.
-  if ($key = uc_credit_encryption_key()) {
-    // Setup our encryption object.
-    $crypt = new uc_encryption_class;
-
-    // Encrypt the Login ID, Transaction key, and MD5 Hash.
-    if (!empty($form_state['values']['authnet_uc_md5_hash'])) {
-      variable_set('authnet_uc_md5_hash', $crypt->encrypt($key, $form_state['values']['authnet_uc_md5_hash']));
-    }
-
-    // Store any errors.
-    uc_store_encryption_errors($crypt, 'authnet_uc');
-  }
 }
 
 /* ******************************************************************************

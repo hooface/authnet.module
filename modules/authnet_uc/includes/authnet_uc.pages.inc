@@ -23,7 +23,6 @@
  * For sites migrating from uc_authorizenet - consider defaulting to the existing config
  */
 function _authnet_uc_settings_form() {
-  $login_data = _authnet_uc_login_data();
 
   // Link to general settings.
   $form['authnet'] = array(
@@ -56,41 +55,4 @@ function _authnet_uc_settings_form() {
   );
 
   return $form;
-}
-
-/* ******************************************************************************
- * Helpers
- * *****************************************************************************/
-
-/**
- * Decrypts the login data for using Authorize.net APIs.
- */
-function _authnet_uc_login_data() {
-  static $data;
-
-  if (!empty($data)) {
-    return $data;
-  }
-
-  $md5_hash = variable_get('authnet_uc_md5_hash', '');
-
-  // If CC encryption has been configured properly.
-  if ($key = uc_credit_encryption_key()) {
-    // Setup our encryption object.
-    $crypt = new uc_encryption_class;
-
-    // Decrypt the MD5 Hash.
-    if (!empty($md5_hash)) {
-      $md5_hash = $crypt->decrypt($key, $md5_hash);
-    }
-
-    // Store any errors.
-    uc_store_encryption_errors($crypt, 'authnet_uc');
-  }
-
-  $data = array(
-    'md5_hash' => $md5_hash,
-  );
-
-  return $data;
 }
