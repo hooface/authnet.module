@@ -25,101 +25,34 @@
 function _authnet_uc_settings_form() {
   $login_data = _authnet_uc_login_data();
 
-  $form['api_id_key'] = array(
+  // Link to general settings.
+  $form['authnet'] = array(
     '#type' => 'fieldset',
-    '#title' => t('API Login ID and Transaction Key'),
-    '#description' => t('This information is required for Ubercart to interact with your payment gateway account.  It is different from your login ID and password and may be found through your account settings page.'),
-  );
-  $form['api_id_key']['authnet_uc_api_login_id'] = array(
-    '#type' => 'textfield',
-    '#title' => t('API Login ID'),
-    '#default_value' => variable_get('authnet_uc_api_login_id', ''),
-  );
-  $form['api_id_key']['authnet_uc_api_transaction_key'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Transaction Key'),
-    '#default_value' => variable_get('authnet_uc_api_transaction_key', ''),
+    '#title' => t('General Authorize.net settings'),
+    '#description' => t('General Authorize.net settings can be configured in the ' . l('Authorize.net API settings', 'admin/settings/authnet') . '.'),
   );
 
-  $form['aim_settings'] = array(
+  // Ubercart-specific AIM settings
+  $form['uc_aim'] = array(
     '#type' => 'fieldset',
-    '#title' => t('AIM settings'),
-    '#description' => t('These settings pertain to the Authorize.Net AIM payment method for card not present transactions.'),
-  );
-  $form['aim_settings']['authnet_uc_aim_txn_mode'] = array(
-    '#type' => 'radios',
-    '#title' => t('Transaction mode'),
-    '#description' => t('Only specify a developer test account if you login to your account through https://test.authorize.net.<br/>Adjust to live transactions when you are ready to start processing real payments.'),
-    '#options' => array(
-      'live' => t('Live transactions in a live account'),
-      'live_test' => t('Test transactions in a live account'),
-      'developer_test' => t('Developer test account transactions'),
-    ),
-    '#default_value' => variable_get('authnet_uc_aim_txn_mode', 'live_test'),
+    '#title' => t('Ubercart-specific AIM settings'),
+    '#description' => t('The following settings apply to Authorize.net AIM transactions conducted by Ubercart.'),
   );
 
-  $form['aim_settings']['authnet_uc_aim_email_customer'] = array(
+  // AIM email receipt
+  $form['uc_aim']['authnet_uc_aim_email_receipt'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Tell Authorize.net to e-mail the customer a receipt based on your account settings.'),
+    '#title' => t('Send the customer an email receipt via Authorize.net when the Advanced Integration Method (AIM) is used.'),
     '#default_value' => variable_get('authnet_uc_aim_email_customer', FALSE),
   );
-  $form['aim_settings']['authnet_uc_response_debug'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Log full API response messages from Authorize.net for debugging.'),
-    '#default_value' => variable_get('authnet_uc_response_debug', FALSE),
-  );
 
-
-  $form['arb_settings'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('ARB settings'),
-    '#description' => t('These settings pertain to the Authorize.Net Automated Recurring Billing service.')
-  );
-  $form['arb_settings']['authnet_uc_arb_mode'] = array(
-    '#type' => 'radios',
-    '#title' => t('Transaction mode'),
-    '#description' => t('Only specify developer mode if you login to your account through https://test.authorize.net.<br />Adjust to production mode when you are ready to start processing real recurring fees.'),
-    '#options' => array(
-      'production' => t('Production'),
-      'developer' => t('Developer test'),
-      'disabled' => t('Disabled'),
-    ),
-    '#default_value' => variable_get('authnet_uc_arb_mode', 'disabled'),
-  );
-  $form['arb_settings']['authnet_uc_md5_hash'] = array(
-    '#type' => 'textfield',
-    '#title' => t('MD5 Hash'),
-    '#description' => t('<b>Note:</b> You must first configure credit card encryption before setting this.<br />Enter the value here you entered in your Auth.Net account settings.'),
-    '#default_value' => $login_data['md5_hash'],
-    '#access' => user_access('administer credit cards'),
-  );
-  $form['arb_settings']['authnet_uc_report_arb_post'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Log reported ARB payments in watchdog.'),
-    '#description' => t('Make sure you have set your Silent POST URL in Authorize.Net to @url.', array('@url' => url('authnet/silent-post', array('absolute' => TRUE)))),
-    '#default_value' => variable_get('authnet_uc_report_arb_post', FALSE),
-  );
-
-  $form['cim_settings'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('CIM settings'),
-    '#description' => t('These settings pertain to the Authorize.Net Customer Information Management service.')
-  );
-  $form['cim_settings']['authnet_uc_cim_profile'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Always create a CIM profile for securely storing CC info for later use.'),
-    '#default_value' => variable_get('authnet_uc_cim_profile', FALSE),
-  );
-  $form['cim_settings']['authnet_uc_cim_mode'] = array(
-    '#type' => 'radios',
-    '#title' => t('Transaction mode'),
-    '#description' => t('Only specify a developer test account if you login to your account through https://test.authorize.net.<br/>Adjust to live transactions when you are ready to start processing real payments.'),
-    '#options' => array(
-      'production' => t('Production'),
-      'developer' => t('Developer test'),
-      'disabled' => t('Disabled'),
-    ),
-    '#default_value' => variable_get('authnet_uc_cim_mode', 'disabled'),
+  // Allow admin to set duplicate window
+  $form['uc_aim']['authnet_uc_aim_duplicate_window'] = array(
+    '#type' => 'select',
+    '#title' => t('Duplicate window'),
+    '#description' => t('Blocks submission of duplicate transactions within the specified window.  Defaults to 120 seconds.'),
+    '#default_value' => variable_get('authnet_uc_aim_duplicate_window', 120),
+    '#options' => drupal_map_assoc(array(0, 15, 30, 45, 60, 75, 90, 105, 120)),
   );
 
   return $form;
@@ -130,7 +63,7 @@ function _authnet_uc_settings_form() {
  * *****************************************************************************/
 
 /**
- * Decrypts the login data for using Auth.Net APIs.
+ * Decrypts the login data for using Authorize.net APIs.
  */
 function _authnet_uc_login_data() {
   static $data;
