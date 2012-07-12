@@ -62,3 +62,69 @@ function _authnet_uc_charge($order, $amount, $data){
   return array('success' => FALSE, 'message' => t('Not yet implemented'));
 }
 
+
+/* ******************************************************************************
+ * Helpers
+ * *****************************************************************************/
+
+/**
+ * Create a CIM profile using an order's data.
+ */
+function _authnet_uc_cim_profile_from_order($order){
+  // @todo: uc_authorizenet sets a refId. Should we??
+  // $refId = substr($order->order_id .'-'. time(), 0, 20);
+
+  // @todo: entity based customer ID
+  //$merchantCustomerId = !empty($order->uid) ? 'user:'.$order->uid : 'order:'.$order->order_id;
+  $merchantCustomerId = $order->uid;
+
+  // @todo: What's the deal with all these substrs? should we move that logic to the api??
+  $values = array(
+    'merchantCustomerId' => substr($merchantCustomerId, 0, 20),
+    'description' => substr(t('Order @order taking place at @date', array('@order' => $order->order_id, '@date' => format_date(time()))), 0, 255),
+    'email' => substr($order->primary_email, 0, 255),
+    'paymentProfiles' => array(_authnet_uc_payment_profile_from_order($order));
+    'shipToList' => array(_authnet_uc_address_from_order($order, $type = 'delivery'));
+  );
+  return authnet_customer_profile_new($values);
+}
+
+/**
+ * Get address info from order
+ */
+function _authnet_uc_payment_profile_from_order($order){
+  return array(
+    'customerType' => 'individual',
+    'billTo' => _authnet_uc_address_from_order($order, 'billing');
+    'payment' => _authnet_uc_payment_from_order($order);
+  );
+}
+
+/**
+ * Get address info from order
+ */
+function _authnet_uc_address_from_order($order, $type = 'billing') {
+  $country = uc_get_country_data(array('country_id' => $order->{$type.'_country'}));
+  return array(
+    'firstName' => substr($order->{$type.'_first_name'}, 0, 50),
+    'lastName' => substr($order->{$type.'_last_name'}, 0, 50),
+    'company' => substr($order->{$type.'_company'}, 0, 50),
+    'address' => substr($order->{$type.'_street1'}, 0, 60),
+    'city' => substr($order->{$type.'_city'}, 0, 40),
+    'state' => substr(uc_get_zone_code($order->{$type.'_zone'}), 0, 2),
+    'zip' => substr($order->{$type.'_postal_code'}, 0, 20),
+    'country' => !$country ? '' : $country[0]['country_iso_code_2'],
+  );
+}
+
+/**
+ * Get payment info from order
+ */
+function _authnet_uc_payment_from_order($order) {
+  return array(
+    'creditCard' => array(
+      'cardNumber' => $order->payment_details['cc_number'],
+      'expirationDate' => $order->payment_details['cc_exp_year'] .'-'. str_pad($order->payment_details['cc_exp_month'], 2, '0', STR_PAD_LEFT),
+    ),
+  );
+}
