@@ -43,7 +43,25 @@ function _authnet_uc_charge($order_id, $amount, $data) {
  * Create a CIM profile using an order's data.
  */
 function _authnet_uc_cim_profile_create($order){
-  return t('Not yet Implemented');
+  $cim_profile = _authnet_uc_cim_profile_from_order($order);
+  $success = authnet_cim_profile_save($cim_profile);
+
+  // Fail
+  if(!$success){
+    $message = authnet_get_error_message();
+    $comment = t('Authorize.Net: Creating CIM profile failed.<br />!message',array('!message' => $message));
+    uc_order_comment_save($order->order_id, 0, $comment, 'admin');
+    return $message;
+  }
+
+  // Success
+  $comment = t('Authorize.Net: CIM profile created - @id', array('@id' => $cim_profile->customerProfileId));
+  uc_order_comment_save($order->order_id, 0, $comment);
+
+  // Save the new credit reference to the db.
+  $order->data = uc_credit_log_reference($order->order_id, $cim_profile->customerProfileId, $order->payment_details['cc_number']);
+
+  return '';
 }
 
 /**
