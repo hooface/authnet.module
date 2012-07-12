@@ -19,14 +19,11 @@ function authnet_request_new($type) {
   // Include the Authorize.net SDK.
   authnet_sdk_include();
 
-  // Define the available types.
-  $types = array(
-    'AIM' => 'AuthorizeNetAIM',
-    'CIM' => 'AuthorizeNetCIM',
-  );
+  // Build the class name.
+  $class = 'AuthorizeNet' . $type;
 
   // Create an Authorize.net request object.
-  $request = new $types[$type](variable_get('authnet_login_id', ''), variable_get('authnet_transaction_key', ''));
+  $request = new $class(variable_get('authnet_login_id', ''), variable_get('authnet_transaction_key', ''));
 
   // Enable sandbox mode, if the setting is set.
   if (variable_get('authnet_sandbox', FALSE)) {
