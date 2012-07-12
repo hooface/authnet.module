@@ -30,6 +30,12 @@ function authnet_cim_entity_schema() {
   $schema['authnet_cim_entity'] = array(
     'description' => t('Authorize.net entity customer profile id relationships.'),
     'fields' => array(
+      'customer_profile_id' => array(
+        'description' => t('Authorize.net customer profile id'),
+        'type' => 'varchar',
+        'length' => '11',
+        'not null' => TRUE,
+      ),
       'type' => array(
         'description' => t('Drupal entity type'),
         'type' => 'varchar',
@@ -43,15 +49,12 @@ function authnet_cim_entity_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
-      'customer_profile_id' => array(
-        'description' => t('Authorize.net customer profile id'),
-        'type' => 'varchar',
-        'length' => '11',
-        'not null' => TRUE,
-        'default' => '',
-      ),
     ),
-    'primary key' => array('type', 'id'),
+    'primary key' => array('customer_profile_id'),
+    'indexes' => array(
+      'type' => array('type'),
+      'id' => array('id'),
+    ),
   );
   return $schema;
 }
