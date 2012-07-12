@@ -17,7 +17,7 @@ function authnet_uc_payment_gateway() {
   $gateways[] = array(
     'id' => 'authnet',
     'title' => t('Authorize.net'),
-    'description' => t('Process credit card payments using the AIM service of Authorize.net.'),
+    'description' => t('Process credit card payments using Authorize.net.'),
     'settings' => 'authnet_uc_settings_form',
     'credit' => 'authnet_uc_charge',
     'credit_txn_types' => array(UC_CREDIT_AUTH_ONLY, UC_CREDIT_PRIOR_AUTH_CAPTURE, UC_CREDIT_AUTH_CAPTURE, UC_CREDIT_REFERENCE_SET, UC_CREDIT_REFERENCE_TXN),
