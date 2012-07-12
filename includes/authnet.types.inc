@@ -10,11 +10,23 @@
  *
  * @param $type
  *   The type of AuthorizeNet request object to create (AIM, CIM, etc).
+ * @param $options
+ *   Optional variable overrides. Possible values:
+ *     login_id (Authorize.net login id)
+ *     transaction_key (Authorize.net transaction key)
+ *     sandbox (Sandbox mode boolean)
  *
  * @return
  *   Returns an AuthorizeNet request object.
  */
-function authnet_request_new($type) {
+function authnet_request_new($type, $options = array()) {
+
+  // Merge in defaults.
+  $options += array(
+    'login_id' => variable_get('authnet_login_id', ''),
+    'transaction_key' => variable_get('authnet_transaction_key', ''),
+    'sandbox' => variable_get('authnet_sandbox', FALSE),
+  );
 
   // Include the Authorize.net SDK.
   authnet_sdk_include();
@@ -23,10 +35,10 @@ function authnet_request_new($type) {
   $class = 'AuthorizeNet' . $type;
 
   // Create an Authorize.net request object.
-  $request = new $class(variable_get('authnet_login_id', ''), variable_get('authnet_transaction_key', ''));
+  $request = new $class($options['login_id'], $options['transaction_key']);
 
   // Enable sandbox mode, if the setting is set.
-  if (variable_get('authnet_sandbox', FALSE)) {
+  if ($options['sandbox']) {
     $request->setSandbox(TRUE);
   }
 
