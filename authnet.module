@@ -119,67 +119,18 @@ function authnet_log_response($response) {
   authnet_set_response($response);
 
   // Create a message container and error flag.
-  $message = '';
-  $error = FALSE;
+  list($success, $message) = _authnet_response_status($response);
 
-  // If the response object is an instance of AuthorizeNetCIM_Response...
-  if ($response instanceof AuthorizeNetCIM_Response) {
+  // Process the message if it's an error, or if debug mode is on.
+  if (!$success || variable_get('authnet_debug', FALSE)) {
 
-    // Prepend the Authorize.net request type to the message.
-    $message = 'Authorize.net CIM';
-
-    // If the response is an error...
-    if ($response->isError()) {
-
-      // Get the error message.
-      $message .= $response->getErrorMessage();
-
-      // Set the error flag.
-      $error = TRUE;
+    // Print errors to the screen, if Drupal's core error_level variable is greater than or equal to 1.
+    if (!$success && variable_get('error_level', 1) >= 1) {
+      drupal_set_message($message, 'error');
     }
 
-    // Otherwise, generate the normal message text.
-    else {
-      $message .= 'Success: ' . $response->getResultCode() . ' Message: ' . $response->getMessageText() . ' ' . $response->getMessageCode();
-    }
-  }
-
-  // Or, if the response object is an instance of AuthorizeNetAIM_Response...
-  elseif ($response instanceof AuthorizeNetAIM_Response) {
-
-    // Prepend the Authorize.net request type to the message.
-    $message = 'Authorize.net AIM';
-
-    // If the response is an error...
-    if ($response->error) {
-
-      // Get the error message.
-      $message .= $response->error_message;
-
-      // Set the error flag.
-      $error = TRUE;
-    }
-
-    // Otherwise, generate the normal message text.
-    else {
-      $message .= ' Success: Response Code: ' . $response->response_code . ' Response Subcode: ' . $response->response_subcode . ' Response Reason Code: ' . $response->response_reason_code . ' Response Reason Text: ' . $response->response_reason_text;
-    }
-  }
-
-  // If a message is available...
-  if (!empty($message)) {
-
-    // Process the message if it's an error, or if debug mode is on.
-    if ($error || variable_get('authnet_debug', FALSE)) {
-
-      // Print errors to the screen, if Drupal's core error_level variable is greater than or equal to 1.
-      if ($error && variable_get('error_level', 1) >= 1) {
-        drupal_set_message($message, 'error');
-      }
-
-      // Log the message to watchdog.
-      watchdog('authnet', $message);
-    }
+    // Log the message to watchdog.
+    watchdog('authnet', $message);
   }
 }
 
@@ -200,6 +151,60 @@ function authnet_set_response($response = NULL) {
   if ($response) $last_response = $response);
 
   return $last_response;
+}
+
+/**
+ * Check to see if a response was successful
+ *
+ * @param $response
+ *   An Authorize.net response object.
+ *
+ * @return
+ *   An array in the form array('success' => bool, 'message' => string);
+ */
+function _authnet_response_status($response) {
+  // If the response object is an instance of AuthorizeNetCIM_Response...
+  if ($response instanceof AuthorizeNetCIM_Response) {
+
+    // Prepend the Authorize.net request type to the message.
+    $message = 'Authorize.net CIM';
+
+    // Error Message
+    if ($response->isError()) $message .= $response->getErrorMessage();
+
+    // Success Message
+    else {
+      $message .= t('Success: !ResultCode  Message: !MessageText !MessageCode', array(
+        '!ResultCode' => $response->getResultCode(),
+        '!MessageText' => $response->getMessageText(),
+        '!MessageCode' => $response->getMessageCode(),
+      ));
+    }
+
+    return array('success' => $response->isError(), 'message' => $message);
+  }
+
+  // Or, if the response object is an instance of AuthorizeNetAIM_Response...
+  elseif ($response instanceof AuthorizeNetAIM_Response) {
+
+    // Prepend the Authorize.net request type to the message.
+    $message = 'Authorize.net AIM';
+
+    // Error message
+    if ($response->error) $message .= $response->error_message;
+
+    // Success message
+    else {
+      $message .= t('Success: Response Code: !code Response Subcode: !subcode Response Reason Code: !reason_code Response Reason Text: !reason_text', array(
+        '!code' => $response->response_code,
+        '!subcode' => $response->response_subcode,
+        '!reason_code' => $response->response_reason_code,
+        '!reason_text' => $response->response_reason_text,
+      ));
+    }
+
+    return array('success' => $response->error, 'message' => $message);
+  }
 }
 
 /**
