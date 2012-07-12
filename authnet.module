@@ -116,7 +116,7 @@ function authnet_sdk_include() {
 function authnet_log_response($response) {
 
   // Add the response to the static cache in authnet_get_response().
-  authnet_get_response($response);
+  authnet_set_response($response);
 
   // Create a message container and error flag.
   $message = '';
@@ -186,7 +186,14 @@ function authnet_log_response($response) {
 /**
  * Retrieves a statically-cached Authorize.net response object.
  */
-function authnet_get_response($response = NULL) {
+function authnet_get_response() {
+  return authnet_set_response();
+}
+
+/**
+ * Stores Authorize.net response objects in a static cache.
+ */
+function authnet_set_response($response = NULL) {
 
   // Create a static response cache.
   static $responses = array();
