@@ -135,6 +135,19 @@ function authnet_log_response($response) {
 }
 
 /**
+ * Retrieves the last error
+ *
+ * @return
+ *   The last error message if the last request failed
+ */
+function authnet_get_error_message() {
+  $response = authnet_get_response();
+  list($success, $message) _authnet_response_status($response);
+  if(!$success) return $message;
+  else return FALSE;
+}
+
+/**
  * Retrieves a statically-cached Authorize.net response object.
  */
 function authnet_get_response() {
