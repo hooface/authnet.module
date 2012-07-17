@@ -136,6 +136,7 @@ function authnet_uc_payment_method_credit_checkout_form($form_state, $order, $cu
     '#title' => t('Choose an existing credit card or add a new one:'),
     '#options' => $options,
     '#required' => TRUE,
+    '#default_value' => 'new',
   );
 
   // Append the old uc_payment_method_credit_form().
