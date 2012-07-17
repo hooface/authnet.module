@@ -33,4 +33,5 @@ function authnet_ui_payment_profile_options($customer_profile) {
       $options[] = t('Credit card: ' . $payment_profile->payment->creditCard->cardNumber . ' (' . $payment_profile->billTo->address . ')');
     }
   }
+  return $options;
 }
