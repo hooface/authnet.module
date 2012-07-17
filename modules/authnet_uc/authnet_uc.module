@@ -52,6 +52,17 @@ function authnet_uc_form_alter(&$form, &$form_state, $form_id) {
   }
 }
 
+/**
+ * Implements hook_theme().
+ */
+function authnet_uc_theme() {
+  return array(
+    'authnet_uc_payment_method_credit_checkout_form' => array(
+      'arguments' => array('form' => NULL),
+    ),
+  );
+}
+
 /* ******************************************************************************
  * Ubercart hooks
  * *****************************************************************************/
@@ -132,6 +143,25 @@ function authnet_uc_payment_method_credit_checkout_form($form_state, $order, $cu
 
   // Return the form.
   return $form;
+}
+
+/* ******************************************************************************
+ * Theme functions
+ * *****************************************************************************/
+
+/**
+ * Themes the "add a credit card" form to be in a compact table.
+ */
+function theme_authnet_uc_payment_method_credit_checkout_form($form) {
+
+  // Render the radio select list.
+  $output = drupal_render($form['select']);
+
+  // Pass-through to the original theme_uc_payment_method_credit_form().
+  $output .= theme_uc_payment_method_credit_form($form);
+
+  // Return the rendered form.
+  return $output;
 }
 
 /* ******************************************************************************
