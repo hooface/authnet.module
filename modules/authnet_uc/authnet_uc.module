@@ -47,20 +47,9 @@ function authnet_uc_form_alter(&$form, &$form_state, $form_id) {
               '#weight' => -1,
             );
 
-            // Generate a list of payment profile options.
-            $options = array();
-            foreach ($customer_profile->paymentProfiles as $payment_profile) {
-
-              // At the moment we're only adding credit card payment profiles.
-              if (!empty($payment_profile->payment->creditCard->cardNumber)) {
-
-                // Add an option to the array with the last four digits and the street address.
-                $options[] = t('Credit card: ' . $payment_profile->payment->creditCard->cardNumber . ' (' . $payment_profile->billTo->address . ')');
-              }
-            }
             $form['authnet_payment_profiles']['payment_profile'] = array(
               '#type' => 'radios',
-              '#options' => $options,
+              '#options' => authnet_ui_payment_profile_options($customer_profile),
             );
 
             // Buttons
