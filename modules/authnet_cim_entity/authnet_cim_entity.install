@@ -56,5 +56,54 @@ function authnet_cim_entity_schema() {
       'id' => array('id'),
     ),
   );
+  $schema['authnet_cim_entity_payment_profile'] = array(
+    'description' => t('Authorize.net customer payment profiles.'),
+    'fields' => array(
+      'payment_profile_id' => array(
+        'description' => t('Authorize.net payment profile id'),
+        'type' => 'varchar',
+        'length' => '11',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'customer_profile_id' => array(
+        'description' => t('Authorize.net customer profile id'),
+        'type' => 'varchar',
+        'length' => '11',
+        'not null' => TRUE,
+      ),
+      'cc_last_four' => array(
+        'description' => t('Credit card: last four digits'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'size' => 'small',
+        'not null' => FALSE,
+      ),
+      'cc_type' => array(
+        'description' => t('TODO: please describe this field!'),
+        'type' => 'varchar',
+        'length' => '128',
+        'not null' => FALSE,
+      ),
+      'cc_exp_year' => array(
+        'description' => t('TODO: please describe this field!'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'size' => 'small',
+        'not null' => FALSE,
+      ),
+      'cc_exp_month' => array(
+        'description' => t('TODO: please describe this field!'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'size' => 'tiny',
+        'not null' => FALSE,
+      ),
+    ),
+    'primary key' => array('payment_profile_id'),
+    'indexes' => array(
+      'customer_profile_id' => array('customer_profile_id'),
+    ),
+  );
   return $schema;
 }
