@@ -23,14 +23,9 @@ function authnet_uc_form_alter(&$form, &$form_state, $form_id) {
     $order = uc_order_load($form['order_id']['#value']);
     if (empty($order) || empty($order->uid)) return;
 
-    // Load the customer's profile id.
-    // Bail if no customer profile is found
-    $customer_profile_id = authnet_cim_entity_profile_id_load('user', $order->uid);
-    if (empty($customer_profile_id)) return;
-
     // Load the customer profile from Authorize.net.
     // Bail if the customer profile doesn't have payment profiles...
-    $customer_profile = authnet_cim_profile_load($customer_profile_id);
+    $customer_profile = authnet_cim_entity_profile_load('user', $order->uid);
     if (empty($customer_profile->paymentProfiles)) return;
 
     // Set the weight of the 'amount' field so that it is at the top.
