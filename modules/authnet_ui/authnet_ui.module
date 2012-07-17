@@ -30,7 +30,7 @@ function authnet_ui_payment_profile_options($customer_profile) {
     if (!empty($payment_profile->payment->creditCard->cardNumber)) {
 
       // Add an option to the array with the last four digits and the street address.
-      $options[] = t('Credit card: ' . $payment_profile->payment->creditCard->cardNumber . ' (' . $payment_profile->billTo->address . ')');
+      $options[$payment_profile->customerPaymentProfileId] = t('Credit card: ' . $payment_profile->payment->creditCard->cardNumber . ' (' . $payment_profile->billTo->address . ')');
     }
   }
   return $options;
