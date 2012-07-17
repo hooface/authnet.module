@@ -8,4 +8,40 @@
 /* ******************************************************************************
  * Drupal hooks
  * *****************************************************************************/
- 
+
+/**
+ * Implementation of hook_menu().
+ */
+function authnet_user_menu() {
+  $items['user/%user/billing'] = array(
+    'title' => 'Billing',
+    'page callback' => 'authnet_user_billing_page',
+    'access callback' => 'authnet_user_manage_cards_access',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'authnet_user.pages.inc',
+  );
+//  $items['user/%user/billing/add'] = array(
+//    'title' => 'Add ',
+//    'page callback' => 'authnet_user_placeholder',
+//    'access callback' => 'authnet_user_manage_cards_access',
+//    'access arguments' => array(1),
+//    'type' => MENU_CALLBACK,
+//    'file' => 'authnet_user.pages.inc',
+//  );
+  return $items;
+}
+
+
+/* ******************************************************************************
+ * Access Callbacks
+ * *****************************************************************************/
+
+/**
+ * Access callback for credit card management.
+ */
+function authnet_user_manage_cards_access($account) {
+  // Allow access if logged in user matches the account, or
+  // user has perm 'administer credit cards' ( comes from uc_credit )
+  return (($GLOBALS['user']->uid == $account->uid) || user_access('administer credit cards')) && $account->uid > 0;
+}
