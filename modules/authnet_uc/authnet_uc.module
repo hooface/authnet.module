@@ -18,49 +18,42 @@ function authnet_uc_form_alter(&$form, &$form_state, $form_id) {
   // Alter the credit card terminal form in the order admin interface (/admin/store/orders/%order-id/credit)
   if ($form_id == 'uc_credit_terminal_form') {
 
-    // Get the order id from the hidden field, and only proceed if it's present.
-    if (isset($form['order_id']['#value']) && !empty($form['order_id']['#value'])) {
+    // Load the order.
+    // Bail if no order or if order doesn't have a user
+    $order = uc_order_load($form['order_id']['#value']);
+    if (empty($order) || empty($order->uid)) return;
 
-      // Load the order.
-      $order = uc_order_load($form['order_id']['#value']);
+    // Load the customer's profile id.
+    // Bail if no customer profile is found
+    $customer_profile_id = authnet_cim_entity_profile_id_load('user', $order->uid);
+    if (empty($customer_profile_id)) return;
 
-      // If the order has a user assigned to it, see if the user has existing payment profiles.
-      if (!empty($order->uid)) {
+    // Load the customer profile from Authorize.net.
+    // Bail if the customer profile doesn't have payment profiles...
+    $customer_profile = authnet_cim_profile_load($customer_profile_id);
+    if (empty($customer_profile->paymentProfiles)) return;
 
-        // Load the customer's profile id.
-        if ($customer_profile_id = authnet_cim_entity_profile_id_load('user', $order->uid)) {
+    // Set the weight of the 'amount' field so that it is at the top.
+    $form['amount']['#weight'] = -2;
 
-          // Load the customer profile from Authorize.net.
-          $customer_profile = authnet_cim_profile_load($customer_profile_id);
+    // Create a new fieldset for the existing payment profiles.
+    $form['authnet_payment_profiles'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Existing payment profiles'),
+      '#description' => t('This order\'s customer has the following payment profiles.'),
+      '#weight' => -1,
+    );
 
-          // If the customer profile has payment profiles...
-          if (!empty($customer_profile->paymentProfiles)) {
+    $form['authnet_payment_profiles']['payment_profile'] = array(
+      '#type' => 'radios',
+      '#options' => authnet_ui_payment_profile_options($customer_profile),
+    );
 
-            // Set the weight of the 'amount' field so that it is at the top.
-            $form['amount']['#weight'] = -2;
-
-            // Create a new fieldset for the existing payment profiles.
-            $form['authnet_payment_profiles'] = array(
-              '#type' => 'fieldset',
-              '#title' => t('Existing payment profiles'),
-              '#description' => t('This order\'s customer has the following payment profiles.'),
-              '#weight' => -1,
-            );
-
-            $form['authnet_payment_profiles']['payment_profile'] = array(
-              '#type' => 'radios',
-              '#options' => authnet_ui_payment_profile_options($customer_profile),
-            );
-
-            // Buttons
-            $form['authnet_payment_profiles']['authorize'] = array(
-              '#type' => 'submit',
-              '#value' => t('Charge amount to this profile'),
-            );
-          }
-        }
-      }
-    }
+    // Buttons
+    $form['authnet_payment_profiles']['authorize'] = array(
+      '#type' => 'submit',
+      '#value' => t('Charge amount to this profile'),
+    );
   }
 }
 
