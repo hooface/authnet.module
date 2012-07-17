@@ -5,6 +5,13 @@
  * Authorize.net CIM Entity
  */
 
+/**
+ * @todo
+ * When customer profiles are created, add payment profiles too.
+ * When customer profiles are updated, add/remove payment profiles.
+ * When payment profiles are added/updated/deleted, do the same in the database.
+ */
+
 /* ******************************************************************************
  * Authnet hooks
  * *****************************************************************************/
