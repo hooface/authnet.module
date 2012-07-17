@@ -77,6 +77,30 @@ function authnet_uc_payment_gateway() {
   return $gateways;
 }
 
+/**
+ * Implementation of hook_payment_method_alter().
+ */
+function authnet_uc_payment_method_alter(&$methods) {
+
+  /**
+   * Replace the callback function of the 'credit' payment method with our own.
+   * We do this so that we can offer users the ability to choose an existing card.
+   * See authnet_uc_payment_method_credit() below.
+   */
+  if (!empty($methods)) {
+    foreach ($methods as &$method) {
+      if ($method['id'] == 'credit') {
+
+        // Replace the callback function with our own.
+        $method['callback'] = 'authnet_uc_payment_method_credit';
+
+        // Stop the foreach loop.
+        break;
+      }
+    }
+  }
+}
+
 /* ******************************************************************************
  * Forms
  * *****************************************************************************/
@@ -99,4 +123,17 @@ function authnet_uc_settings_form() {
 function authnet_uc_charge($order_id, $amount, $data) {
   module_load_include('inc', 'authnet_uc', 'includes/authnet_uc.charge');
   return _authnet_uc_charge($order_id, $amount, $data);
+}
+
+/**
+ * Replacement callback for the credit payment method.
+ * The goal of this function is to act as a simple wrapper around the uc_credit's normal payment method callback: uc_payment_method_credit().
+ * This function is called first, does the stuff it needs to do, and in most cases passes the call of to uc_payment_method_credit().
+ *
+ * See authnet_uc_payment_method_alter() above.
+ */
+function authnet_uc_payment_method_credit($op, &$arg1, $silent = FALSE) {
+
+  // Pass the arguments to uc_payment_method_credit().
+  return uc_payment_method_credit($op, $arg1, $silent);
 }
