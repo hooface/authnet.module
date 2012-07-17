@@ -45,7 +45,7 @@ function authnet_cim_entity_authnet_cim_profile_delete($customerProfileId) {
  * *****************************************************************************/
 
 /**
- * Get a customer profile id, based on an entity id.
+ * Get a customer profile, based on an entity type and id.
  *
  * @param $type
  *   The Drupal entity type.
@@ -53,12 +53,20 @@ function authnet_cim_entity_authnet_cim_profile_delete($customerProfileId) {
  *   The Drupal entity id.
  *
  * @return
- *   Returns the Authorize.net customer profile id for the given entity id, if available. FALSE otherwise.
+ *   Returns the Authorize.net customer profile for the given entity type and id, if available. FALSE otherwise.
  */
-function authnet_cim_entity_profile_id_load($type, $id) {
+function authnet_cim_entity_profile_load($type, $id) {
 
   // Look up the customer profile id.
-  return db_result(db_query('SELECT customer_profile_id FROM {authnet_cim_entity} WHERE type="%s" AND id=%d', array($type, $id)));
+  $customer_profile_id = db_result(db_query('SELECT customer_profile_id FROM {authnet_cim_entity} WHERE type="%s" AND id=%d', array($type, $id)));
+
+  // Return FALSE if a customer profile id wasn't found.
+  if (!$customer_profile_id) {
+    return FALSE;
+  }
+
+  // Return the loaded customer profile.
+  return authnet_cim_profile_load($customer_profile_id);
 }
 
 /**
