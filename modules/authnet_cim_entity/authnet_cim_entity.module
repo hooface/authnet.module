@@ -37,6 +37,8 @@ function authnet_cim_entity_authnet_cim_profile_insert($customerProfile) {
  * Implementation of hook_authnet_cim_profile_delete().
  */
 function authnet_cim_entity_authnet_cim_profile_delete($customerProfileId) {
+
+  // Delete the customer and payment profiles from the databse.
   authnet_cim_entity_profile_id_delete($customerProfileId);
 }
 
@@ -117,13 +119,16 @@ function authnet_cim_entity_profile_id_save($type, $id, $customer_profile_id) {
 }
 
 /**
- * Delete a customer profile id from the database.
+ * Delete a customer profile and their payment profiles from the database.
  *
  * @param $customer_profile_id
  *   The Authorize.net customer profile id.
  */
 function authnet_cim_entity_profile_id_delete($customer_profile_id) {
 
-  // Delete the profile id.
+  // Delete the customer profile from the database.
   db_query('DELETE FROM {authnet_cim_entity} WHERE customer_profile_id=%d', $customer_profile_id);
+
+  // Delete all of the customer's payment profiles from the database.
+  db_query('DELETE FROM {authnet_cim_entity_payment_profile} WHERE customer_profile_id=%d', $customer_profile_id);
 }
