@@ -7,6 +7,75 @@
  */
 
 /* ******************************************************************************
+ * Drupal hooks
+ * *****************************************************************************/
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function authnet_uc_form_alter(&$form, &$form_state, $form_id) {
+
+  // Alter the credit card terminal form in the order admin interface (/admin/store/orders/%order-id/credit)
+  if ($form_id == 'uc_credit_terminal_form') {
+
+    // Get the order id from the hidden field, and only proceed if it's present.
+    if (isset($form['order_id']['#value']) && !empty($form['order_id']['#value'])) {
+
+      // Load the order.
+      $order = uc_order_load($form['order_id']['#value']);
+
+      // If the order has a user assigned to it, see if the user has existing payment profiles.
+      if (!empty($order->uid)) {
+
+        // Load the customer's profile id.
+        if ($customer_profile_id = authnet_cim_entity_profile_id_load('user', $order->uid)) {
+
+          // Load the customer profile from Authorize.net.
+          $customer_profile = authnet_cim_profile_load($customer_profile_id);
+
+          // If the customer profile has payment profiles...
+          if (!empty($customer_profile->paymentProfiles)) {
+
+            // Set the weight of the 'amount' field so that it is at the top.
+            $form['amount']['#weight'] = -2;
+
+            // Create a new fieldset for the existing payment profiles.
+            $form['authnet_payment_profiles'] = array(
+              '#type' => 'fieldset',
+              '#title' => t('Existing payment profiles'),
+              '#description' => t('This order\'s customer has the following payment profiles.'),
+              '#weight' => -1,
+            );
+
+            // Generate a list of payment profile options.
+            $options = array();
+            foreach ($customer_profile->paymentProfiles as $payment_profile) {
+
+              // At the moment we're only adding credit card payment profiles.
+              if (!empty($payment_profile->payment->creditCard->cardNumber)) {
+
+                // Add an option to the array with the last four digits and the street address.
+                $options[] = t('Credit card: ' . $payment_profile->payment->creditCard->cardNumber . ' (' . $payment_profile->billTo->address . ')');
+              }
+            }
+            $form['authnet_payment_profiles']['payment_profile'] = array(
+              '#type' => 'radios',
+              '#options' => $options,
+            );
+
+            // Buttons
+            $form['authnet_payment_profiles']['authorize'] = array(
+              '#type' => 'submit',
+              '#value' => t('Charge amount to this profile'),
+            );
+          }
+        }
+      }
+    }
+  }
+}
+
+/* ******************************************************************************
  * Ubercart hooks
  * *****************************************************************************/
 
