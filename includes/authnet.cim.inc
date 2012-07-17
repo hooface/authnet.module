@@ -104,6 +104,13 @@ function authnet_cim_profile_save(AuthorizeNetCustomer &$customerProfile) {
       module_invoke_all('authnet_cim_profile_insert', $customerProfile);
     }
 
+    // If the profile is being updated...
+    else {
+
+      // Invoke hook_authnet_cim_profile_update and pass in the customer profile object.
+      module_invoke_all('authnet_cim_profile_update', $customerProfile);
+    }
+
     // Return TRUE.
     return TRUE;
   }
