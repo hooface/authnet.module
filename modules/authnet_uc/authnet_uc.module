@@ -101,11 +101,37 @@ function authnet_uc_payment_method_alter(&$methods) {
  * *****************************************************************************/
 
 /**
- * Callback for payment gateway settings.
+ * Payment gateway settings form.
  */
 function authnet_uc_settings_form() {
   module_load_include('inc', 'authnet_uc', 'includes/authnet_uc.pages');
   return _authnet_uc_settings_form();
+}
+
+/**
+ * Credit payment method checkout form.
+ */
+function authnet_uc_payment_method_credit_checkout_form($form_state, $order, $customer_profile) {
+
+  // Get the list of payment profile options for this customer.
+  $options = authnet_ui_payment_profile_options($customer_profile);
+
+  // Add an option for setting up a new card.
+  $options['new'] = t('Add a new card...');
+
+  // Display the list of radio buttons.
+  $form['select'] = array(
+    '#type' => 'radios',
+    '#title' => t('Choose an existing credit card or add a new one:'),
+    '#options' => $options,
+    '#required' => TRUE,
+  );
+
+  // Append the old uc_payment_method_credit_form().
+  $form += uc_payment_method_credit_form($form_state, $order);
+
+  // Return the form.
+  return $form;
 }
 
 /* ******************************************************************************
@@ -129,6 +155,21 @@ function authnet_uc_charge($order_id, $amount, $data) {
  */
 function authnet_uc_payment_method_credit($op, &$arg1, $silent = FALSE) {
 
-  // Pass the arguments to uc_payment_method_credit().
+  // If the $op is 'cart-details' it means we're rendering the checkout form.
+  if ($op == 'cart-details') {
+
+    // Get information about the current user.
+    global $user;
+
+    // If the user is logged in and has a customer profile...
+    if ($user->uid && $customer_profile = authnet_cim_entity_profile_load('user', $user->uid)) {
+
+      // Return our custom form, stripped for Ubercart's checkout form.
+      $details = drupal_get_form('authnet_uc_payment_method_credit_checkout_form', $arg1, $customer_profile);
+      return uc_strip_form($details);
+    }
+  }
+
+  // If the above code hasn't returned something already, pass-through to to original uc_payment_method_credit() function.
   return uc_payment_method_credit($op, $arg1, $silent);
 }
