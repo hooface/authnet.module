@@ -200,11 +200,12 @@ function authnet_set_response($response = NULL) {
  *   An array in the form array('success' => bool, 'message' => string);
  */
 function _authnet_response_status($response) {
+
   // If the response object is an instance of AuthorizeNetCIM_Response...
   if ($response instanceof AuthorizeNetCIM_Response) {
 
     // Prepend the Authorize.net request type to the message.
-    $message = 'Authorize.net CIM';
+    $message = 'Authorize.net CIM ';
 
     // Error Message
     if ($response->isError()) $message .= $response->getErrorMessage();
@@ -218,14 +219,14 @@ function _authnet_response_status($response) {
       ));
     }
 
-    return array('success' => $response->isError(), 'message' => $message);
+    return array('success' => !$response->isError(), 'message' => $message);
   }
 
   // Or, if the response object is an instance of AuthorizeNetAIM_Response...
   elseif ($response instanceof AuthorizeNetAIM_Response) {
 
     // Prepend the Authorize.net request type to the message.
-    $message = 'Authorize.net AIM';
+    $message = 'Authorize.net AIM ';
 
     // Error message
     if ($response->error) $message .= $response->error_message;
@@ -240,7 +241,7 @@ function _authnet_response_status($response) {
       ));
     }
 
-    return array('success' => $response->error, 'message' => $message);
+    return array('success' => !$response->error, 'message' => $message);
   }
 }
 
