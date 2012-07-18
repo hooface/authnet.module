@@ -118,19 +118,24 @@ function authnet_log_response($response) {
   // Add the response to the static cache in authnet_get_response().
   authnet_set_response($response);
 
-  // Create a message container and error flag.
-  list($success, $message) = _authnet_response_status($response);
+  // Parse the response to get a message and error flag.
+  $status = _authnet_response_status($response);
+
+  // If success or message flags aren't set, bail.
+  if (!isset($status['success']) || !isset($status['message'])) {
+    return;
+  }
 
   // Process the message if it's an error, or if debug mode is on.
-  if (!$success || variable_get('authnet_debug', FALSE)) {
+  if (!$status['success'] || variable_get('authnet_debug', FALSE)) {
 
     // Print errors to the screen, if Drupal's core error_level variable is greater than or equal to 1.
-    if (!$success && variable_get('error_level', 1) >= 1) {
-      drupal_set_message($message, 'error');
+    if (!$status['success'] && variable_get('error_level', 1) >= 1) {
+      drupal_set_message($status['message'], 'error');
     }
 
     // Log the message to watchdog.
-    watchdog('authnet', $message);
+    watchdog('authnet', $status['message']);
   }
 }
 
@@ -138,13 +143,30 @@ function authnet_log_response($response) {
  * Retrieves the last error
  *
  * @return
- *   The last error message if the last request failed
+ *   The last error message if the last request failed, FALSE otherwise.
  */
 function authnet_get_error_message() {
+
+  // Get the latest response.
   $response = authnet_get_response();
-  list($success, $message) = _authnet_response_status($response);
-  if(!$success) return $message;
-  else return FALSE;
+
+  // Parse the response to get a message and error flag.
+  $status = _authnet_response_status($response);
+
+  // If success or message flags aren't set, bail.
+  if (!isset($status['success']) || !isset($status['message'])) {
+    return;
+  }
+
+  // If the request was not successful, return the error message.
+  if (!$status['success']) {
+    return $message;
+  }
+
+  // Otherwise return FALSE
+  else {
+    return FALSE;
+  }
 }
 
 /**
