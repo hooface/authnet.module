@@ -29,8 +29,21 @@ function authnet_user_billing_page($user) {
   // Load the list of payment profiles.
   $profiles_list = authnet_ui_payment_profile_options($customer_profile);
 
-  // Theme the list as an item list.
-  $output .= theme('item_list', $profiles_list);
+  // Put together header and rows for the payment profile table.
+  $header = array(
+    t('Credit card'),
+    t('Operations'),
+  );
+  $rows = array();
+  foreach ($profiles_list as $payment_profile) {
+    $rows[] = array(
+      l($payment_profile, 'user/' . $user->uid . '/billing/edit'),
+      l('Edit', 'user/' . $user->uid . '/billing/edit') . ' | ' . l('Delete', 'user/' . $user->uid . '/billing/delete'),
+    );
+  }
+
+  // Add the themed table to the output.
+  $output .= theme('table', $header, $rows);
 
   // Return the output.
   return $output;
