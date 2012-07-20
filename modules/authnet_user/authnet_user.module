@@ -16,6 +16,7 @@ function authnet_user_menu() {
   $items['user/%user/billing'] = array(
     'title' => 'Billing',
     'page callback' => 'authnet_user_billing_page',
+    'page arguments' => array(1),
     'access callback' => 'authnet_user_manage_cards_access',
     'access arguments' => array(1),
     'type' => MENU_LOCAL_TASK,
