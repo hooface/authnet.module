@@ -59,6 +59,12 @@ function authnet_cim_entity_schema() {
   $schema['authnet_cim_entity_payment_profile'] = array(
     'description' => t('Authorize.net customer payment profiles.'),
     'fields' => array(
+      'pid' => array(
+        'description' => t('Primary key'),
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
       'payment_profile_id' => array(
         'description' => t('Authorize.net payment profile id'),
         'type' => 'varchar',
@@ -100,8 +106,9 @@ function authnet_cim_entity_schema() {
         'not null' => FALSE,
       ),
     ),
-    'primary key' => array('payment_profile_id'),
+    'primary key' => array('pid'),
     'indexes' => array(
+      'payment_profile_id' => array('payment_profile_id'),
       'customer_profile_id' => array('customer_profile_id'),
     ),
   );
