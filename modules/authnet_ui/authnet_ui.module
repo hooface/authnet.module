@@ -10,21 +10,32 @@
  * *****************************************************************************/
 
 /**
- * User billing add/edit form.
+ * Payment profile form.
+ *
+ * @param $customer_profile_id
+ *   The id of the Authorize.net customer profile (optional).
+ * @param $payment_profile_id
+ *   The id of the Authorize.net payment profile (optional).
  */
-function authnet_ui_billing_form($form_state, $user) {
+function authnet_ui_payment_profile_form($form_state, $customer_profile_id = NULL, $payment_profile_id = NULL) {
 
   // Set the form up as a tree.
   $form = array(
     '#tree' => TRUE,
   );
 
-  // Billing fieldset.
-  $form['billing'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Billing address'),
-  );
-  $form['billing']['customer_type'] = array(
+  // If a customer profile id and a payment profile id are provided, load the profile.
+  if ($payment_profile_id) {
+    $payment_profile = authnet_cim_payment_profile_load($customer_profile_id, $payment_profile_id);
+  }
+
+  // Otherwise, initialze a blank payment profile for default values.
+  else {
+    $payment_profile = authnet_payment_profile_new();
+  }
+
+  // Customer type.
+  $form['customer_type'] = array(
     '#type' => 'select',
     '#title' => t('Customer type'),
     '#options' => array(
@@ -32,60 +43,79 @@ function authnet_ui_billing_form($form_state, $user) {
       'individual' => 'Individual',
       'business' => 'Business',
     ),
+    '#default_value' => $payment_profile->customerType,
+  );
+
+  // Billing address fieldset/fields.
+  $form['billing'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Billing address'),
   );
   $form['billing']['first_name'] = array(
     '#type' => 'textfield',
     '#title' => t('First name'),
     '#required' => TRUE,
+    '#default_value' => $payment_profile->billTo->firstName,
   );
   $form['billing']['last_name'] = array(
     '#type' => 'textfield',
     '#title' => t('Last name'),
     '#required' => TRUE,
+    '#default_value' => $payment_profile->billTo->lastName,
   );
   $form['billing']['company'] = array(
     '#type' => 'textfield',
     '#title' => t('Company'),
+    '#default_value' => $payment_profile->billTo->company,
   );
   $form['billing']['address'] = array(
     '#type' => 'textfield',
     '#title' => t('Address'),
     '#required' => TRUE,
+    '#default_value' => $payment_profile->billTo->address,
   );
   $form['billing']['city'] = array(
     '#type' => 'textfield',
     '#title' => t('City'),
     '#required' => TRUE,
+    '#default_value' => $payment_profile->billTo->city,
   );
   $form['billing']['state'] = array(
     '#type' => 'textfield',
     '#title' => t('State/province'),
     '#required' => TRUE,
+    '#default_value' => $payment_profile->billTo->state,
   );
   $form['billing']['zip'] = array(
     '#type' => 'textfield',
     '#title' => t('Zip/postal code'),
     '#required' => TRUE,
+    '#default_value' => $payment_profile->billTo->zip,
   );
   $form['billing']['country'] = array(
     '#type' => 'textfield',
     '#title' => t('Country'),
     '#required' => TRUE,
+    '#default_value' => $payment_profile->billTo->country,
   );
   $form['billing']['phone'] = array(
     '#type' => 'textfield',
     '#title' => t('Phone'),
+    '#default_value' => $payment_profile->billTo->phoneNumber,
   );
   $form['billing']['fax'] = array(
     '#type' => 'textfield',
     '#title' => t('Fax'),
+    '#default_value' => $payment_profile->billTo->faxNumber,
   );
 
-  // Credit card fieldset.
+  // Card fieldset.
   $form['card'] = array(
     '#type' => 'fieldset',
     '#title' => t('Card information'),
   );
+
+  // Card type.
   $form['card']['type'] = array(
     '#type' => 'select',
     '#title' => t('Card type'),
@@ -97,11 +127,16 @@ function authnet_ui_billing_form($form_state, $user) {
     ),
     '#required' => TRUE,
   );
+
+  // Card number.
   $form['card']['number'] = array(
     '#type' => 'textfield',
     '#title' => t('Card number'),
     '#required' => TRUE,
+    '#default_value' => $payment_profile->payment->creditCard->cardNumber,
   );
+
+  // Card expiration month.
   $form['card']['exp_month'] = array(
     '#type' => 'select',
     '#title' => t('Expiration month'),
@@ -128,6 +163,8 @@ function authnet_ui_billing_form($form_state, $user) {
   for ($year=$current_year;$year<=($current_year+10);$year++) {
     $years[] = $year;
   }
+
+  // Card expiration year.
   $form['card']['exp_year'] = array(
     '#type' => 'select',
     '#title' => t('Expiration year'),
@@ -135,6 +172,7 @@ function authnet_ui_billing_form($form_state, $user) {
     '#required' => TRUE,
   );
 
+  // Card CVV.
   $form['card']['cvv'] = array(
     '#type' => 'textfield',
     '#title' => t('Card CVV'),
