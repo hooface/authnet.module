@@ -194,22 +194,24 @@ function authnet_ui_payment_profile_form($form_state, $customer_profile_id = NUL
  * *****************************************************************************/
 
 /**
- * Generate a list of payment profile options
+ * Generate an array of payment profile options for a given user.
  *
  * @param $customer_profile
- *   A customer profile object
+ *   A customer profile object.
  *
  * @return
- *   An array of options usable as form radio options
+ *   An array of payment profiles.
  */
 function authnet_ui_payment_profile_options($customer_profile) {
   $options = array();
-  foreach ($customer_profile->paymentProfiles as $payment_profile) {
-    // At the moment we're only adding credit card payment profiles.
-    if (!empty($payment_profile->payment->creditCard->cardNumber)) {
+  if (!empty($customer_profile->paymentProfiles)) {
+    foreach ($customer_profile->paymentProfiles as $payment_profile) {
+      // At the moment we're only adding credit card payment profiles.
+      if (!empty($payment_profile->payment->creditCard->cardNumber)) {
 
-      // Add an option to the array with the last four digits and the street address.
-      $options[$payment_profile->customerPaymentProfileId] = t('Credit card: ' . $payment_profile->payment->creditCard->cardNumber . ' (' . $payment_profile->billTo->address . ')');
+        // Add an option to the array with the last four digits and the street address.
+        $options[$payment_profile->customerPaymentProfileId] = t('Credit card: ' . $payment_profile->payment->creditCard->cardNumber . ' (' . $payment_profile->billTo->address . ')');
+      }
     }
   }
   return $options;
