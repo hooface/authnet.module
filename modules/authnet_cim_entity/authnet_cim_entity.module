@@ -196,9 +196,12 @@ function authnet_cim_entity_payment_profile_new($customer_profile_id = NULL, $pa
       // Trim the card number to the last 4 digits.
       $record['cc_last_four'] = substr($payment_profile->payment->creditCard->cardNumber, -4);
 
-      // Split the expiration date into a month and year.
-      $record['cc_exp_month'] = substr($payment_profile->payment->creditCard->expirationDate, 0, 2);
-      $record['cc_exp_year'] = 2000 + substr($payment_profile->payment->creditCard->expirationDate, -2);  // Start with the year 2000 and add the two year digits.
+      // Parse the expiration date. A valid date will be in the format 'YYYY-MM'. Ignore invalid dates.
+      $expiration_date = explode('-', $payment_profile->payment->creditCard->expirationDate);
+      if (count($expiration_date) == 2) {
+        $record['cc_exp_month'] = $expiration_date[1];
+        $record['cc_exp_year'] = $expiration_date[0];
+      }
     }
   }
 
