@@ -17,7 +17,7 @@ function authnet_user_menu() {
     'title' => 'Billing',
     'page callback' => 'authnet_user_billing_page',
     'page arguments' => array(1),
-    'access callback' => 'authnet_user_manage_cards_access',
+    'access callback' => 'authnet_user_access',
     'access arguments' => array(1),
     'type' => MENU_LOCAL_TASK,
     'file' => 'authnet_user.pages.inc',
@@ -31,7 +31,7 @@ function authnet_user_menu() {
     'title' => 'Add',
     'page callback' => 'authnet_user_payment_profile',
     'page arguments' => array(1),
-    'access callback' => 'authnet_user_manage_cards_access',
+    'access callback' => 'authnet_user_access',
     'access arguments' => array(1),
     'type' => MENU_LOCAL_TASK,
     'file' => 'authnet_user.pages.inc',
@@ -46,9 +46,9 @@ function authnet_user_menu() {
  * *****************************************************************************/
 
 /**
- * Access callback for credit card management.
+ * Access callback for payment profile management.
  */
-function authnet_user_manage_cards_access($account) {
+function authnet_user_access($account) {
   // Allow access if logged in user matches the account, or
   // user has perm 'administer credit cards' ( comes from uc_credit )
   return (($GLOBALS['user']->uid == $account->uid) || user_access('administer credit cards')) && $account->uid > 0;
