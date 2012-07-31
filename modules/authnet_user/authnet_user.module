@@ -40,8 +40,8 @@ function authnet_user_menu() {
   // Add a user's payment profile.
   $items['user/%user/billing/add'] = array(
     'title' => 'Add',
-    'page callback' => 'authnet_user_payment_profile',
-    'page arguments' => array(1),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('authnet_user_payment_profile_form', 1),
     'access callback' => 'authnet_user_access',
     'access arguments' => array(1),
     'type' => MENU_LOCAL_TASK,
@@ -52,8 +52,8 @@ function authnet_user_menu() {
   // Edit a user's payment profile.
   $items['user/%user/billing/%/edit'] = array(
     'title' => 'Edit',
-    'page callback' => 'authnet_user_payment_profile',
-    'page arguments' => array(1, 3),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('authnet_user_payment_profile_form', 1, 3),
     'access callback' => 'authnet_user_payment_profile_access',
     'access arguments' => array(1, 3),
     'type' => MENU_CALLBACK,
@@ -62,7 +62,6 @@ function authnet_user_menu() {
 
   return $items;
 }
-
 
 /* ******************************************************************************
  * Access Callbacks

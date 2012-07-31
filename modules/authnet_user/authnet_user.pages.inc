@@ -50,14 +50,14 @@ function authnet_user_billing_page($user) {
 }
 
 /**
- * User payment profile form page callback.
+ * User payment profile form.
  *
  * @param $user
  *   The user account object.
  * @param $pid
  *   The id of the payment profile database record (optional).
  */
-function authnet_user_payment_profile($user, $pid = NULL) {
+function authnet_user_payment_profile_form($form_state, $user, $pid = NULL) {
 
   // Set the page title.
   if ($pid) {
@@ -76,6 +76,12 @@ function authnet_user_payment_profile($user, $pid = NULL) {
     $payment_profile_id = authnet_cim_entity_payment_profile_id_load($pid);
   }
 
+  // Start with an empty form.
+  $form = array();
+
+  // Add the Authnet UI payment profile form.
+  $form += authnet_ui_payment_profile_form($customer_profile_id, $payment_profile_id);
+
   // Return the payment profile form.
-  return drupal_get_form('authnet_ui_payment_profile_form', $customer_profile_id, $payment_profile_id);
+  return $form;
 }
