@@ -139,3 +139,56 @@ function authnet_cim_entity_profile_id_delete($customer_profile_id) {
   // Delete all of the customer's payment profiles from the database.
   db_query('DELETE FROM {authnet_cim_entity_payment_profile} WHERE customer_profile_id=%d', $customer_profile_id);
 }
+
+/* ******************************************************************************
+ * Payment profile functions
+ * Note that these functions only deal with the database records and the fields
+ * they contain. They do not contact Authorize.net, so most of the payment
+ * profile information is not included.
+ * *****************************************************************************/
+
+/**
+ * Load a payment profile record from the database.
+ *
+ * @param $payment_profile_id
+ *  The id of the payment profile record to load.
+ *
+ * @return
+ *   Returns the payment profile record.
+ */
+function authnet_cim_entity_payment_profile_load($payment_profile_id) {
+
+  // Load the payment profile from the database.
+  $payment_profile = db_fetch_array(db_query('SELECT * FROM {authnet_cim_entity_payment_profile} WHERE payment_profile_id=%d', $payment_profile_id));
+
+  // If the last four digits of the credit card number are less than four digits, prepend zeros.
+  if ($payment_profile && count($payment_profile['cc_last_four']) < 4) {
+    $payment_profile['cc_last_four'] = str_pad($payment_profile['cc_last_four'], 4, '0', STR_PAD_LEFT);
+  }
+
+  return $payment_profile;
+}
+
+/**
+ * Save a payment profile record to the database.
+ *
+ * @param payment_profile
+ *   The payment profile record to save.
+ */
+function authnet_cim_entity_payment_profile_save($payment_profile) {
+  $update = array();
+  if (isset($payment_profile['pid']) && !empty($payment_profile['pid'])) {
+    $update[] = 'pid';
+  }
+  drupal_write_record('authnet_cim_entity_payment_profile', $payment_profile, $update);
+}
+
+/**
+ * Delete a payment profile record from the database.
+ *
+ * @param $payment_profile_id
+ *   The id of the payment profile to delete.
+ */
+function authnet_cim_entity_payment_profile_delete($payment_profile_id) {
+  db_query('DELETE FROM {authnet_cim_entity_payment_profile} WHERE payment_profile_id=%d', $payment_profile_id);
+}
