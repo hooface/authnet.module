@@ -45,6 +45,30 @@ function authnet_cim_entity_authnet_cim_profile_delete($customerProfileId) {
  * *****************************************************************************/
 
 /**
+ * Get a customer profile id, based on an entity type and id.
+ *
+ * @param $type
+ *   The Drupal entity type.
+ * @param $id
+ *   The Drupal entity id.
+ *
+ * @return
+ *   Returns a customer profile id for the given entity type and id, if available. FALSE otherwise.
+ */
+function authnet_cim_entity_profile_id_load($type, $id) {
+
+  // Look up the customer profile id.
+  $customer_profile_id = db_result(db_query('SELECT customer_profile_id FROM {authnet_cim_entity} WHERE type="%s" AND id=%d', array($type, $id)));
+
+  // Return FALSE if a customer profile id wasn't found.
+  if (!$customer_profile_id) {
+    return FALSE;
+  }
+
+  return $customer_profile_id;
+}
+
+/**
  * Get a customer profile, based on an entity type and id.
  *
  * @param $type
@@ -58,7 +82,7 @@ function authnet_cim_entity_authnet_cim_profile_delete($customerProfileId) {
 function authnet_cim_entity_profile_load($type, $id) {
 
   // Look up the customer profile id.
-  $customer_profile_id = db_result(db_query('SELECT customer_profile_id FROM {authnet_cim_entity} WHERE type="%s" AND id=%d', array($type, $id)));
+  $customer_profile_id = authnet_cim_entity_profile_id_load($type, $id);
 
   // Return FALSE if a customer profile id wasn't found.
   if (!$customer_profile_id) {
