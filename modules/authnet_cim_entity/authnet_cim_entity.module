@@ -148,6 +148,42 @@ function authnet_cim_entity_profile_id_delete($customer_profile_id) {
  * *****************************************************************************/
 
 /**
+ * Generate a database record array, optionally from an AuthorizeNetPaymentProfile object.
+ */
+function authnet_cim_entity_payment_profile_new($customer_profile_id = NULL, $payment_profile = NULL) {
+
+  // Put together an empty record.
+  $record = array(
+    'pid' => NULL,
+    'payment_profile_id' => '',
+    'customer_profile_id' => '',
+    'cc_last_four' => '',
+    'cc_type' => '',
+    'cc_exp_year' => '',
+    'cc_exp_month' => '',
+  );
+
+  // If a payment profile is supplied, fill in the appropriate values.
+  if ($customer_profile_id && $payment_profile) {
+    $record['customer_profile_id'] = $customer_profile_id;
+    $record['payment_profile_id'] = $payment_profile->customerPaymentProfileId;
+
+    // If the payment profile is a credit card...
+    if (!empty($payment_profile->payment->creditCard->cardNumber)) {
+
+      // Trim the card number to the last 4 digits.
+      $record['cc_last_four'] = substr($payment_profile->payment->creditCard->cardNumber, -4);
+
+      // Split the expiration date into a month and year.
+      $record['cc_exp_month'] = substr($payment_profile->payment->creditCard->expirationDate, 0, 2);
+      $record['cc_exp_year'] = 2000 + substr($payment_profile->payment->creditCard->expirationDate, -2);  // Start with the year 2000 and add the two year digits.
+    }
+  }
+
+  return $record;
+}
+
+/**
  * Load a payment profile record from the database.
  *
  * @param $payment_profile_id
