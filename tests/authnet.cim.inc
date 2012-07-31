@@ -16,16 +16,9 @@
 $uid = 1;
 $user = user_load($uid);
 
-// Optionally load a description.
-$description = '';
-if (function_exists('content_profile_load')) {
-  $profile = content_profile_load('customer', $uid);
-  $description = $profile->title;
-}
-
 $values = array(
   'merchantCustomerId' => $user->uid,
-  'description' => $description,
+  'description' => $user->name,
   'email' => $user->mail,
   'paymentProfiles' => array(
     array(
@@ -43,12 +36,10 @@ $values = array(
         'faxNumber' => '789 123 4567',
       ),
       'payment' => array(
-        'bankAccount' => array(
-          'accountType' => 'checking',
-          'routingNumber' => '123456789',
-          'accountNumber' => '987654321',
-          'nameOnAccount' => 'John Doe',
-          'bankName' => 'Bank, Inc.',
+        'creditCard' => array(
+          'cardNumber' => '4007000000027',
+          'expirationDate' => '2012-12',
+          'cardCode' => '123',
         ),
       ),
     ),
