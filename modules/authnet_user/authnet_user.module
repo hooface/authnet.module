@@ -22,14 +22,14 @@ function authnet_user_menu() {
     'type' => MENU_LOCAL_TASK,
     'file' => 'authnet_user.pages.inc',
   );
-//  $items['user/%user/billing/add'] = array(
-//    'title' => 'Add ',
-//    'page callback' => 'authnet_user_placeholder',
-//    'access callback' => 'authnet_user_manage_cards_access',
-//    'access arguments' => array(1),
-//    'type' => MENU_CALLBACK,
-//    'file' => 'authnet_user.pages.inc',
-//  );
+ $items['user/%user/billing/add'] = array(
+   'title' => 'Add a credit card',
+   'page callback' => 'drupal_get_form',
+   'page arguments' => array('authnet_ui_billing_form', 1),
+   'access callback' => 'authnet_user_manage_cards_access',
+   'access arguments' => array(1),
+   'type' => MENU_CALLBACK,
+ );
   return $items;
 }
 
