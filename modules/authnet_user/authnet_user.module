@@ -60,3 +60,32 @@ function authnet_user_access($account) {
   // user has perm 'administer authnet payment profiles'.
   return (($GLOBALS['user']->uid == $account->uid) || user_access('administer authnet payment profiles')) && $account->uid > 0;
 }
+
+
+/**
+ * Access callback for editing/deleting payment profiles.
+ */
+function authnet_user_payment_profile_access($account, $pid) {
+
+  // If the user has 'administer authnet payment profiles' access, return TRUE.
+  if (user_access('administer authnet payment profiles')) {
+    return TRUE;
+  }
+
+  // Load the customer profile id.
+  $customer_profile_id = authnet_cim_entity_profile_id_load('user', $account->uid);
+
+  // Load the payment profile id.
+  $payment_profile_id = authnet_cim_entity_payment_profile_id_load($pid);
+
+  // Load the payment profile database record.
+  $payment_profile = authnet_cim_entity_payment_profile_load($payment_profile_id);
+
+  // Return TRUE if the payment profile id matches the customer profile id.
+  if ($payment_profile && $payment_profile['customer_profile_id'] == $customer_profile_id) {
+    return TRUE;
+  }
+
+  // Otherwise return FALSE.
+  return FALSE;
+}
