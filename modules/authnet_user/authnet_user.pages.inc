@@ -48,3 +48,23 @@ function authnet_user_billing_page($user) {
   // Return the output.
   return $output;
 }
+
+/**
+ * User payment profile form page callback.
+ */
+function authnet_user_payment_profile($user) {
+
+  // Set the page title.
+  if (arg(3) == 'add') {
+    drupal_set_title(t('Add a payment profile'));
+  }
+  else {
+    drupal_set_title(t('Edit payment profile'));
+  }
+
+  // Load the user's customer profile id.
+  $customer_profile_id = authnet_cim_entity_profile_id_load('user', $user->uid);
+
+  // Return the payment profile form.
+  return drupal_get_form('authnet_ui_payment_profile_form', $customer_profile_id, $payment_profile_id);
+}
