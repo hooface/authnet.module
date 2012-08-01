@@ -239,6 +239,32 @@ function authnet_cim_entity_payment_profile_load($payment_profile_id) {
 }
 
 /**
+ * Load all payment profile records for a customer profile id.
+ *
+ * @param $customer_profile_id
+ *   The customer profile id.
+ *
+ * @return
+ *   Returns an array of payment profile records from the database.
+ */
+function authnet_cim_entity_customer_payment_profiles_load($customer_profile_id) {
+
+  // Start with an empty result set.
+  $payment_profiles = array();
+
+  // Get all the payment profiles for that customer profile id.
+  $result = db_query('SELECT * FROM {authnet_cim_entity_payment_profile} WHERE customer_profile_id=%d', $customer_profile_id);
+
+  // Loop through the results and add them to the array.
+  while ($payment_profile = db_fetch_array($result)) {
+    $payment_profiles[$payment_profile['payment_profile_id']] = $payment_profile;
+  }
+
+  // Return the results.
+  return $payment_profiles;
+}
+
+/**
  * Save a payment profile record to the database.
  *
  * @param payment_profile
