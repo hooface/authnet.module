@@ -137,23 +137,24 @@ function authnet_ui_payment_profile_form($form_state, $customer_profile_id = NUL
   );
 
   // Card expiration month.
+  $months = array(
+    '01',
+    '02',
+    '03',
+    '04',
+    '05',
+    '06',
+    '07',
+    '08',
+    '09',
+    '10',
+    '11',
+    '12',
+  );
   $form['card']['exp_month'] = array(
     '#type' => 'select',
     '#title' => t('Expiration month'),
-    '#options' => array(
-      '01',
-      '02',
-      '03',
-      '04',
-      '05',
-      '06',
-      '07',
-      '08',
-      '09',
-      '10',
-      '11',
-      '12',
-    ),
+    '#options' => drupal_map_assoc($months),
     '#required' => TRUE,
   );
 
@@ -168,7 +169,7 @@ function authnet_ui_payment_profile_form($form_state, $customer_profile_id = NUL
   $form['card']['exp_year'] = array(
     '#type' => 'select',
     '#title' => t('Expiration year'),
-    '#options' => $years,
+    '#options' => drupal_map_assoc($years),
     '#required' => TRUE,
   );
 
