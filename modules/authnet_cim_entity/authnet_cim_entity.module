@@ -21,43 +21,36 @@
  */
 function authnet_cim_entity_authnet_cim_profile_insert($customerProfile) {
 
-  // If a mechant customer id was set...
-  if (!empty($customerProfile->merchantCustomerId)) {
+  // Get the entity type and id.
+  $entity = authnet_cim_entity_id_parse($customerProfile->merchantCustomerId);
 
-    // Split the merchant customer id into a type and id, based on the expected format: "[type]:[id]" (ie: "user:1")
-    $data = explode(':', $customerProfile->merchantCustomerId);
-    if (count($data) == 2) {
+  // If a type or id are empty, return.
+  if (empty($entity['type']) || empty($entity['id'])) {
+    return;
+  }
 
-      // Get the entity type and id.
-      $type = $data[0];
-      $id = $data[1];
+  // Save the association to the database.
+  authnet_cim_entity_profile_id_save($entity['type'], $entity['id'], $customerProfile->customerProfileId);
 
-      // If a type and id are set, save the association.
-      if (!empty($type) && !empty($id)) {
-        authnet_cim_entity_profile_id_save($type, $id, $customerProfile->customerProfileId);
+  // If there are payment profiles, save those too.
+  if (!empty($customerProfile->paymentProfiles)) {
+    foreach ($customerProfile->paymentProfiles as $payment_profile) {
 
-        // If there are payment profiles, save those too.
-        if (!empty($customerProfile->paymentProfiles)) {
-          foreach ($customerProfile->paymentProfiles as $payment_profile) {
-
-            // Generate a payment profile database record from the payment profile.
-            /**
-             * @todo
-             * This doesn't work super well. When hook_authnet_cim_profile_insert() is called, some of the important
-             * payment profile information is no longer available, because Authorize.net doesn't return the full card
-             * number or expiration date when payment profiles are loaded from it. The card number shouldn't be an issue,
-             * because Authorize.net does return something like "XXXX0027" (if the last 4 digits are 0027), which will still
-             * work with the authnet_cim_entity_payment_profile_new() function. However, it returns "XXXX" as the expiration date,
-             * which doesn't work. So the main thing that is lost here is the expiration date.
-             * This isn't a critical issue, as long as module developers that use authnet_cim_profile_save() are aware of it.
-             * The workaround is to save the payment profile record separate from the customer profile, and save the payment
-             * profile database record at the same time, when the information IS available.
-             */
-            $record = authnet_cim_entity_payment_profile_new($customerProfile->customerProfileId, $payment_profile);
-            authnet_cim_entity_payment_profile_save($record);
-          }
-        }
-      }
+      // Generate a payment profile database record from the payment profile.
+      /**
+       * @todo
+       * This doesn't work super well. When hook_authnet_cim_profile_insert() is called, some of the important
+       * payment profile information is no longer available, because Authorize.net doesn't return the full card
+       * number or expiration date when payment profiles are loaded from it. The card number shouldn't be an issue,
+       * because Authorize.net does return something like "XXXX0027" (if the last 4 digits are 0027), which will still
+       * work with the authnet_cim_entity_payment_profile_new() function. However, it returns "XXXX" as the expiration date,
+       * which doesn't work. So the main thing that is lost here is the expiration date.
+       * This isn't a critical issue, as long as module developers that use authnet_cim_profile_save() are aware of it.
+       * The workaround is to save the payment profile record separate from the customer profile, and save the payment
+       * profile database record at the same time, when the information IS available.
+       */
+      $record = authnet_cim_entity_payment_profile_new($customerProfile->customerProfileId, $payment_profile);
+      authnet_cim_entity_payment_profile_save($record);
     }
   }
 }
@@ -267,4 +260,36 @@ function authnet_cim_entity_payment_profile_save($payment_profile) {
  */
 function authnet_cim_entity_payment_profile_delete($payment_profile_id) {
   db_query('DELETE FROM {authnet_cim_entity_payment_profile} WHERE payment_profile_id=%d', $payment_profile_id);
+}
+
+/* ******************************************************************************
+ * Helper functions
+ * *****************************************************************************/
+
+/**
+ * Split an Authorize.net customer profile's merchant customer id into a type and id, based on the expected format: "[type]:[id]" (ie: "user:1").
+ */
+function authnet_cim_entity_id_parse($id) {
+
+  // Create an array with empty values.
+  $entity = array(
+    'type' => '',
+    'id' => '',
+  );
+
+  // Make sure the id isn't empty.
+  if (!empty($id)) {
+
+    // Explode the id at the colon.
+    $data = explode(':', $id);
+
+    // If the explosion was successful, and there are exactly two parts, fill in the data.
+    if (count($data) == 2) {
+      $entity['type'] = $data[0];  // The first part is the entity type.
+      $entity['id'] = $data[1];  // The second part is the entity id.
+    }
+  }
+
+  // Return the entity information.
+  return $entity;
 }
