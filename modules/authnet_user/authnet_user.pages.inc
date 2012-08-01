@@ -79,13 +79,25 @@ function authnet_user_payment_profile_form(&$form_state, $user, $pid = NULL) {
   // Start with an empty form.
   $form = array();
 
-  // Save the user id, customer profile id, and payment profile id to the form state.
-  $form_state['storage']['uid'] = $user->uid;
-  $form_state['storage']['customer_profile_id'] = $customer_profile_id;
-  $form_state['storage']['payment_profile_id'] = $payment_profile_id;
+  // Save the user id, customer profile id, and payment profile id values.
+  $form['uid'] = array(
+    '#type' => 'value',
+    '#value' => $user->uid,
+  );
+  $form['customer_profile_id'] = array(
+    '#type' => 'value',
+    '#value' => $customer_profile_id,
+  );
+  $form['payment_profile_id'] = array(
+    '#type' => 'value',
+    '#value' => $payment_profile_id,
+  );
 
   // Add the Authnet UI payment profile form.
   $form += authnet_ui_payment_profile_form($customer_profile_id, $payment_profile_id);
+
+  // Redirect to the user's billing list.
+  $form['#redirect'] = 'user/' . $user->uid . '/billing';
 
   // Return the payment profile form.
   return $form;
@@ -93,24 +105,22 @@ function authnet_user_payment_profile_form(&$form_state, $user, $pid = NULL) {
 
 /**
  * Payment profile form submit.
- * This is added to the payment profile form via hook_form_alter().
- * @see authnet_user_form_alter()
  */
 function authnet_user_payment_profile_form_submit($form, &$form_state) {
 
   // Load the user object.
-  $user = user_load($form_state['storage']['uid']);
+  $user = user_load($form_state['values']['uid']);
 
   // If a customer profile id is not available, create a new profile.
-  $customer_profile_id = $form_state['storage']['customer_profile_id'];
+  $customer_profile_id = $form_state['values']['customer_profile_id'];
   if (!$customer_profile_id) {
-    $customer_profile = authnet_user_customer_profile_new($user);
-    $customer_profile_id = $customer_profile->customer_profile_id;
+    $customer_profile = authnet_user_customer_profile_new($user);dpm($customer_profile);
+    $customer_profile_id = $customer_profile->customerProfileId;
   }
 
   // Assemble the payment profile object from the form values.
   $values = array(
-    'customerPaymentProfileId' => $form_state['storage']['payment_profile_id'],
+    'customerPaymentProfileId' => $form_state['values']['payment_profile_id'],
     'customerType' => check_plain($form_state['values']['customer_type']),
     'billTo' => array(
       'firstName' => check_plain($form_state['values']['billing']['first_name']),
