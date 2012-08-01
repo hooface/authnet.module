@@ -39,8 +39,7 @@ function authnet_cim_entity_authnet_cim_profile_insert($customerProfile) {
        * work with the authnet_cim_entity_payment_profile_new() function. However, it returns "XXXX" as the expiration date,
        * which doesn't work. So the main thing that is lost here is the expiration date.
        * This isn't a critical issue, as long as module developers that use authnet_cim_profile_save() are aware of it.
-       * The workaround is to save the payment profile record separate from the customer profile, and save the payment
-       * profile database record at the same time, when the information IS available.
+       * The workaround is to save the payment profile record manually, when the information IS available.
        */
       $record = authnet_cim_entity_payment_profile_new($customerProfile->customerProfileId, $payment_profile);
       authnet_cim_entity_payment_profile_save($record);

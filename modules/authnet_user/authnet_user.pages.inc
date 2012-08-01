@@ -136,4 +136,39 @@ function authnet_user_payment_profile_form_submit($form, &$form_state) {
 
   // Save the payment profile.
   authnet_cim_payment_profile_save($customer_profile_id, $payment_profile);
+
+  /**
+   * Authorize.net does not return the expiration date when it saves a payment profile, nor does it save
+   * the credit card type, so those pieces of information are missing from the database record that the authnet_cim_entity
+   * module creates. Therefore, we need to add it here.
+   * It's less than ideal that we need to save the payment profile record twice like this, but it's the only way to ensure
+   * that the values are saved to the database, while still maintaining the ability to use the authnet_cim_entity module
+   * without the authnet_user module.
+   */
+
+  // Load the record that was saved to the database.
+  $record = authnet_cim_entity_payment_profile_load($payment_profile->customerPaymentProfileId);
+  if ($record) {
+
+    // Set a flag for whether or not we need to save the record.
+    $save = FALSE;
+
+    // Set the card type, if it's different from the saved record, and not empty.
+    if (!empty($form_state['values']['card']['type']) && $record['cc_type'] != $form_state['values']['card']['type']) {
+      $record['cc_type'] = check_plain($form_state['values']['card']['type']);
+      $save = TRUE;
+    }
+
+    // Set the expiration month and year, if they are different from the saved record, and are not empty.
+    if ( (!empty($form_state['values']['card']['exp_month']) && !empty($form_state['values']['card']['exp_year'])) && ( ($record['cc_exp_month'] != $form_state['values']['card']['exp_month']) || ($record['cc_exp_year'] != $form_state['values']['card']['exp_year']) ) ) {
+      $record['cc_exp_month'] = check_plain($form_state['values']['card']['exp_month']);
+      $record['cc_exp_year'] = check_plain($form_state['values']['card']['exp_year']);
+      $save = TRUE;
+    }
+
+    // Save the record.
+    if ($save) {
+      authnet_cim_entity_payment_profile_save($record);
+    }
+  }
 }
