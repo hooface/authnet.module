@@ -5,11 +5,6 @@
  * Authorize.net CIM Entity
  */
 
-/**
- * @todo
- * When payment profiles are added/updated/deleted, do the same in the database.
- */
-
 /* ******************************************************************************
  * Authnet hooks
  * *****************************************************************************/
@@ -121,6 +116,27 @@ function authnet_cim_entity_authnet_cim_profile_delete($customerProfileId) {
 
   // Delete the customer and payment profiles from the databse.
   authnet_cim_entity_profile_id_delete($customerProfileId);
+}
+
+/**
+ * Implementation of hook_authnet_cim_payment_profile_insert().
+ */
+function authnet_cim_entity_authnet_cim_payment_profile_insert($customerProfileId, $paymentProfile) {
+
+  // Generate a payment profile database record from the payment profile.
+  $record = authnet_cim_entity_payment_profile_new($customerProfileId, $paymentProfile);
+
+  // Save the profile.
+  authnet_cim_entity_payment_profile_save($record);
+}
+
+/**
+ * Implementation of hook_authnet_cim_payment_profile_delete().
+ */
+function authnet_cim_entity_authnet_cim_payment_profile_delete($customerProfileId, $paymentProfileId) {
+
+  // Delete the payment profile record from the database.
+  authnet_cim_entity_payment_profile_delete($paymentProfileId);
 }
 
 /* ******************************************************************************
