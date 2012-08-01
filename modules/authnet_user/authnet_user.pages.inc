@@ -172,3 +172,45 @@ function authnet_user_payment_profile_form_submit($form, &$form_state) {
     }
   }
 }
+
+/**
+ * User payment profile delete form.
+ *
+ * @param $user
+ *   The user account object.
+ * @param $pid
+ *   The id of the payment profile database record.
+ */
+function authnet_user_payment_profile_delete_form(&$form_state, $user, $pid) {
+
+  // Start an empty form array.
+  $form = array();
+
+  // Load the payment profile id.
+  $payment_profile_id = authnet_cim_entity_payment_profile_id_load($pid);
+
+  // Store the payment profile id value in the form.
+  $form['payment_profile_id'] = array(
+    '#type' => 'value',
+    '#value' => $payment_profile_id,
+  );
+
+  // Redirect to the user's billing list in the end.
+  $redirect = 'user/' . $user->uid . '/billing';
+  $form['#redirect'] = $redirect;
+
+  // Return a confirmation form.
+  return confirm_form($form, 'Are you sure you want to delete this payment profile?', $redirect);
+}
+
+/**
+ * User payment profile delete form submit.
+ */
+function authnet_user_payment_profile_delete_form_submit($form, &$form_state) {
+
+  // Load the payment profile record.
+  $payment_profile = authnet_cim_entity_payment_profile_load($form_state['values']['payment_profile_id']);
+
+  // Delete the payment profile.
+  authnet_cim_payment_profile_delete($payment_profile['customer_profile_id'], $payment_profile['payment_profile_id']);
+}

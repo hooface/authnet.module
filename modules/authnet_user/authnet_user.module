@@ -60,6 +60,17 @@ function authnet_user_menu() {
     'file' => 'authnet_user.pages.inc',
   );
 
+  // Delete a user's payment profile.
+  $items['user/%user/billing/%/delete'] = array(
+    'title' => 'Delete',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('authnet_user_payment_profile_delete_form', 1, 3),
+    'access callback' => 'authnet_user_payment_profile_access',
+    'access arguments' => array(1, 3),
+    'type' => MENU_CALLBACK,
+    'file' => 'authnet_user.pages.inc',
+  );
+
   return $items;
 }
 
