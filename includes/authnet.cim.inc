@@ -185,6 +185,9 @@ function authnet_cim_payment_profile_load($customerProfileId, $customerPaymentPr
     // Convert the payment profile from a SimpleXMLElement to an AuthorizeNetPaymentProfile object.
     $paymentProfile = authnet_payment_profile_new(_authnet_simplexml_to_array($response->xml->paymentProfile));
 
+    // Invoke hook_authnet_cim_payment_profile_load and pass in the payment profile object.
+    module_invoke_all('authnet_cim_payment_profile_load', $customerProfileId, $paymentProfile);
+
     // Return the profile.
     return $paymentProfile;
   }
@@ -245,6 +248,16 @@ function authnet_cim_payment_profile_save($customerProfileId, AuthorizeNetPaymen
 
       // Load the full payment profile object with another call to Authorize.net.
       $paymentProfile = authnet_cim_payment_profile_load($customerProfileId, $customerPaymentProfileId);
+
+      // Invoke hook_authnet_cim_payment_profile_insert and pass in the payment profile object.
+      module_invoke_all('authnet_cim_payment_profile_insert', $customerProfileId, $paymentProfile);
+    }
+
+    // If the profile is being updated...
+    else {
+
+      // Invoke hook_authnet_cim_payment_profile_update and pass in the payment profile object.
+      module_invoke_all('authnet_cim_payment_profile_update', $customerProfileId, $paymentProfile);
     }
 
     // Return TRUE.
@@ -277,8 +290,13 @@ function authnet_cim_payment_profile_delete($customerProfileId, $customerPayment
   // Log the response object.
   authnet_log_response($response);
 
-  // If the request was successful, return TRUE.
+  // If the request was successful...
   if ($response->isOk()) {
+
+    // Invoke hook_authnet_cim_payment_profile_delete and pass in the payment profile id.
+    module_invoke_all('authnet_cim_payment_profile_delete', $customerProfileId, $customerPaymentProfileId);
+
+    // Return TRUE.
     return TRUE;
   }
 
