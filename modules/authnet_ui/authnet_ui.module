@@ -116,15 +116,16 @@ function authnet_ui_payment_profile_form($form_state, $customer_profile_id = NUL
   );
 
   // Card type.
+  $card_types = array(
+    'Visa',
+    'MasterCard',
+    'American Express',
+    'Discover',
+  );
   $form['card']['type'] = array(
     '#type' => 'select',
     '#title' => t('Card type'),
-    '#options' => array(
-      'visa' => 'Visa',
-      'mastercard' => 'MasterCard',
-      'american_express' => 'American Express',
-      'discover' => 'Discover',
-    ),
+    '#options' => drupal_map_assoc($card_types),
     '#required' => TRUE,
   );
 
@@ -178,7 +179,6 @@ function authnet_ui_payment_profile_form($form_state, $customer_profile_id = NUL
     '#type' => 'textfield',
     '#title' => t('Card CVV'),
     '#size' => 5,
-    '#required' => TRUE,
   );
 
   // Save button.
