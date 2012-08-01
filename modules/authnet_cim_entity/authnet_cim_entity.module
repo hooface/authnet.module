@@ -7,8 +7,6 @@
 
 /**
  * @todo
- * When customer profiles are created, add payment profiles too.
- * When customer profiles are updated, add/remove payment profiles.
  * When payment profiles are added/updated/deleted, do the same in the database.
  */
 
@@ -51,6 +49,67 @@ function authnet_cim_entity_authnet_cim_profile_insert($customerProfile) {
        */
       $record = authnet_cim_entity_payment_profile_new($customerProfile->customerProfileId, $payment_profile);
       authnet_cim_entity_payment_profile_save($record);
+    }
+  }
+}
+
+/**
+ * Implementation of hook_authnet_cim_profile_update().
+ */
+function authnet_cim_entity_authnet_cim_profile_update($customerProfile) {
+
+  /**
+   * The purpose of the following code is to ensure that the payment profiles assigned to a customer profile in Authorize.net
+   * match those that we have saved in the {authnet_cim_entity_payment_profile} table. To do that, we'll start by going through
+   * all of the payment profiles on the customer profile that was passed into this function, and add new ones to the database.
+   * Then, we'll see if there are any extra payment profiles in the database, indicating that they don't exist in Authorize.net,
+   * and delete them.
+   */
+
+  // Get the entity type and id.
+  $entity = authnet_cim_entity_id_parse($customerProfile->merchantCustomerId);
+
+  // If a type or id are empty, return.
+  if (empty($entity['type']) || empty($entity['id'])) {
+    return;
+  }
+
+  // Save the new payment profiles, and make an array of all payment profile ids in the Authorize.net record.
+  $payment_profile_ids = array();
+  if (!empty($customerProfile->paymentProfiles)) {
+    foreach ($customerProfile->paymentProfiles as $paymentProfile) {
+
+      // Load the payment profile from the database if it exists.
+      $existing_record = authnet_cim_entity_payment_profile_load($paymentProfile->customerPaymentProfileId);
+
+      // If an existing record doesn't exist, save one.
+      if (!$existing_record) {
+
+        // Generate a payment profile database record from the payment profile.
+        $record = authnet_cim_entity_payment_profile_new($customerProfile->customerProfileId, $paymentProfile);
+
+        // Save the profile.
+        authnet_cim_entity_payment_profile_save($record);
+      }
+
+      // Keep track of the payment profile ids.
+      $payment_profile_ids[] = $paymentProfile->customerPaymentProfileId;
+    }
+  }
+
+  // Load all the saved payment profiles.
+  $payment_profiles = authnet_cim_entity_customer_payment_profiles_load($customerProfile->customerProfileId);
+
+  // If there are more saved profiles than official ones, we need to delete some.
+  if (count($payment_profiles) > count($payment_profile_ids)) {
+
+    // Loop through the database records.
+    foreach ($payment_profiles as $payment_profile) {
+
+      // If the database record's payment profile id doesn't exist in the list from Authorize.net, delete it.
+      if (!in_array($payment_profile['payment_profile_id'], $payment_profile_ids)) {
+        authnet_cim_entity_payment_profile_delete($payment_profile['payment_profile_id']);
+      }
     }
   }
 }
