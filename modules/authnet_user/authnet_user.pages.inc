@@ -118,9 +118,12 @@ function authnet_user_payment_profile_form_submit($form, &$form_state) {
     $customer_profile_id = $customer_profile->customerProfileId;
   }
 
+  // Get the payment profile id.
+  $payment_profile_id = $form_state['values']['payment_profile_id'];
+
   // Assemble the payment profile object from the form values.
   $values = array(
-    'customerPaymentProfileId' => $form_state['values']['payment_profile_id'],
+    'customerPaymentProfileId' => $payment_profile_id,
     'customerType' => check_plain($form_state['values']['customer_type']),
     'billTo' => array(
       'firstName' => check_plain($form_state['values']['billing']['first_name']),
@@ -134,14 +137,39 @@ function authnet_user_payment_profile_form_submit($form, &$form_state) {
       'phoneNumber' => check_plain($form_state['values']['billing']['phone']),
       'faxNumber' => check_plain($form_state['values']['billing']['fax']),
     ),
-    'payment' => array(
-      'creditCard' => array(
-        'cardNumber' => check_plain($form_state['values']['card']['number']),
-        'expirationDate' => check_plain($form_state['values']['card']['exp_year']) . '-' . check_plain($form_state['values']['card']['exp_month']),
-        'cardCode' => check_plain($form_state['values']['card']['cvv']),
-      ),
-    ),
   );
+
+  // Assemble the credit card information.
+  $cc = array(
+    'type' => $form_state['values']['card']['type'],
+    'number' => $form_state['values']['card']['number'],
+    'exp' => $form_state['values']['card']['exp_year'] . '-' . $form_state['values']['card']['exp_month'],
+    'cvv' => $form_state['values']['card']['cvv'],
+  );
+
+  // Only add credit card fields if a) the payment profile is new, or b) all the fields are present in the form.
+  if (!$payment_profile_id || ( !empty($cc['type']) && $cc['exp'] != '-' )) {
+    $values['payment'] = array(
+      'creditCard' => array(
+        'cardNumber' => check_plain($cc['number']),
+        'expirationDate' => check_plain($cc['exp']),
+        'cardCode' => check_plain($cc['cvv']),
+      ),
+    );
+  }
+
+  // Otherwise, add default payment information, which Authorize.net will ignore.
+  else {
+    $values['payment'] = array(
+      'creditCard' => array(
+        'cardNumber' => check_plain($cc['number']),
+        'expirationDate' => 'XXXX',
+        'cardCode' => '',
+      ),
+    );
+  }
+
+  // Generate the AuthorizeNetPaymentProfile object from the values.
   $payment_profile = authnet_payment_profile_new($values);
 
   // Save the payment profile.

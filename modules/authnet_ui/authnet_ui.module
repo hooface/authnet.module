@@ -115,8 +115,14 @@ function authnet_ui_payment_profile_form($form_state, $customer_profile_id = NUL
     '#title' => t('Card information'),
   );
 
+  // If we're editing an existing profile, provide an explanation about how the credit card fields work.
+  if ($payment_profile_id) {
+    $form['card']['#description'] = t('Note: the form below will NOT display your existing credit card information (except for the last four digits of the card). If you need to update your credit card, fill in all the fields below with the new information. Otherwise, leave them alone and the original values will be used.');
+  }
+
   // Card type.
   $card_types = array(
+    '',
     'Visa',
     'MasterCard',
     'American Express',
@@ -126,19 +132,18 @@ function authnet_ui_payment_profile_form($form_state, $customer_profile_id = NUL
     '#type' => 'select',
     '#title' => t('Card type'),
     '#options' => drupal_map_assoc($card_types),
-    '#required' => TRUE,
   );
 
   // Card number.
   $form['card']['number'] = array(
     '#type' => 'textfield',
     '#title' => t('Card number'),
-    '#required' => TRUE,
     '#default_value' => $payment_profile->payment->creditCard->cardNumber,
   );
 
   // Card expiration month.
   $months = array(
+    '',
     '01',
     '02',
     '03',
@@ -156,19 +161,18 @@ function authnet_ui_payment_profile_form($form_state, $customer_profile_id = NUL
     '#type' => 'select',
     '#title' => t('Expiration month'),
     '#options' => drupal_map_assoc($months),
-    '#required' => TRUE,
   );
 
   // Build a list of year options (current year + 10).
   $current_year = date('Y');
-  $years = range($current_year, $current_year + 10);
+  $years = array('');
+  $years += range($current_year, $current_year + 10);
 
   // Card expiration year.
   $form['card']['exp_year'] = array(
     '#type' => 'select',
     '#title' => t('Expiration year'),
     '#options' => drupal_map_assoc($years),
-    '#required' => TRUE,
   );
 
   // Card CVV.
@@ -177,6 +181,14 @@ function authnet_ui_payment_profile_form($form_state, $customer_profile_id = NUL
     '#title' => t('Card CVV'),
     '#size' => 5,
   );
+
+  // Only make the credit card fields required if we're saving a new payment profile.
+  if (!$payment_profile_id) {
+    $form['card']['type']['#required'] = TRUE;
+    $form['card']['number']['#required'] = TRUE;
+    $form['card']['exp_month']['#required'] = TRUE;
+    $form['card']['exp_year']['#required'] = TRUE;
+  }
 
   // Save button.
   $form['submit'] = array(
