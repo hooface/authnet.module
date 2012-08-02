@@ -140,19 +140,20 @@ function authnet_cim_entity_authnet_cim_payment_profile_delete($customerProfileI
  *   The Drupal entity id.
  *
  * @return
- *   Returns a customer profile id for the given entity type and id, if available. FALSE otherwise.
+ *   Returns a customer profile id for the given entity type and id.
  */
 function authnet_cim_entity_profile_id_load($type, $id) {
 
-  // Look up the customer profile id.
-  $customer_profile_id = db_result(db_query('SELECT customer_profile_id FROM {authnet_cim_entity} WHERE type="%s" AND id=%d', array($type, $id)));
+  // Create a static variable for storing customer profile ids.
+  static $customer_profile_ids = array();
 
-  // Return FALSE if a customer profile id wasn't found.
-  if (!$customer_profile_id) {
-    return FALSE;
+  // If the customer profile id of the given type and id is not known, look it up.
+  if (!isset($customer_profile_ids[$type]) || !isset($customer_profile_ids[$type][$id])) {
+    $customer_profile_ids[$type][$id] = db_result(db_query('SELECT customer_profile_id FROM {authnet_cim_entity} WHERE type="%s" AND id=%d', array($type, $id)));
   }
 
-  return $customer_profile_id;
+  // Return the requested customer profile id.
+  return $customer_profile_ids[$type][$id];
 }
 
 /**
@@ -275,8 +276,16 @@ function authnet_cim_entity_payment_profile_new($customer_profile_id = NULL, $pa
  */
 function authnet_cim_entity_payment_profile_id_load($pid) {
 
-  // Load the payment profile from the database.
-  return db_result(db_query('SELECT payment_profile_id FROM {authnet_cim_entity_payment_profile} WHERE pid=%d', $pid));
+  // Create a static variable for storing payment_profile_ids.
+  static $payment_profile_ids = array();
+
+  // If the payment profile id for the given pid isn't known, look it up.
+  if (!isset($payment_profile_ids[$pid])) {
+    $payment_profile_ids[$pid] = db_result(db_query('SELECT payment_profile_id FROM {authnet_cim_entity_payment_profile} WHERE pid=%d', $pid));
+  }
+
+  // Return the payment profile id.
+  return $payment_profile_ids[$pid];
 }
 
 /**
