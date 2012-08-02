@@ -300,14 +300,7 @@ function authnet_cim_entity_payment_profile_id_load($pid) {
 function authnet_cim_entity_payment_profile_load($payment_profile_id) {
 
   // Load the payment profile from the database.
-  $payment_profile = db_fetch_array(db_query('SELECT * FROM {authnet_cim_entity_payment_profile} WHERE payment_profile_id=%d', $payment_profile_id));
-
-  // If the last four digits of the credit card number are less than four digits, prepend zeros.
-  if ($payment_profile && count($payment_profile['cc_last_four']) < 4) {
-    $payment_profile['cc_last_four'] = str_pad($payment_profile['cc_last_four'], 4, '0', STR_PAD_LEFT);
-  }
-
-  return $payment_profile;
+  return db_fetch_array(db_query('SELECT * FROM {authnet_cim_entity_payment_profile} WHERE payment_profile_id=%d', $payment_profile_id));
 }
 
 /**

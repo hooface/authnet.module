@@ -80,9 +80,8 @@ function authnet_cim_entity_schema() {
       ),
       'cc_last_four' => array(
         'description' => t('Credit card: last four digits'),
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'size' => 'small',
+        'type' => 'varchar',
+        'length' => '5',
         'not null' => FALSE,
       ),
       'cc_type' => array(
