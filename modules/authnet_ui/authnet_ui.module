@@ -325,8 +325,15 @@ function authnet_ui_payment_profile_options($customer_profile) {
       // At the moment we're only adding credit card payment profiles.
       if (!empty($payment_profile->payment->creditCard->cardNumber)) {
 
-        // Add an option to the array with the last four digits and the street address.
-        $options[$payment_profile->customerPaymentProfileId] = t('Credit card: ' . $payment_profile->payment->creditCard->cardNumber . ' (' . $payment_profile->billTo->address . ')');
+        // Load the payment profile database record.
+        $db_record = authnet_cim_entity_payment_profile_load($payment_profile->customerPaymentProfileId);
+
+        // Only add it if we have a record of it.
+        if ($db_record) {
+
+          // Add an option to the array with the last four digits and the street address.
+          $options[$db_record['pid']] = t('@cc_type @last_four (last 4) - @address', array('@cc_type' => $db_record['cc_type'], '@last_four' => $db_record['cc_last_four'], '@address' => $payment_profile->billTo->address));
+        }
       }
     }
   }
