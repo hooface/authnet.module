@@ -50,7 +50,7 @@ function authnet_user_menu() {
   );
 
   // Edit a user's payment profile.
-  $items['user/%user/billing/%/edit'] = array(
+  $items['user/%user/billing/%authnet_cim_entity_payment_profile_id/edit'] = array(
     'title' => 'Edit',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('authnet_user_payment_profile_form', 1, 3),
@@ -61,7 +61,7 @@ function authnet_user_menu() {
   );
 
   // Delete a user's payment profile.
-  $items['user/%user/billing/%/delete'] = array(
+  $items['user/%user/billing/%authnet_cim_entity_payment_profile_id/delete'] = array(
     'title' => 'Delete',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('authnet_user_payment_profile_delete_form', 1, 3),

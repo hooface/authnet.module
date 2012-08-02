@@ -54,13 +54,13 @@ function authnet_user_billing_page($user) {
  *
  * @param $user
  *   The user account object.
- * @param $pid
- *   The id of the payment profile database record (optional).
+ * @param $payment_profile_id
+ *   The id of the payment profile to edit.
  */
-function authnet_user_payment_profile_form(&$form_state, $user, $pid = NULL) {
+function authnet_user_payment_profile_form(&$form_state, $user, $payment_profile_id = NULL) {
 
   // Set the page title.
-  if ($pid) {
+  if ($payment_profile_id) {
     drupal_set_title(t('Edit payment profile'));
   }
   else {
@@ -69,12 +69,6 @@ function authnet_user_payment_profile_form(&$form_state, $user, $pid = NULL) {
 
   // Load the user's customer profile id.
   $customer_profile_id = authnet_cim_entity_profile_id_load('user', $user->uid);
-
-  // Load the payment profile id.
-  $payment_profile_id = NULL;
-  if ($pid) {
-    $payment_profile_id = authnet_cim_entity_payment_profile_id_load($pid);
-  }
 
   // Start with an empty form.
   $form = array();
@@ -105,15 +99,12 @@ function authnet_user_payment_profile_form(&$form_state, $user, $pid = NULL) {
  * @param $user
  *   The user account object.
  * @param $pid
- *   The id of the payment profile database record.
+ *   The id of the payment profile to delete.
  */
-function authnet_user_payment_profile_delete_form(&$form_state, $user, $pid) {
+function authnet_user_payment_profile_delete_form(&$form_state, $user, $payment_profile_id) {
 
   // Start an empty form array.
   $form = array();
-
-  // Load the payment profile id.
-  $payment_profile_id = authnet_cim_entity_payment_profile_id_load($pid);
 
   // Store the payment profile id value in the form.
   $form['payment_profile_id'] = array(
