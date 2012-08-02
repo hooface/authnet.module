@@ -276,10 +276,12 @@ function authnet_cim_entity_payment_profile_new($customer_profile_id = NULL, $pa
     'pid' => NULL,
     'payment_profile_id' => '',
     'customer_profile_id' => '',
+    'label' => '',
     'cc_last_four' => '',
     'cc_type' => '',
     'cc_exp_year' => '',
     'cc_exp_month' => '',
+    'is_default' => 0,
   );
 
   // If a payment profile is supplied, fill in the appropriate values.

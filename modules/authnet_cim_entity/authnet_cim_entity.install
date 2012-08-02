@@ -78,6 +78,12 @@ function authnet_cim_entity_schema() {
         'length' => '11',
         'not null' => TRUE,
       ),
+      'label' => array(
+        'description' => t('Payment profile label.'),
+        'type' => 'varchar',
+        'length' => '128',
+        'not null' => FALSE,
+      ),
       'cc_last_four' => array(
         'description' => t('Credit card: last four digits'),
         'type' => 'varchar',
@@ -103,6 +109,13 @@ function authnet_cim_entity_schema() {
         'unsigned' => TRUE,
         'size' => 'tiny',
         'not null' => FALSE,
+      ),
+      'is_default' => array(
+        'description' => t('Boolean: whether or not this payment profile is the default for the customer'),
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
       ),
     ),
     'primary key' => array('pid'),
