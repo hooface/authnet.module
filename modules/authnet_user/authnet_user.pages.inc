@@ -30,10 +30,10 @@ function authnet_user_billing_page($user) {
     t('Operations'),
   );
   $rows = array();
-  foreach ($profiles_list as $payment_profile) {
+  foreach ($profiles_list as $pid => $payment_profile) {
     $rows[] = array(
-      l($payment_profile, 'user/' . $user->uid . '/billing/edit'),
-      l('Edit', 'user/' . $user->uid . '/billing/edit') . ' | ' . l('Delete', 'user/' . $user->uid . '/billing/delete'),
+      l($payment_profile, 'user/' . $user->uid . '/billing/' . $pid . '/edit'),
+      l('Edit', 'user/' . $user->uid . '/billing/' . $pid . '/edit') . ' | ' . l('Delete', 'user/' . $user->uid . '/billing/' . $pid . '/delete'),
     );
   }
 
