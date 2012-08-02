@@ -114,6 +114,8 @@ function authnet_user_authnet_ui_payment_profile_form_submit($payment_profile, $
    * Authorize.net does not save the credit card type, so that piece of information is missing from the database record
    * that the authnet_cim_entity module creates. Therefore, we need to add it here.
    *
+   * We also add payment profile label and default status here.
+   *
    * It's less than ideal that we need to save the payment profile record twice like this, but it's the only way to ensure
    * that the type is saved to the database, while still maintaining the ability to use the authnet_cim_entity module
    * without the authnet_user module.
@@ -123,13 +125,32 @@ function authnet_user_authnet_ui_payment_profile_form_submit($payment_profile, $
   $record = authnet_cim_entity_payment_profile_load($payment_profile->customerPaymentProfileId);
   if ($record) {
 
+    // Create a save flag.
+    $save = FALSE;
+
     // Set the card type, if it's different from the saved record, and not empty.
     if (!empty($form_state['values']['card']['type']) && $record['cc_type'] != $form_state['values']['card']['type']) {
-
-      // Set the cc type on the record.
       $record['cc_type'] = check_plain($form_state['values']['card']['type']);
+      $save = TRUE;
+    }
 
-      // Save the record.
+    // Set the profile label, if it's different from the saved record.
+    if ($record['label'] != $form_state['values']['label']) {
+      $record['label'] = check_plain($form_state['values']['label']);
+      $save = TRUE;
+    }
+
+    // Set the profile default status, if it's different from the saved record.
+    if ($record['is_default'] != $form_state['values']['is_default']) {
+      $record['is_default'] = check_plain($form_state['values']['is_default']);
+      $save = TRUE;
+
+      // Set all the other payment profiles for this customer to NOT default.
+      db_query('UPDATE {authnet_cim_entity_payment_profile} SET is_default=0 WHERE is_default=1 AND customer_profile_id=%d', $record['customer_profile_id']);
+    }
+
+    // Save the record.
+    if ($save) {
       authnet_cim_entity_payment_profile_save($record);
     }
   }

@@ -83,6 +83,29 @@ function authnet_user_payment_profile_form(&$form_state, $user, $payment_profile
     '#value' => $user->uid,
   );
 
+  // Load the payment profile record, if it exists. Otherwise, just create a blank one.
+  if ($payment_profile_id) {
+    $payment_profile = authnet_cim_entity_payment_profile_load($payment_profile_id);
+  }
+  else {
+    $payment_profile = authnet_cim_entity_payment_profile_new();
+  }
+
+  // Payment profile label.
+  $form['label'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Label'),
+    '#description' => t('Use this field to give your payment profile a descriptive label.'),
+    '#default_value' => $payment_profile['label'],
+  );
+
+  // Checkbox to make this payment profile the default one.
+  $form['is_default'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Make this payment profile the default.'),
+    '#default_value' => $payment_profile['is_default'],
+  );
+
   // Add the Authnet UI payment profile form.
   $form += authnet_ui_payment_profile_form($form_state, $customer_profile_id, $payment_profile_id);
 
