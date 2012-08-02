@@ -82,6 +82,12 @@ function authnet_uc_form_alter(&$form, &$form_state, $form_id) {
       '#title' => t('Add this credit card to the customer’s payment profiles (and make it the default). Leave this unchecked to only associate this transaction with the order.'),
       '#weight' => -1,
     );
+
+    // If the 'references' fieldset is available, change the language to be more accurate.
+    if (isset($form['references'])) {
+      $form['references']['#title'] = t('Order references');
+      $form['references']['#description'] = t('Use the available buttons in this fieldset to select and act on a reference that has been associated with this order.');
+    }
   }
 }
 
