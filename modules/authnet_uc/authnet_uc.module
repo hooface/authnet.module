@@ -36,12 +36,12 @@ function authnet_uc_form_alter(&$form, &$form_state, $form_id) {
     $form['authnet_payment_profiles'] = array(
       '#type' => 'fieldset',
       '#title' => t('Customer payment profiles'),
-      '#description' => t('This order\'s customer has the following payment profiles.'),
+      '#description' => t('Select from the customer\'s existing payment profiles below.'),
       '#weight' => -1,
     );
 
     // If the customer doesn't have any payment profiles...
-    if (!empty($payment_profiles)) {
+    if (empty($payment_profiles)) {
 
       // Change the fieldset description.
       $form['authnet_payment_profiles']['#description'] = t('The customer assigned to this order doesn\'t have any payment profiles. Use the form below to add one.');
@@ -66,6 +66,16 @@ function authnet_uc_form_alter(&$form, &$form_state, $form_id) {
         '#value' => t('Charge amount to this profile'),
       );
     }
+
+    // Set the weight of the 'cc_data' fieldset so that it is at the top.
+    $form['specify_card']['cc_data']['#weight'] = -2;
+
+    // Add a checkbox for adding a credit card to a customer profile.
+    $form['specify_card']['add_profile'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Add this credit card to the customer’s payment profiles (and make it the default). Leave this unchecked to only associate this transaction with the order.'),
+      '#weight' => -1,
+    );
   }
 }
 
