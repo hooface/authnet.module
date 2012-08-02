@@ -97,8 +97,27 @@ function authnet_cim_profile_save(AuthorizeNetCustomer &$customerProfile) {
       // Get the new profile id from the response.
       $customerProfileId = $response->getCustomerProfileId();
 
+      // If the new customer profile has payment profiles with credit cards, save their expiration date information so that it's available in the insert hook after reloading the profile.
+      $expiration_dates = array();
+      if (!empty($customerProfile->paymentProfiles)) {
+        foreach ($customerProfile->paymentProfiles as $paymentProfile) {
+          if (!empty($paymentProfile->payment->creditCard->expirationDate)) {
+            $expiration_dates[$paymentProfile->customerPaymentProfileId] = $paymentProfile->payment->creditCard->expirationDate;
+          }
+        }
+      }
+
       // Load the full customer profile object with another call to Authorize.net.
       $customerProfile = authnet_cim_profile_load($customerProfileId);
+
+      // Restore the expiration dates.
+      if (!empty($customerProfile->paymentProfiles)) {
+        foreach ($customerProfile->paymentProfiles as $paymentProfile) {
+          if (!empty($expiration_dates[$paymentProfile->customerPaymentProfileId])) {
+            $paymentProfile->payment->creditCard->expirationDate = $expiration_dates[$paymentProfile->customerPaymentProfileId];
+          }
+        }
+      }
 
       // Invoke hook_authnet_cim_profile_insert and pass in the customer profile object.
       module_invoke_all('authnet_cim_profile_insert', $customerProfile);
@@ -246,8 +265,19 @@ function authnet_cim_payment_profile_save($customerProfileId, AuthorizeNetPaymen
       // Get the new profile id from the response.
       $customerPaymentProfileId = $response->getPaymentProfileId();
 
+      // If the new payment profile has a credit card expiration date, save it so that it's available in the insert hook after reloading the profile.
+      $expiration_date = '';
+      if (!empty($paymentProfile->payment->creditCard->expirationDate)) {
+        $expiration_date = $paymentProfile->payment->creditCard->expirationDate;
+      }
+
       // Load the full payment profile object with another call to Authorize.net.
       $paymentProfile = authnet_cim_payment_profile_load($customerProfileId, $customerPaymentProfileId);
+
+      // Restore the expiration date.
+      if (!empty($expiration_date)) {
+        $paymentProfile->payment->creditCard->expirationDate = $expiration_date;
+      }
 
       // Invoke hook_authnet_cim_payment_profile_insert and pass in the payment profile object.
       module_invoke_all('authnet_cim_payment_profile_insert', $customerProfileId, $paymentProfile);
