@@ -67,6 +67,12 @@ function authnet_uc_form_alter(&$form, &$form_state, $form_id) {
       );
     }
 
+    // Make the 'specify_card' fieldset collapsed by default, if the customer has payment profiles.
+    if (!empty($payment_profiles)) {
+      $form['specify_card']['#collapsible'] = TRUE;
+      $form['specify_card']['#collapsed'] = TRUE;
+    }
+
     // Set the weight of the 'cc_data' fieldset so that it is at the top.
     $form['specify_card']['cc_data']['#weight'] = -2;
 
