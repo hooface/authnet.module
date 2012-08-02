@@ -79,18 +79,14 @@ function authnet_user_payment_profile_form(&$form_state, $user, $pid = NULL) {
   // Start with an empty form.
   $form = array();
 
-  // Save the user id, customer profile id, and payment profile id values.
+  /**
+   * Save the user id value to the form. This will be used to generate information for the Authorize.net 
+   * customer profile, if one doesn't exist already.
+   * @see authnet_user_authnet_ui_form_customer_profile_new()
+   */
   $form['uid'] = array(
     '#type' => 'value',
     '#value' => $user->uid,
-  );
-  $form['customer_profile_id'] = array(
-    '#type' => 'value',
-    '#value' => $customer_profile_id,
-  );
-  $form['payment_profile_id'] = array(
-    '#type' => 'value',
-    '#value' => $payment_profile_id,
   );
 
   // Add the Authnet UI payment profile form.
@@ -101,102 +97,6 @@ function authnet_user_payment_profile_form(&$form_state, $user, $pid = NULL) {
 
   // Return the payment profile form.
   return $form;
-}
-
-/**
- * Payment profile form submit.
- */
-function authnet_user_payment_profile_form_submit($form, &$form_state) {
-
-  // Load the user object.
-  $user = user_load($form_state['values']['uid']);
-
-  // If a customer profile id is not available, create a new profile.
-  $customer_profile_id = $form_state['values']['customer_profile_id'];
-  if (!$customer_profile_id) {
-    $customer_profile = authnet_user_customer_profile_new($user);dpm($customer_profile);
-    $customer_profile_id = $customer_profile->customerProfileId;
-  }
-
-  // Get the payment profile id.
-  $payment_profile_id = $form_state['values']['payment_profile_id'];
-
-  // Assemble the payment profile object from the form values.
-  $values = array(
-    'customerPaymentProfileId' => $payment_profile_id,
-    'customerType' => check_plain($form_state['values']['customer_type']),
-    'billTo' => array(
-      'firstName' => check_plain($form_state['values']['billing']['first_name']),
-      'lastName' => check_plain($form_state['values']['billing']['last_name']),
-      'company' => check_plain($form_state['values']['billing']['company']),
-      'address' => check_plain($form_state['values']['billing']['address']),
-      'city' => check_plain($form_state['values']['billing']['city']),
-      'state' => check_plain($form_state['values']['billing']['state']),
-      'zip' => check_plain($form_state['values']['billing']['zip']),
-      'country' => check_plain($form_state['values']['billing']['country']),
-      'phoneNumber' => check_plain($form_state['values']['billing']['phone']),
-      'faxNumber' => check_plain($form_state['values']['billing']['fax']),
-    ),
-  );
-
-  // Assemble the credit card information.
-  $cc = array(
-    'type' => $form_state['values']['card']['type'],
-    'number' => $form_state['values']['card']['number'],
-    'exp' => $form_state['values']['card']['exp_year'] . '-' . $form_state['values']['card']['exp_month'],
-    'cvv' => $form_state['values']['card']['cvv'],
-  );
-
-  // Only add credit card fields if a) the payment profile is new, or b) all the fields are present in the form.
-  if (!$payment_profile_id || ( !empty($cc['type']) && $cc['exp'] != '-' )) {
-    $values['payment'] = array(
-      'creditCard' => array(
-        'cardNumber' => check_plain($cc['number']),
-        'expirationDate' => check_plain($cc['exp']),
-        'cardCode' => check_plain($cc['cvv']),
-      ),
-    );
-  }
-
-  // Otherwise, add default payment information, which Authorize.net will ignore.
-  else {
-    $values['payment'] = array(
-      'creditCard' => array(
-        'cardNumber' => check_plain($cc['number']),
-        'expirationDate' => 'XXXX',
-        'cardCode' => '',
-      ),
-    );
-  }
-
-  // Generate the AuthorizeNetPaymentProfile object from the values.
-  $payment_profile = authnet_payment_profile_new($values);
-
-  // Save the payment profile.
-  authnet_cim_payment_profile_save($customer_profile_id, $payment_profile);
-
-  /**
-   * Authorize.net does not save the credit card type, so that piece of information is missing from the database record
-   * that the authnet_cim_entity module creates. Therefore, we need to add it here.
-   * It's less than ideal that we need to save the payment profile record twice like this, but it's the only way to ensure
-   * that the type is saved to the database, while still maintaining the ability to use the authnet_cim_entity module
-   * without the authnet_user module.
-   */
-
-  // Load the record that was saved to the database.
-  $record = authnet_cim_entity_payment_profile_load($payment_profile->customerPaymentProfileId);
-  if ($record) {
-
-    // Set the card type, if it's different from the saved record, and not empty.
-    if (!empty($form_state['values']['card']['type']) && $record['cc_type'] != $form_state['values']['card']['type']) {
-
-      // Set the cc type on the record.
-      $record['cc_type'] = check_plain($form_state['values']['card']['type']);
-
-      // Save the record.
-      authnet_cim_entity_payment_profile_save($record);
-    }
-  }
 }
 
 /**

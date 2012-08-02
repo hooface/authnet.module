@@ -75,6 +75,32 @@ function authnet_user_menu() {
 }
 
 /* ******************************************************************************
+ * Authnet UI hooks
+ * *****************************************************************************/
+
+/**
+ * Implementation of hook_authnet_ui_form_customer_profile_new().
+ */
+function authnet_user_authnet_ui_form_customer_profile_new(&$profile, $form_state, $form_id) {
+
+  // If this is being called by our authnet_user_payment_profile_form...
+  if ($form_id == 'authnet_user_payment_profile_form') {
+
+    // If a user id is set in the form...
+    if (!empty($form_state['values']['uid'])) {
+
+      // Load the user object.
+      $user = user_load($form_state['values']['uid']);
+
+      // Customize the customer profile with the user information.
+      $profile->merchantCustomerId = 'user:' . $user->uid;
+      $profile->description = $user->name;
+      $profile->email = $user->mail;
+    }
+  }
+}
+
+/* ******************************************************************************
  * Access Callbacks
  * *****************************************************************************/
 
@@ -114,40 +140,4 @@ function authnet_user_payment_profile_access($account, $pid) {
 
   // Otherwise return FALSE.
   return FALSE;
-}
-
-/* ******************************************************************************
- * Helper functions
- * *****************************************************************************/
-
-/**
- * Create a new AuthorizeNetCustomer object for a user.
- *
- * @param $user
- *   A user object.
- * @param $save
- *   Boolean: whether or not to automatically save the new customer profile to Authorize.net. Defaults to TRUE.
- *
- * @return
- *   Returns a new AuthorizeNetCustomer object with some initial values filled in.
- */
-function authnet_user_customer_profile_new($user, $save = TRUE) {
-
-  // Initialize the values based on the user account information.
-  $values = array(
-    'merchantCustomerId' => 'user:' . $user->uid,
-    'description' => $user->name,
-    'email' => $user->mail,
-  );
-
-  // Create a new AuthorizeNetCustomer object with the values.
-  $profile = authnet_customer_profile_new($values);
-
-  // If $save is TRUE, save the new profile to Authorize.net.
-  if ($save) {
-    authnet_cim_profile_save($profile);
-  }
-
-  // Return the profile.
-  return $profile;
 }
