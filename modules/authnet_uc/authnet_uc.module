@@ -145,8 +145,20 @@ function authnet_uc_payment_method_credit_checkout_form($form_state, $order, $cu
     '#title' => t('Choose an existing credit card or add a new one:'),
     '#options' => $options,
     '#required' => TRUE,
-    '#default_value' => 'new',
   );
+
+  // Load the customer's default payment profile.
+  $default_pid = authnet_cim_entity_customer_payment_profile_default($customer_profile_id);
+
+  // If the customer has a default payment profile, select that first.
+  if ($default_pid) {
+    $form['select']['#default_value'] = $default_pid;
+  }
+
+  // Otherwise, select 'Add a new card'.
+  else {
+    $form['select']['#default_value'] = 'new';
+  }
 
   // Append the old uc_payment_method_credit_form().
   $form += uc_payment_method_credit_form($form_state, $order);
