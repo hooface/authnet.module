@@ -91,20 +91,20 @@ function authnet_cim_entity_schema() {
         'not null' => FALSE,
       ),
       'cc_type' => array(
-        'description' => t('TODO: please describe this field!'),
+        'description' => t('Credit card: type'),
         'type' => 'varchar',
         'length' => '128',
         'not null' => FALSE,
       ),
       'cc_exp_year' => array(
-        'description' => t('TODO: please describe this field!'),
+        'description' => t('Credit card: expiration year'),
         'type' => 'int',
         'unsigned' => TRUE,
         'size' => 'small',
         'not null' => FALSE,
       ),
       'cc_exp_month' => array(
-        'description' => t('TODO: please describe this field!'),
+        'description' => t('Credit card: expiration month'),
         'type' => 'int',
         'unsigned' => TRUE,
         'size' => 'tiny',
