@@ -23,10 +23,14 @@ function authnet_uc_form_alter(&$form, &$form_state, $form_id) {
     $order = uc_order_load($form['order_id']['#value']);
     if (empty($order) || empty($order->uid)) return;
 
-    // Load the customer profile from Authorize.net.
+    // Load the customer profile id.
+    $customer_profile_id = authnet_cim_entity_profile_id_load('user', $order->uid);
+
+    // Load the customer's payment profiles.
+    $payment_profiles = authnet_cim_entity_customer_payment_profiles_load($customer_profile_id);
+
     // Bail if the customer profile doesn't have payment profiles...
-    $customer_profile = authnet_cim_entity_profile_load('user', $order->uid);
-    if (empty($customer_profile->paymentProfiles)) return;
+    if (empty($payment_profiles)) return;
 
     // Set the weight of the 'amount' field so that it is at the top.
     $form['amount']['#weight'] = -2;
@@ -39,9 +43,10 @@ function authnet_uc_form_alter(&$form, &$form_state, $form_id) {
       '#weight' => -1,
     );
 
+    // Radio select list of payment profiles
     $form['authnet_payment_profiles']['payment_profile'] = array(
       '#type' => 'radios',
-      '#options' => authnet_ui_payment_profile_options($customer_profile),
+      '#options' => authnet_ui_payment_profile_options($customer_profile_id),
     );
 
     // Buttons
@@ -122,10 +127,10 @@ function authnet_uc_settings_form() {
 /**
  * Credit payment method checkout form.
  */
-function authnet_uc_payment_method_credit_checkout_form($form_state, $order, $customer_profile) {
+function authnet_uc_payment_method_credit_checkout_form($form_state, $order, $customer_profile_id) {
 
   // Get the list of payment profile options for this customer.
-  $options = authnet_ui_payment_profile_options($customer_profile);
+  $options = authnet_ui_payment_profile_options($customer_profile_id);
 
   // Add an option for setting up a new card.
   $options['new'] = t('Add a new card...');
@@ -193,10 +198,10 @@ function authnet_uc_payment_method_credit($op, &$arg1, $silent = FALSE) {
     global $user;
 
     // If the user is logged in and has a customer profile...
-    if ($user->uid && $customer_profile = authnet_cim_entity_profile_load('user', $user->uid)) {
+    if ($user->uid && $customer_profile_id = authnet_cim_entity_profile_id_load('user', $user->uid)) {
 
       // Return our custom form, stripped for Ubercart's checkout form.
-      $details = drupal_get_form('authnet_uc_payment_method_credit_checkout_form', $arg1, $customer_profile);
+      $details = drupal_get_form('authnet_uc_payment_method_credit_checkout_form', $arg1, $customer_profile_id);
       return uc_strip_form($details);
     }
   }

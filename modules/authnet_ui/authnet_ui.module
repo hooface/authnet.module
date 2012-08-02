@@ -336,30 +336,21 @@ function authnet_ui_payment_profile_form_submit($form, &$form_state) {
 /**
  * Generate an array of payment profile options for a given user.
  *
- * @param $customer_profile
- *   A customer profile object.
+ * @param $customer_profile_id
+ *   The customer profile id to load payment profile options for.
  *
  * @return
- *   An array of payment profiles.
+ *   An array of themed payment profiles.
  */
-function authnet_ui_payment_profile_options($customer_profile) {
+function authnet_ui_payment_profile_options($customer_profile_id) {
   $options = array();
-  if (!empty($customer_profile->paymentProfiles)) {
-    foreach ($customer_profile->paymentProfiles as $payment_profile) {
-      // At the moment we're only adding credit card payment profiles.
-      if (!empty($payment_profile->payment->creditCard->cardNumber)) {
 
-        // Load the payment profile database record.
-        $db_record = authnet_cim_entity_payment_profile_load($payment_profile->customerPaymentProfileId);
+  // Load the customer's payment profiles and iterate through them.
+  $payment_profiles = authnet_cim_entity_customer_payment_profiles_load($customer_profile_id);
+  foreach ($payment_profiles as $payment_profile) {
 
-        // Only add it if we have a record of it.
-        if ($db_record) {
-
-          // Add an option to the array with the last four digits and the street address.
-          $options[$db_record['pid']] = theme('authnet_payment_profile', $db_record);
-        }
-      }
-    }
+    // Add an option to the array with the last four digits and the street address.
+    $options[$payment_profile['pid']] = theme('authnet_payment_profile', $payment_profile);
   }
   return $options;
 }
