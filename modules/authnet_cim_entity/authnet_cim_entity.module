@@ -395,6 +395,23 @@ function authnet_cim_entity_payment_profile_delete($payment_profile_id) {
   db_query('DELETE FROM {authnet_cim_entity_payment_profile} WHERE payment_profile_id=%d', $payment_profile_id);
 }
 
+/**
+ * Determine the pid of a customer's default payment profile.
+ */
+function authnet_cim_entity_customer_payment_profile_default($customer_profile_id) {
+
+  // Create a static variable for storing default pids.
+  static $default_pids = array();
+
+  // If the default pid for the given customer profile id isn't known, look it up.
+  if (!isset($default_pids[$customer_profile_id])) {
+    $default_pids[$customer_profile_id] = db_result(db_query('SELECT pid FROM {authnet_cim_entity_payment_profile} WHERE customer_profile_id=%d AND is_default=1', $customer_profile_id));
+  }
+
+  // Return the default pid for the customer profile id.
+  return $default_pids[$customer_profile_id];
+}
+
 /* ******************************************************************************
  * Helper functions
  * *****************************************************************************/

@@ -37,13 +37,8 @@ function authnet_user_payment_profiles_list_form($form_state, $user) {
     '#value' => $customer_profile_id,
   );
 
-  // Figure out the pid of the default payment profile.
-  foreach ($payment_profiles as $payment_profile) {
-    if ($payment_profile['is_default']) {
-      $default_pid = $payment_profile['pid'];
-      break;
-    }
-  }
+  // Load the customer's default payment profile.
+  $default_pid = authnet_cim_entity_customer_payment_profile_default($customer_profile_id);
 
   // Save the original default payment profile pid to the form for comparison later.
   $form['old_default'] = array(

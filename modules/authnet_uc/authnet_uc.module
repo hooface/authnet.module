@@ -32,13 +32,8 @@ function authnet_uc_form_alter(&$form, &$form_state, $form_id) {
     // Bail if the customer profile doesn't have payment profiles...
     if (empty($payment_profiles)) return;
 
-    // Determine the pid of the default payment profile.
-    $default_pid = NULL;
-    foreach ($payment_profiles as $payment_profile) {
-      if ($payment_profile['is_default']) {
-        $default_pid = $payment_profile['pid'];
-      }
-    }
+    // Load the customer's default payment profile.
+    $default_pid = authnet_cim_entity_customer_payment_profile_default($customer_profile_id);
 
     // Set the weight of the 'amount' field so that it is at the top.
     $form['amount']['#weight'] = -2;
