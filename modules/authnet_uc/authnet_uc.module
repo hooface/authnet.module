@@ -29,35 +29,43 @@ function authnet_uc_form_alter(&$form, &$form_state, $form_id) {
     // Load the customer's payment profiles.
     $payment_profiles = authnet_cim_entity_customer_payment_profiles_load($customer_profile_id);
 
-    // Bail if the customer profile doesn't have payment profiles...
-    if (empty($payment_profiles)) return;
-
-    // Load the customer's default payment profile.
-    $default_pid = authnet_cim_entity_customer_payment_profile_default($customer_profile_id);
-
     // Set the weight of the 'amount' field so that it is at the top.
     $form['amount']['#weight'] = -2;
 
     // Create a new fieldset for the existing payment profiles.
     $form['authnet_payment_profiles'] = array(
       '#type' => 'fieldset',
-      '#title' => t('Existing payment profiles'),
+      '#title' => t('Customer payment profiles'),
       '#description' => t('This order\'s customer has the following payment profiles.'),
       '#weight' => -1,
     );
 
-    // Radio select list of payment profiles
-    $form['authnet_payment_profiles']['payment_profile'] = array(
-      '#type' => 'radios',
-      '#options' => authnet_ui_payment_profile_options($customer_profile_id),
-      '#default_value' => $default_pid,
-    );
+    // If the customer doesn't have any payment profiles...
+    if (!empty($payment_profiles)) {
 
-    // Buttons
-    $form['authnet_payment_profiles']['authorize'] = array(
-      '#type' => 'submit',
-      '#value' => t('Charge amount to this profile'),
-    );
+      // Change the fieldset description.
+      $form['authnet_payment_profiles']['#description'] = t('The customer assigned to this order doesn\'t have any payment profiles. Use the form below to add one.');
+    }
+
+    // If the customer does have payment profiles, display them.
+    else {
+
+      // Load the customer's default payment profile.
+      $default_pid = authnet_cim_entity_customer_payment_profile_default($customer_profile_id);
+
+      // Radio select list of payment profiles
+      $form['authnet_payment_profiles']['payment_profile'] = array(
+        '#type' => 'radios',
+        '#options' => authnet_ui_payment_profile_options($customer_profile_id),
+        '#default_value' => $default_pid,
+      );
+
+      // Buttons
+      $form['authnet_payment_profiles']['authorize'] = array(
+        '#type' => 'submit',
+        '#value' => t('Charge amount to this profile'),
+      );
+    }
   }
 }
 
