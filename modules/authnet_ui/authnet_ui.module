@@ -281,28 +281,8 @@ function authnet_ui_payment_profile_form_submit($form, &$form_state) {
   // Save the payment profile.
   authnet_cim_payment_profile_save($customer_profile_id, $payment_profile);
 
-  /**
-   * Authorize.net does not save the credit card type, so that piece of information is missing from the database record
-   * that the authnet_cim_entity module creates. Therefore, we need to add it here.
-   * It's less than ideal that we need to save the payment profile record twice like this, but it's the only way to ensure
-   * that the type is saved to the database, while still maintaining the ability to use the authnet_cim_entity module
-   * without the authnet_user module.
-   */
-
-  // Load the record that was saved to the database.
-  $record = authnet_cim_entity_payment_profile_load($payment_profile->customerPaymentProfileId);
-  if ($record) {
-
-    // Set the card type, if it's different from the saved record, and not empty.
-    if (!empty($form_state['values']['card']['type']) && $record['cc_type'] != $form_state['values']['card']['type']) {
-
-      // Set the cc type on the record.
-      $record['cc_type'] = check_plain($form_state['values']['card']['type']);
-
-      // Save the record.
-      authnet_cim_entity_payment_profile_save($record);
-    }
-  }
+  // Invoke a hook to allow other modules to do stuff with the new payment profile after it's been saved via this form.
+  module_invoke_all('authnet_ui_payment_profile_form_submit', $payment_profile, $form_state);
 }
 
 /* ******************************************************************************
