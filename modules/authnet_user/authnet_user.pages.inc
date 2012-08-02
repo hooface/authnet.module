@@ -31,8 +31,35 @@ function authnet_user_payment_profiles_list_form($form_state, $user) {
     '#value' => $user->uid,
   );
 
+  // Save the customre profile id to the form.
+  $form['customer_profile_id'] = array(
+    '#type' => 'value',
+    '#value' => $customer_profile_id,
+  );
+
+  // Figure out the pid of the default payment profile.
+  foreach ($payment_profiles as $payment_profile) {
+    if ($payment_profile['is_default']) {
+      $default_pid = $payment_profile['pid'];
+      break;
+    }
+  }
+
+  // Save the original default payment profile pid to the form for comparison later.
+  $form['old_default'] = array(
+    '#type' => 'value',
+    '#value' => $default_pid,
+  );
+
   // Create form elements for each payment profile.
   foreach ($payment_profiles as $payment_profile) {
+
+    // Radio button for setting a payment profile as the default.
+    $form['payment_profiles'][$payment_profile['pid']]['default'] = array(
+      '#type' => 'radio',
+      '#return_value' => $payment_profile['pid'],
+      '#default_value' => $default_pid,
+    );
 
     // Store the payment profile record in the form. It will be used in the theme function.
     $form['payment_profiles'][$payment_profile['pid']]['payment_profile'] = array(
@@ -41,8 +68,33 @@ function authnet_user_payment_profiles_list_form($form_state, $user) {
     );
   }
 
+  // Submit button.
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );
+
   // Return the output.
   return $form;
+}
+
+/**
+ * User payment profiles list form submit.
+ */
+function authnet_user_payment_profiles_list_form_submit($form, &$form_state) {
+
+  // If the default payment profile has changed, update it in the database.
+  if ($form_state['values']['old_default'] != $form_state['values']['default']) {
+
+    // Get the customer profile id.
+    $customer_profile_id = $form_state['values']['customer_profile_id'];
+
+    // Set all the other payment profiles for this customer to NOT default.
+    db_query('UPDATE {authnet_cim_entity_payment_profile} SET is_default=0 WHERE is_default=1 AND customer_profile_id=%d', $customer_profile_id);
+
+    // Set the selected payment profile as the default.
+    db_query('UPDATE {authnet_cim_entity_payment_profile} SET is_default=1 WHERE pid=%d', $form_state['values']['default']);
+  }
 }
 
 /**
