@@ -63,16 +63,31 @@ function authnet_cim_entity_authnet_cim_profile_update($customerProfile) {
     foreach ($customerProfile->paymentProfiles as $paymentProfile) {
 
       // Load the payment profile from the database if it exists.
-      $existing_record = authnet_cim_entity_payment_profile_load($paymentProfile->customerPaymentProfileId);
+      $record = authnet_cim_entity_payment_profile_load($paymentProfile->customerPaymentProfileId);
 
-      // If an existing record doesn't exist, save one.
-      if (!$existing_record) {
+      // Generate a new payment profile database record from the payment profile.
+      $new_record = authnet_cim_entity_payment_profile_new($customerProfile->customerProfileId, $paymentProfile);
 
-        // Generate a payment profile database record from the payment profile.
-        $record = authnet_cim_entity_payment_profile_new($customerProfile->customerProfileId, $paymentProfile);
+      // If there is an existing record, check to see if we need to update it.
+      if ($record) {
 
-        // Save the profile.
-        authnet_cim_entity_payment_profile_save($record);
+        // We're only updating the credit card information, at this point, and that's only available if it's been changed.
+        // If the expiration date isn't 'XXXX', then we know that's the case.
+        if ($paymentProfile->payment->creditCard->expirationDate != 'XXXX') {
+
+          // Update the credit card information on the original record.
+          $record['cc_last_four'] = $new_record['cc_last_four'];
+          $record['cc_exp_month'] = $new_record['cc_exp_month'];
+          $record['cc_exp_year'] = $new_record['cc_exp_year'];
+
+          // Save the record.
+          authnet_cim_entity_payment_profile_save($record);
+        }
+      }
+
+      // If an existing record doesn't exist, save the new one.
+      else {
+        authnet_cim_entity_payment_profile_save($new_record);
       }
 
       // Keep track of the payment profile ids.
@@ -116,6 +131,31 @@ function authnet_cim_entity_authnet_cim_payment_profile_insert($customerProfileI
 
   // Save the profile.
   authnet_cim_entity_payment_profile_save($record);
+}
+
+/**
+ * Implementation of hook_authnet_cim_payment_profile_update().
+ */
+function authnet_cim_entity_authnet_cim_payment_profile_update($customerProfileId, $paymentProfile) {
+
+  // We're only updating the credit card information, at this point, and that's only available if it's been changed.
+  // If the expiration date isn't 'XXXX', then we know that's the case.
+  if ($paymentProfile->payment->creditCard->expirationDate != 'XXXX') {
+
+    // Load the payment profile database record.
+    $record = authnet_cim_entity_payment_profile_load($paymentProfile->customerPaymentProfileId);
+
+    // Generate a new record with the new information.
+    $new_record = authnet_cim_entity_payment_profile_new($customerProfileId, $paymentProfile);
+
+    // Update the credit card information on the original record.
+    $record['cc_last_four'] = $new_record['cc_last_four'];
+    $record['cc_exp_month'] = $new_record['cc_exp_month'];
+    $record['cc_exp_year'] = $new_record['cc_exp_year'];
+
+    // Save the record.
+    authnet_cim_entity_payment_profile_save($record);
+  }
 }
 
 /**
