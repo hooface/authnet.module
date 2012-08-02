@@ -167,12 +167,12 @@ function authnet_uc_payment_method_credit_checkout_form($form_state, $order, $cu
   $options = authnet_ui_payment_profile_options($customer_profile_id);
 
   // Add an option for setting up a new card.
-  $options['new'] = t('Add a new card...');
+  $options['new'] = t('Use a new card...');
 
   // Display the list of radio buttons.
   $form['select'] = array(
     '#type' => 'radios',
-    '#title' => t('Choose an existing credit card or add a new one:'),
+    '#title' => t('Choose an existing credit card or use a new one'),
     '#options' => $options,
     '#required' => TRUE,
   );
@@ -193,6 +193,13 @@ function authnet_uc_payment_method_credit_checkout_form($form_state, $order, $cu
   // Append the old uc_payment_method_credit_form().
   $form += uc_payment_method_credit_form($form_state, $order);
 
+  // Add a checkbox to give the customer the choice of saving the card or not.
+  $form['save'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Save this credit card for later use.'),
+    '#default_value' => 1,
+  );
+
   // Return the form.
   return $form;
 }
@@ -211,6 +218,9 @@ function theme_authnet_uc_payment_method_credit_checkout_form($form) {
 
   // Pass-through to the original theme_uc_payment_method_credit_form().
   $output .= theme_uc_payment_method_credit_form($form);
+
+  // Render the rest of the form.
+  $output .= '<div style="text-align: center;">' . drupal_render($form['save']) . '</div>';
 
   // Return the rendered form.
   return $output;
