@@ -94,7 +94,7 @@ function authnet_user_payment_profile_form(&$form_state, $user, $pid = NULL) {
   );
 
   // Add the Authnet UI payment profile form.
-  $form += authnet_ui_payment_profile_form($customer_profile_id, $payment_profile_id);
+  $form += authnet_ui_payment_profile_form($form_state, $customer_profile_id, $payment_profile_id);
 
   // Redirect to the user's billing list.
   $form['#redirect'] = 'user/' . $user->uid . '/billing';
