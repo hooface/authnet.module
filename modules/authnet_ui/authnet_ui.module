@@ -45,8 +45,16 @@ function theme_authnet_payment_profile($payment_profile) {
     $parts[] = 'ending in <strong>' . $payment_profile['cc_last_four'] . '</strong>';
   }
 
-  // Return the parts as a string.
-  return implode(' - ', $parts);
+  // Assemble the output.
+  $output = implode(' - ', $parts);
+
+  // If this is a default payment profile, add a little flag for that.
+  if ($payment_profile['is_default']) {
+    $output .= ' (default)';
+  }
+
+  // Return the output.
+  return $output;
 }
 
 /* ******************************************************************************
