@@ -27,8 +27,8 @@ function authnet_user_menu() {
   // List of user payment profiles.
   $items['user/%user/billing'] = array(
     'title' => 'Billing',
-    'page callback' => 'authnet_user_billing_page',
-    'page arguments' => array(1),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('authnet_user_payment_profiles_list_form', 1),
     'access callback' => 'authnet_user_access',
     'access arguments' => array(1),
     'type' => MENU_LOCAL_TASK,
@@ -75,6 +75,17 @@ function authnet_user_menu() {
   );
 
   return $items;
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function authnet_user_theme($existing, $type, $theme, $path) {
+  return array(
+    'authnet_user_payment_profiles_list_form' => array(
+      'arguments' => array('form' => NULL),
+    ),
+  );
 }
 
 /* ******************************************************************************
@@ -199,4 +210,57 @@ function authnet_user_access($account, $payment_profile_id = NULL) {
 
   // Otherwise, return FALSE.
   return FALSE;
+}
+
+/* ******************************************************************************
+ * Theme functions
+ * *****************************************************************************/
+
+function theme_authnet_user_payment_profiles_list_form($form) {
+
+  // Start with empty output.
+  $output = '';
+
+  // Get the user id from the form.
+  $uid = $form['uid']['#value'];
+
+  // Create a link to add a new profile.
+  $output .= l('+ Add a credit card', 'user/' . $uid . '/billing/add');
+
+  // Put together header and rows for the payment profile table.
+  $header = array(
+    t('Credit card'),
+    t('Operations'),
+  );
+  $rows = array();
+
+  // Get a list of all the existing payment profile primary keys.
+  $pids = element_children($form['payment_profiles']);
+
+  // Create a row for each existing credit card.
+  foreach ($pids as $pid) {
+
+    // Get the payment profile from the form.
+    $payment_profile = $form['payment_profiles'][$pid]['payment_profile']['#value'];
+
+    // Format the payment profile title.
+    $title = theme('authnet_payment_profile', $payment_profile);
+
+    // Add the row.
+    $rows[] = array(
+      l($title, 'user/' . $uid . '/billing/' . $pid . '/edit', array('html' => TRUE)),
+      l('Edit', 'user/' . $uid . '/billing/' . $pid . '/edit') . ' | ' . l('Delete', 'user/' . $uid . '/billing/' . $pid . '/delete'),
+    );
+  }
+
+  // Theme the table.
+  $output .= theme('table', $header, $rows);
+
+  // If there are no existing payment profiles, display some empty text.
+  if (empty($pids)) {
+    $output .= t('You don\'t have any saved cards. Click "Add a credit card" above to save a new one.');
+  }
+
+  // Return the output.
+  return $output;
 }

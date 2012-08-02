@@ -6,17 +6,18 @@
  */
 
 /**
- * User Billing page
+ * User payment profiles list form.
+ *
+ * @param $user
+ *   The user account to display payment profiles for.
  */
-function authnet_user_billing_page($user) {
+function authnet_user_payment_profiles_list_form($form_state, $user) {
 
+  // Set the page title.
   drupal_set_title('Saved cards');
 
-  // Start output.
-  $output = '';
-
-  // Create a link to add a new profile.
-  $output .= l('+ Add a credit card', 'user/' . $user->uid . '/billing/add');
+  // Start an empty form.
+  $form = array();
 
   // Load the customer profile id.
   $customer_profile_id = authnet_cim_entity_profile_id_load('user', $user->uid);
@@ -24,33 +25,24 @@ function authnet_user_billing_page($user) {
   // Load the customer's payment profiles.
   $payment_profiles = authnet_cim_entity_customer_payment_profiles_load($customer_profile_id);
 
-  // Put together header and rows for the payment profile table.
-  $header = array(
-    t('Credit card'),
-    t('Operations'),
+  // Save the user id in the form.
+  $form['uid'] = array(
+    '#type' => 'value',
+    '#value' => $user->uid,
   );
-  $rows = array();
+
+  // Create form elements for each payment profile.
   foreach ($payment_profiles as $payment_profile) {
 
-    // Format the credit card title.
-    $cc_title = theme('authnet_payment_profile', $payment_profile);
-
-    $rows[] = array(
-      l($cc_title, 'user/' . $user->uid . '/billing/' . $payment_profile['pid'] . '/edit', array('html' => TRUE)),
-      l('Edit', 'user/' . $user->uid . '/billing/' . $payment_profile['pid'] . '/edit') . ' | ' . l('Delete', 'user/' . $user->uid . '/billing/' . $payment_profile['pid'] . '/delete'),
+    // Store the payment profile record in the form. It will be used in the theme function.
+    $form['payment_profiles'][$payment_profile['pid']]['payment_profile'] = array(
+      '#type' => 'value',
+      '#value' => $payment_profile,
     );
   }
 
-  // Add the themed table to the output.
-  $output .= theme('table', $header, $rows);
-
-  // Display an empty text message if no profiles are available.
-  if (empty($customer_profile) || empty($customer_profile->paymentProfiles)) {
-    $output .= t('You don\'t have any saved cards. Click "Add a credit card" above to save a new one.');
-  }
-
   // Return the output.
-  return $output;
+  return $form;
 }
 
 /**
