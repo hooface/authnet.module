@@ -6,6 +6,50 @@
  */
 
 /* ******************************************************************************
+ * Drupal hooks
+ * *****************************************************************************/
+
+/**
+ * Implementation of hook_theme().
+ */
+function authnet_ui_theme($existing, $type, $theme, $path) {
+  return array(
+    'authnet_payment_profile' => array(
+      'arguments' => array('payment_profile' => array()),
+    ),
+  );
+}
+
+/* ******************************************************************************
+ * Theme callbacks
+ * *****************************************************************************/
+
+/**
+ * Theme a payment profile description.
+ */
+function theme_authnet_payment_profile($payment_profile) {
+  $parts = array();
+
+  // If the payment profile has a label, start with that.
+  if (!empty($payment_profile['label'])) {
+    $parts[] = '<strong>' . $payment_profile['label'] . '</strong>';
+  }
+
+  // If the payment profile has a card type, add that.
+  if (!empty($payment_profile['cc_type'])) {
+    $parts[] = $payment_profile['cc_type'];
+  }
+
+  // If the last four digits are available, add them.
+  if (!empty($payment_profile['cc_last_four'])) {
+    $parts[] = 'ending in <strong>' . $payment_profile['cc_last_four'] . '</strong>';
+  }
+
+  // Return the parts as a string.
+  return implode(' - ', $parts);
+}
+
+/* ******************************************************************************
  * Form functions
  * *****************************************************************************/
 
@@ -312,7 +356,7 @@ function authnet_ui_payment_profile_options($customer_profile) {
         if ($db_record) {
 
           // Add an option to the array with the last four digits and the street address.
-          $options[$db_record['pid']] = t('@cc_type @last_four (last 4) - @address', array('@cc_type' => $db_record['cc_type'], '@last_four' => $db_record['cc_last_four'], '@address' => $payment_profile->billTo->address));
+          $options[$db_record['pid']] = theme('authnet_payment_profile', $db_record);
         }
       }
     }

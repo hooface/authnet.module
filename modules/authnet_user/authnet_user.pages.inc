@@ -18,11 +18,11 @@ function authnet_user_billing_page($user) {
   // Create a link to add a new profile.
   $output .= l('+ Add a credit card', 'user/' . $user->uid . '/billing/add');
 
-  // Load the customer profile from Authorize.net.
-  $customer_profile = authnet_cim_entity_profile_load('user', $user->uid);
+  // Load the customer profile id.
+  $customer_profile_id = authnet_cim_entity_profile_id_load('user', $user->uid);
 
-  // Load the list of payment profiles.
-  $profiles_list = authnet_ui_payment_profile_options($customer_profile);
+  // Load the customer's payment profiles.
+  $payment_profiles = authnet_cim_entity_customer_payment_profiles_load($customer_profile_id);
 
   // Put together header and rows for the payment profile table.
   $header = array(
@@ -30,10 +30,14 @@ function authnet_user_billing_page($user) {
     t('Operations'),
   );
   $rows = array();
-  foreach ($profiles_list as $pid => $payment_profile) {
+  foreach ($payment_profiles as $payment_profile) {
+
+    // Format the credit card title.
+    $cc_title = theme('authnet_payment_profile', $payment_profile);
+
     $rows[] = array(
-      l($payment_profile, 'user/' . $user->uid . '/billing/' . $pid . '/edit'),
-      l('Edit', 'user/' . $user->uid . '/billing/' . $pid . '/edit') . ' | ' . l('Delete', 'user/' . $user->uid . '/billing/' . $pid . '/delete'),
+      l($cc_title, 'user/' . $user->uid . '/billing/' . $payment_profile['pid'] . '/edit', array('html' => TRUE)),
+      l('Edit', 'user/' . $user->uid . '/billing/' . $payment_profile['pid'] . '/edit') . ' | ' . l('Delete', 'user/' . $user->uid . '/billing/' . $payment_profile['pid'] . '/delete'),
     );
   }
 
