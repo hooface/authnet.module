@@ -61,9 +61,10 @@ function authnet_uc_form_alter(&$form, &$form_state, $form_id) {
       );
 
       // Buttons
-      $form['authnet_payment_profiles']['authorize'] = array(
+      $form['authnet_payment_profiles']['charge'] = array(
         '#type' => 'submit',
         '#value' => t('Charge amount to this profile'),
+        '#submit' => array('authnet_uc_payment_profile_charge'),
       );
     }
 
@@ -147,7 +148,7 @@ function authnet_uc_payment_method_alter(&$methods) {
 }
 
 /* ******************************************************************************
- * Forms
+ * Form functions
  * *****************************************************************************/
 
 /**
@@ -202,6 +203,50 @@ function authnet_uc_payment_method_credit_checkout_form($form_state, $order, $cu
 
   // Return the form.
   return $form;
+}
+
+/**
+ * Submit function for the order admin payment profile charge button.
+ */
+function authnet_uc_payment_profile_charge($form, &$form_state) {
+
+  // Get the pid of the payment profile that was selected.
+  $pid = $form_state['values']['payment_profile'];
+
+  // If no payment profile was selected, don't do anything.
+  if (!$pid) {
+    return;
+  }
+
+  // Load the customer's payment profile information.
+  $payment_profile_id = authnet_cim_entity_payment_profile_id_load($pid);
+  $payment_profile = authnet_cim_entity_payment_profile_load($payment_profile_id);
+
+  // Build the data array passed on to the payment gateway.
+  $data = array();
+
+  // Set the transaction type to "Authorize and Capture"
+  $data['txn_type'] = UC_CREDIT_AUTH_CAPTURE;
+
+  // Set the Authorize.net customer profile id and payment profile id to charge to.
+  $data['customer_profile_id'] = $payment_profile['customer_profile_id'];
+  $data['payment_profile_id'] = $payment_profile_id;
+
+  // Process the payment
+  $result = uc_payment_process('credit', $form_state['values']['order_id'], $form_state['values']['amount'], $data, TRUE, NULL, FALSE);
+
+  // If the payment was processed successfully...
+  if ($result) {
+    drupal_set_message(t('The credit card was processed successfully. See the admin comments for more details.'));
+  }
+
+  // If an error occurred during processing...
+  else {
+    drupal_set_message(t('There was an error processing the credit card. See the admin comments for details.'), 'error');
+  }
+
+  // Redirect to the order view.
+  $form_state['redirect'] = 'admin/store/orders/'. $form_state['values']['order_id'];
 }
 
 /* ******************************************************************************
