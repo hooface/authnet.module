@@ -63,11 +63,13 @@ function authnet_user_payment_profiles_list_form($form_state, $user) {
     );
   }
 
-  // Submit button.
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save'),
-  );
+  // Submit button (if there are payment profiles).
+  if (!empty($payment_profiles)) {
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Save'),
+    );
+  }
 
   // Return the output.
   return $form;
