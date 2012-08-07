@@ -174,7 +174,7 @@ function authnet_uc_payment_method_credit_checkout_form($form_state, $order, $cu
   $options['new'] = t('Use a new card...');
 
   // Display the list of radio buttons.
-  $form['select'] = array(
+  $form['cc_select'] = array(
     '#type' => 'radios',
     '#title' => t('Choose an existing credit card or use a new one'),
     '#options' => $options,
@@ -186,19 +186,19 @@ function authnet_uc_payment_method_credit_checkout_form($form_state, $order, $cu
 
   // If the customer has a default payment profile, select that first.
   if ($default_pid) {
-    $form['select']['#default_value'] = $default_pid;
+    $form['cc_select']['#default_value'] = $default_pid;
   }
 
   // Otherwise, select 'Add a new card'.
   else {
-    $form['select']['#default_value'] = 'new';
+    $form['cc_select']['#default_value'] = 'new';
   }
 
   // Append the old uc_payment_method_credit_form().
   $form += uc_payment_method_credit_form($form_state, $order);
 
   // Add a checkbox to give the customer the choice of saving the card or not.
-  $form['save'] = array(
+  $form['cc_save'] = array(
     '#type' => 'checkbox',
     '#title' => t('Save this credit card for later use.'),
     '#default_value' => 1,
@@ -380,13 +380,13 @@ function authnet_uc_payment_profile_add_submit($form, &$form_state) {
 function theme_authnet_uc_payment_method_credit_checkout_form($form) {
 
   // Render the radio select list.
-  $output = drupal_render($form['select']);
+  $output = drupal_render($form['cc_select']);
 
   // Pass-through to the original theme_uc_payment_method_credit_form().
   $output .= theme_uc_payment_method_credit_form($form);
 
   // Render the rest of the form.
-  $output .= '<div style="text-align: center;">' . drupal_render($form['save']) . '</div>';
+  $output .= '<div style="text-align: center;">' . drupal_render($form['cc_save']) . '</div>';
 
   // Return the rendered form.
   return $output;
