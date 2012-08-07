@@ -36,7 +36,7 @@ function authnet_uc_form_alter(&$form, &$form_state, $form_id) {
     $form['authnet_payment_profiles'] = array(
       '#type' => 'fieldset',
       '#title' => t('Customer payment profiles'),
-      '#description' => t('Select from the customer\'s existing payment profiles below.'),
+      '#description' => t('Select from the customer\'s existing payment profiles below. To edit them, go to the ' . l('customer\'s billing list', 'user/' . $order->uid . '/billing') . '.'),
       '#weight' => -1,
     );
 
