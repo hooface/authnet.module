@@ -77,11 +77,14 @@ function authnet_uc_form_alter(&$form, &$form_state, $form_id) {
     // Set the weight of the 'cc_data' fieldset so that it is at the top.
     $form['specify_card']['cc_data']['#weight'] = -2;
 
-    // Add a checkbox for adding a credit card to a customer profile.
+    // Add a button for adding a credit card to a customer profile.
     $form['specify_card']['add_profile'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Add this credit card to the customer’s payment profiles (and make it the default). Leave this unchecked to only associate this transaction with the order.'),
+      '#type' => 'submit',
+      '#value' => 'Add credit card to customer',
+      '#validate' => array('authnet_uc_payment_profile_add_validate'),
+      '#submit'=> array('authnet_uc_payment_profile_add_submit'),
       '#weight' => -1,
+      '#suffix' => '<br /><br />Use the buttons below to process this transaction without using the customer\'s payment profiles.<br /><br />',
     );
 
     // If the 'references' fieldset is available, change the language to be more accurate.
@@ -247,6 +250,124 @@ function authnet_uc_payment_profile_charge_submit($form, &$form_state) {
 
   // Redirect to the order view.
   $form_state['redirect'] = 'admin/store/orders/'. $form_state['values']['order_id'];
+}
+
+/**
+ * Validation function for adding a new credit card to a customer from the order admin credit card terminal.
+ */
+function authnet_uc_payment_profile_add_validate($form, &$form_state) {
+
+  // Load the order information.
+  $order = uc_order_load($form_state['values']['order_id']);
+
+  // Bail if no order was found.
+  if (!$order) {
+    return;
+  }
+
+  // Make sure that all the necessary billing fields are available on the order.
+  $required_billing_fields = array(
+    'first name' => $order->billing_first_name,
+    'last name' => $order->billing_last_name,
+    'address' => trim($order->billing_street1 . ' ' . $order->billing_street2),
+    'city' => $order->billing_city,
+    'state/province' => uc_zone_get_by_id($order->billing_zone),
+    'zip/postal code' => $order->billing_postal_code,
+    'country' => uc_country_get_by_id($order->billing_country),
+  );
+  $missing = array();
+  foreach ($required_billing_fields as $name => $field) {
+    if (empty($field)) {
+      $missing[] = $name;
+    }
+  }
+  if (!empty($missing)) {
+    form_set_error('', 'The order must have a valid billing address in order to add a new credit card. Please add missing fields to the order\'s billing address and try again. The following fields are missing: ' . implode(', ', $missing));
+  }
+
+  // Make sure that all the necessary credit card fields are available.
+  $required_cc_fields = array(
+    'card type' => $form_state['values']['cc_data']['cc_type'],
+    'card number' => $form_state['values']['cc_data']['cc_number'],
+    'expiration month' => $form_state['values']['cc_data']['cc_exp_month'],
+    'expiration year' => $form_state['values']['cc_data']['cc_exp_year'],
+  );
+  $missing = array();
+  foreach ($required_cc_fields as $name => $field) {
+    if (empty($field)) {
+      $missing[] = $name;
+    }
+  }
+  if (!empty($missing)) {
+    form_set_error('', 'Please fill in all of the credit card fields. The following fields are missing: ' . implode(', ', $missing));
+  }
+
+  // Save the order object in the form state so we can use it in the submit function.
+  $form_state['values']['order'] = $order;
+}
+
+/**
+ * Submit function for adding a new credit card to a customer from the order admin credit card terminal.
+ */
+function authnet_uc_payment_profile_add_submit($form, &$form_state) {
+
+  // Get the order object from the form state.
+  $order = $form_state['values']['order'];
+
+  // Make sure the order has a user.
+  if (!$order->uid) {
+    return;
+  }
+
+  // Load the user's customer profile id.
+  $customer_profile_id = authnet_cim_entity_profile_id_load('user', $order->uid);
+
+  // If the user doesn't have a customer profile, create one.
+  if (!$customer_profile_id) {
+    $profile = authnet_user_customer_profile_new($order->uid);
+    $customer_profile_id = $profile->customerProfileId;
+  }
+
+  // Assemble the new payment profile information.
+  $values = array(
+    'customerType' => !empty($order->billing_company) ? 'business' : 'individual',
+    'billTo' => array(
+      'firstName' => check_plain($order->billing_first_name),
+      'lastName' => check_plain($order->billing_last_name),
+      'company' => check_plain($order->billing_company),
+      'address' => check_plain(trim($order->billing_street1 . ' ' . $order->billing_street2)),
+      'city' => check_plain($order->billing_city),
+      'state' => check_plain(uc_zone_get_by_id($order->billing_zone)),
+      'zip' => check_plain($order->billing_postal_code),
+      'country' => uc_country_get_by_id($order->billing_country),
+      'phoneNumber' => check_plain($order->billing_phone),
+      'faxNumber' => '',
+    ),
+    'payment' => array(
+      'creditCard' => array(
+        'cardNumber' => check_plain($form_state['values']['cc_data']['cc_number']),
+        'expirationDate' => check_plain(trim($form_state['values']['cc_data']['cc_exp_year'] . '-' . str_pad($form_state['values']['cc_data']['cc_exp_month'], 2, '0'))),
+        'cardCode' => check_plain($form_state['values']['cc_data']['cc_cvv']),
+      ),
+    ),
+  );
+
+  // Create a new payment profile with the values and send it to Authorize.net.
+  $payment_profile = authnet_payment_profile_new($values);
+  authnet_cim_payment_profile_save($customer_profile_id, $payment_profile);
+
+  // If the profile was saved successfully, load it from the database and resave it to include the credit card type.
+  if ($payment_profile->customerPaymentProfileId) {
+
+    // Load the record.
+    $record = authnet_cim_entity_payment_profile_load($payment_profile->customerPaymentProfileId);
+
+    // Add the credit card type.
+    $record['cc_type'] = check_plain($form_state['values']['cc_data']['cc_type']);
+
+    // Save the record.
+    authnet_cim_entity_payment_profile_save($record);
+  }
 }
 
 /* ******************************************************************************
