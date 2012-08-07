@@ -453,6 +453,23 @@ function authnet_uc_payment_method_credit($op, &$arg1, $silent = FALSE) {
         return;
       }
       break;
+
+    // If the $op is 'cart-review', display information about the payment profile, if one was selected.
+    case 'cart-review':
+
+      // If a payment profile has been selected...
+      if (!empty($arg1->payment_details['payment_profile'])) {
+
+        // Assemble an array of review items.
+        $review = array();
+
+        // Add the saved card information.
+        $review[] = array('title' => t('Saved card'), 'data' => theme('authnet_payment_profile', $arg1->payment_details['payment_profile']));
+
+        // Return the review array.
+        return $review;
+      }
+      break;
   }
 
   // If the above code hasn't returned something already, pass-through to to original uc_payment_method_credit() function.
