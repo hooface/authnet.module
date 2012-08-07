@@ -416,38 +416,42 @@ function authnet_uc_payment_method_credit($op, &$arg1, $silent = FALSE) {
   // Get information about the current user.
   global $user;
 
-  // If the $op is 'cart-details' it means we're rendering the checkout form.
-  if ($op == 'cart-details') {
+  // Switch through the operations.
+  switch ($op) {
 
-    // If the user is logged in and has a customer profile...
-    if ($user->uid && $customer_profile_id = authnet_cim_entity_profile_id_load('user', $user->uid)) {
+    // If the $op is 'cart-details' it means we're rendering the checkout form.
+    case 'cart-details':
 
-      // Return our custom form, stripped for Ubercart's checkout form.
-      $details = drupal_get_form('authnet_uc_payment_method_credit_checkout_form', $arg1, $customer_profile_id);
-      return uc_strip_form($details);
-    }
-  }
+      // If the user is logged in and has a customer profile...
+      if ($user->uid && $customer_profile_id = authnet_cim_entity_profile_id_load('user', $user->uid)) {
 
-  // If the $op is 'cart-process', then perform some extra processing if our custom form was used in $op == 'cart-details' above.
-  elseif ($op == 'cart-process') {
-
-    // If cc_select is not 'new', proceed. (Otherwise we'll just let the original uc_payment_method_credit() function take it.)
-    if (!empty($_POST['cc_select']) && $_POST['cc_select'] != 'new') {
-
-      // Load the payment profile id, based on the pid (stored in cc_select).
-      $payment_profile_id = authnet_cim_entity_payment_profile_id_load($_POST['cc_select']);
-
-      // Check to be sure the user has access to this payment profile.
-      if ($payment_profile_id && !authnet_user_access($user, $payment_profile_id)) {
-        if (!$silent) {
-          drupal_set_message(t('You do not have permission to use this payment profile. Please select one that belongs to you.'), 'error');
-        }
-        return FALSE;
+        // Return our custom form, stripped for Ubercart's checkout form.
+        $details = drupal_get_form('authnet_uc_payment_method_credit_checkout_form', $arg1, $customer_profile_id);
+        return uc_strip_form($details);
       }
+      break;
 
-      //...
-      return;
-    }
+    // If the $op is 'cart-process', then perform some extra processing if our custom form was used in $op == 'cart-details' above.
+    case 'cart-process':
+
+      // If cc_select is not 'new', proceed. (Otherwise we'll just let the original uc_payment_method_credit() function take it.)
+      if (!empty($_POST['cc_select']) && $_POST['cc_select'] != 'new') {
+
+        // Load the payment profile id, based on the pid (stored in cc_select).
+        $payment_profile_id = authnet_cim_entity_payment_profile_id_load($_POST['cc_select']);
+
+        // Check to be sure the user has access to this payment profile.
+        if ($payment_profile_id && !authnet_user_access($user, $payment_profile_id)) {
+          if (!$silent) {
+            drupal_set_message(t('You do not have permission to use this payment profile. Please select one that belongs to you.'), 'error');
+          }
+          return FALSE;
+        }
+
+        //...
+        return;
+      }
+      break;
   }
 
   // If the above code hasn't returned something already, pass-through to to original uc_payment_method_credit() function.
