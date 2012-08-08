@@ -245,9 +245,8 @@ function authnet_uc_payment_profile_charge_submit($form, &$form_state) {
     return;
   }
 
-  // Load the customer's payment profile information.
+  // Load the payment profile id.
   $payment_profile_id = authnet_cim_entity_payment_profile_id_load($pid);
-  $payment_profile = authnet_cim_entity_payment_profile_load($payment_profile_id);
 
   // Build the data array passed on to the payment gateway.
   $data = array();
@@ -255,8 +254,7 @@ function authnet_uc_payment_profile_charge_submit($form, &$form_state) {
   // Set the transaction type to "Authorize and Capture"
   $data['txn_type'] = UC_CREDIT_AUTH_CAPTURE;
 
-  // Set the Authorize.net customer profile id and payment profile id to charge to.
-  $data['customer_profile_id'] = $payment_profile['customer_profile_id'];
+  // Set the Authorize.net payment profile id to charge to.
   $data['payment_profile_id'] = $payment_profile_id;
 
   // Process the payment
