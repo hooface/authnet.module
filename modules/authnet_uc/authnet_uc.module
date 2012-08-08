@@ -181,10 +181,22 @@ function authnet_uc_payment_method_credit_checkout_form($form_state, $order, $cu
     '#required' => TRUE,
   );
 
-  // Load the customer's default payment profile.
-  $default_pid = authnet_cim_entity_customer_payment_profile_default($customer_profile_id);
+  // If a payment profile id was already selected, use it as the default selection.
+  if (!empty($order->payment_details['payment_profile_id'])) {
 
-  // If the customer has a default payment profile, select that first.
+    // Load the payment profile.
+    $payment_profile = authnet_cim_entity_payment_profile_load($order->payment_details['payment_profile_id']);
+
+    // Set the default pid.
+    $default_pid = $payment_profile['pid'];
+  }
+
+  // Otherwise, try to load the customer's default payment profile.
+  else {
+    $default_pid = authnet_cim_entity_customer_payment_profile_default($customer_profile_id);
+  }
+
+  // If a default payment profile id is set, select it as the default value.
   if ($default_pid) {
     $form['cc_select']['#default_value'] = $default_pid;
   }
