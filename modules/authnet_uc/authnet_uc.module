@@ -535,3 +535,30 @@ function authnet_uc_payment_method_credit($op, &$arg1, $silent = FALSE) {
   // If the above code hasn't returned something already, pass-through to to original uc_payment_method_credit() function.
   return uc_payment_method_credit($op, $arg1, $silent);
 }
+
+/* ******************************************************************************
+ * Helper functions
+ * *****************************************************************************/
+
+/**
+ * Get statically cached charge data.
+ *
+ * @see authnet_uc_charge()
+ */
+function authnet_uc_charge_data_get() {
+  return authnet_uc_charge_data_set();
+}
+
+/**
+ * Save a payment profile to a static variable for use later on in session.
+ */
+function authnet_uc_charge_data_set($new_data = NULL) {
+  static $data = array();
+
+  // If new data is passed in, cache it
+  if ($new_data) {
+    $data = $new_data;
+  }
+
+  return $data;
+}
