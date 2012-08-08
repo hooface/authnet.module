@@ -448,23 +448,48 @@ function authnet_uc_payment_method_credit($op, &$arg1, $silent = FALSE) {
           return FALSE;
         }
 
-        // Load the payment profile record information, and add them to the payment details on the order.
-        $arg1->payment_details['payment_profile'] = authnet_cim_entity_payment_profile_load($payment_profile_id);
-        return;
+        // Save the payment profile id to the order's payment details.
+        $arg1->payment_details = array(
+          'payment_profile_id' => $payment_profile_id,
+        );
+
+        // Return TRUE.
+        return TRUE;
+      }
+
+      // If a new card is being added, check to see if the user wants to save it.
+      elseif ($_POST['cc_select'] == 'new') {
+
+        // First, execute the normal function.
+        $result = uc_payment_method_credit($op, $arg1, $silent);
+
+        // Then, if that was successful, add our 'save_card' variable to the payment details of the order.
+        if ($result) {
+          $arg1->payment_details['save_card'] = $_POST['cc_save'] ? TRUE : FALSE;
+          return TRUE;
+        }
+
+        // If the normal function returned FALSE, do the same.
+        else {
+          return $result;
+        }
       }
       break;
 
     // If the $op is 'cart-review', display information about the payment profile, if one was selected.
     case 'cart-review':
 
-      // If a payment profile has been selected...
-      if (!empty($arg1->payment_details['payment_profile'])) {
+      // If the user selected a payment profile...
+      if (!empty($arg1->payment_details['payment_profile_id'])) {
 
         // Assemble an array of review items.
         $review = array();
 
+        // Load the payment profile record for theming.
+        $payment_profile = authnet_cim_entity_payment_profile_load($arg1->payment_details['payment_profile_id']);
+
         // Add the saved card information.
-        $review[] = array('title' => t('Saved card'), 'data' => theme('authnet_payment_profile', $arg1->payment_details['payment_profile']));
+        $review[] = array('title' => t('Saved card'), 'data' => theme('authnet_payment_profile', $payment_profile));
 
         // Return the review array.
         return $review;
