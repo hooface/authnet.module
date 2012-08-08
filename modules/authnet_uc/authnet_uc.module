@@ -168,43 +168,54 @@ function authnet_uc_settings_form() {
  */
 function authnet_uc_payment_method_credit_checkout_form($form_state, $order, $customer_profile_id) {
 
-  // Get the list of payment profile options for this customer.
-  $options = authnet_ui_payment_profile_options($customer_profile_id);
+  // Start with an empty form.
+  $form = array();
 
-  // Add an option for setting up a new card.
-  $options['new'] = t('Use a new card...');
+  // If a customer profile id is provided...
+  if ($customer_profile_id) {
 
-  // Display the list of radio buttons.
-  $form['cc_select'] = array(
-    '#type' => 'radios',
-    '#title' => t('Choose an existing credit card or use a new one'),
-    '#options' => $options,
-    '#required' => TRUE,
-  );
+    // Get the list of payment profile options for this customer.
+    $options = authnet_ui_payment_profile_options($customer_profile_id);
 
-  // If a payment profile id was already selected, use it as the default selection.
-  if (!empty($order->payment_details['payment_profile_id'])) {
+    // If the user has payment profiles, display them in a radio select list.
+    if (!empty($options)) {
 
-    // Load the payment profile.
-    $payment_profile = authnet_cim_entity_payment_profile_load($order->payment_details['payment_profile_id']);
+      // Add an option for setting up a new card.
+      $options['new'] = t('Use a new card...');
 
-    // Set the default pid.
-    $default_pid = $payment_profile['pid'];
-  }
+      // Display the list of radio buttons.
+      $form['cc_select'] = array(
+        '#type' => 'radios',
+        '#title' => t('Choose an existing credit card or use a new one'),
+        '#options' => $options,
+        '#required' => TRUE,
+      );
 
-  // Otherwise, try to load the customer's default payment profile.
-  else {
-    $default_pid = authnet_cim_entity_customer_payment_profile_default($customer_profile_id);
-  }
+      // If a payment profile id was already selected, use it as the default selection.
+      if (!empty($order->payment_details['payment_profile_id'])) {
 
-  // If a default payment profile id is set, select it as the default value.
-  if ($default_pid) {
-    $form['cc_select']['#default_value'] = $default_pid;
-  }
+        // Load the payment profile.
+        $payment_profile = authnet_cim_entity_payment_profile_load($order->payment_details['payment_profile_id']);
 
-  // Otherwise, select 'Add a new card'.
-  else {
-    $form['cc_select']['#default_value'] = 'new';
+        // Set the default pid.
+        $default_pid = $payment_profile['pid'];
+      }
+
+      // Otherwise, try to load the customer's default payment profile.
+      else {
+        $default_pid = authnet_cim_entity_customer_payment_profile_default($customer_profile_id);
+      }
+
+      // If a default payment profile id is set, select it as the default value.
+      if ($default_pid) {
+        $form['cc_select']['#default_value'] = $default_pid;
+      }
+
+      // Otherwise, select 'Add a new card'.
+      else {
+        $form['cc_select']['#default_value'] = 'new';
+      }
+    }
   }
 
   // Append the old uc_payment_method_credit_form().
@@ -383,14 +394,12 @@ function authnet_uc_payment_method_credit($op, &$arg1, $silent = FALSE) {
     // If the $op is 'cart-details' it means we're rendering the checkout form.
     case 'cart-details':
 
-      // If the user is logged in and has a customer profile...
-      if ($user->uid && $customer_profile_id = authnet_cim_entity_profile_id_load('user', $user->uid)) {
+      // Attempt to load the user's customer profile id (it will be FALSE if they are not logged in, or don't have one).
+      $customer_profile_id = authnet_cim_entity_profile_id_load('user', $user->uid);
 
-        // Return our custom form, stripped for Ubercart's checkout form.
-        $details = drupal_get_form('authnet_uc_payment_method_credit_checkout_form', $arg1, $customer_profile_id);
-        return uc_strip_form($details);
-      }
-      break;
+      // Return our custom form, stripped for Ubercart's checkout form.
+      $details = drupal_get_form('authnet_uc_payment_method_credit_checkout_form', $arg1, $customer_profile_id);
+      return uc_strip_form($details);
 
     // If the $op is 'cart-process', then perform some extra processing if our custom form was used in $op == 'cart-details' above.
     case 'cart-process':
