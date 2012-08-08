@@ -475,9 +475,32 @@ function authnet_uc_payment_method_credit($op, &$arg1, $silent = FALSE) {
         // First, execute the normal function.
         $result = uc_payment_method_credit($op, $arg1, $silent);
 
-        // Then, if that was successful, add our 'save_card' variable to the payment details of the order.
+        // Then, if that was successful, add our 'save_card' variable.
         if ($result) {
-          $arg1->payment_details['save_card'] = $_POST['cc_save'] ? TRUE : FALSE;
+
+          // Create the save card variable.
+          $save_card = $_POST['cc_save'] ? TRUE : FALSE;
+
+          // Save it to the payment details on the order (this may not be necessary, but do it anyways for consistency).
+          $arg1->payment_details['save_card'] = $save_card;
+
+          // uc_payment_method_credit() also saves the payment details to the global session variable, encrypted, so that
+          // they can be accessed across page loads. We need to make sure our $save_card variable is included in that too.
+          if (!empty($_SESSION['sescrd'])) {
+
+            // Initialize the encryption key and class.
+            $key = uc_credit_encryption_key();
+            $crypt = new uc_encryption_class();
+
+            // Decrypt the payment details that were saved to the global session variable.
+            $payment_details = unserialize(base64_decode($crypt->decrypt($key, $_SESSION['sescrd'])));
+
+            // Add our variable.
+            $payment_details['save_card'] = $save_card;
+
+            // Encrypt and save it again.
+            $_SESSION['sescrd'] = $crypt->encrypt($key, base64_encode(serialize($arg1->payment_details)));
+          }
           return TRUE;
         }
 
