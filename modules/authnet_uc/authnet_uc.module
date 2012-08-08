@@ -121,7 +121,17 @@ function authnet_uc_payment_gateway() {
     'description' => t('Process credit card payments using Authorize.net.'),
     'settings' => 'authnet_uc_settings_form',
     'credit' => 'authnet_uc_charge',
-    'credit_txn_types' => array(UC_CREDIT_AUTH_ONLY, UC_CREDIT_PRIOR_AUTH_CAPTURE, UC_CREDIT_AUTH_CAPTURE, UC_CREDIT_REFERENCE_SET, UC_CREDIT_REFERENCE_TXN),
+    'credit_txn_types' => array(
+      UC_CREDIT_AUTH_CAPTURE,
+      UC_CREDIT_PRIOR_AUTH_CAPTURE,
+      UC_CREDIT_AUTH_ONLY,
+      // UC_CREDIT_CREDIT,
+      // UC_CREDIT_VOID,
+      UC_CREDIT_REFERENCE_SET,
+      UC_CREDIT_REFERENCE_TXN,
+      // UC_CREDIT_REFERENCE_REMOVE,
+      // UC_CREDIT_REFERENCE_CREDIT,
+    ),
   );
 
   return $gateways;
@@ -502,4 +512,41 @@ function authnet_uc_charge_data_set($new_data = NULL) {
   }
 
   return $data;
+}
+
+/**
+ * Translate Ubercart's transaction types to those expected by Authorize.net.
+ *
+ * @param $uc_type
+ *   The Ubercart transaction type to translate.
+ *
+ * @return
+ *   Returns the Authorize.net equivalent transaction type, FALSE otherwise.
+ */
+function authnet_uc_translate_txn_type($type) {
+
+  // Define the available Ubercart transaction types and their Authorize.net equivalents.
+  $types = array(
+    UC_CREDIT_AUTH_CAPTURE => AUTHNET_METHOD_AUTH_CAPTURE,
+    UC_CREDIT_PRIOR_AUTH_CAPTURE => AUTHNET_METHOD_PRIOR_AUTH_CAPTURE,
+    UC_CREDIT_AUTH_ONLY => AUTHNET_METHOD_AUTH_ONLY,
+    UC_CREDIT_CREDIT => AUTHNET_METHOD_CREDIT,
+    UC_CREDIT_VOID => AUTHNET_METHOD_VOID,
+
+    /**
+     * There is no equivalent for Ubercart's reference transactions, so we handle these specially in the authnet_uc_charge() function.
+     */
+    // UC_CREDIT_REFERENCE_SET => 0,
+    // UC_CREDIT_REFERENCE_TXN => 0,
+    // UC_CREDIT_REFERENCE_REMOVE => 0,
+    // UC_CREDIT_REFERENCE_CREDIT => 0,
+  );
+
+  // If the requested type is in the above array, return it's equivalent.
+  if (array_key_exists($type, $types)) {
+    return $types[$type];
+  }
+
+  // If all else fails, return FALSE.
+  return FALSE;
 }
