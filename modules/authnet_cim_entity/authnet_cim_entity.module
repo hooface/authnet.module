@@ -187,6 +187,11 @@ function authnet_cim_entity_profile_id_load($type, $id) {
   // Create a static variable for storing customer profile ids.
   static $customer_profile_ids = array();
 
+  // If an id wasn't provided, return FALSE.
+  if (!$id) {
+    return FALSE;
+  }
+
   // If the customer profile id of the given type and id is not known, look it up.
   if (!isset($customer_profile_ids[$type]) || !isset($customer_profile_ids[$type][$id])) {
     $customer_profile_ids[$type][$id] = db_result(db_query('SELECT customer_profile_id FROM {authnet_cim_entity} WHERE type="%s" AND id=%d', array($type, $id)));
