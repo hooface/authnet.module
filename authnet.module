@@ -108,6 +108,20 @@ function authnet_sdk_include() {
  * *****************************************************************************/
 
 /**
+ * Returns an array of credit card transaction types available to Authorize.net.
+ */
+function authnet_transaction_types() {
+  return array(
+    AUTHNET_METHOD_AUTH_CAPTURE => t('Authorize and capture immediately'),
+    AUTHNET_METHOD_PRIOR_AUTH_CAPTURE => t('Prior authorization capture'),
+    AUTHNET_METHOD_AUTH_ONLY => t('Authorization only'),
+    AUTHNET_METHOD_CAPTURE_ONLY => t('Capture only'),
+    AUTHNET_METHOD_CREDIT => t('Credit'),
+    AUTHNET_METHOD_VOID => t('Void'),
+  );
+}
+
+/**
  * Logs Authorize.net response objects.
  *
  * @param $response
