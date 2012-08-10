@@ -587,13 +587,13 @@ function _authnet_uc_aim_transaction($order, $amount, $data) {
       '@status' => $success ? t('ACCEPTED') : t('REJECTED'),
       '@message' => $response->response_reason_text,
       '@amount' => uc_price($response->amount, $context),
-      '@avs' => authnet_uc_avs($response->avs_response),
+      '@avs' => authnet_avs($response->avs_response),
     )
   );
 
   // Add the CVV response if enabled.
   if (variable_get('uc_credit_cvv_enabled', TRUE)) {
-    $admin_comment .= '<br />' . t('CVV match: @cvv', array('@cvv' => authnet_uc_cvv($response->card_code_response)));
+    $admin_comment .= '<br />' . t('CVV match: @cvv', array('@cvv' => authnet_cvv($response->card_code_response)));
   }
 
   // Add an admin order comment.

@@ -110,7 +110,7 @@ function authnet_sdk_include() {
 /**
  * Returns the message text for an AVS response code.
  */
-function authnet_uc_avs($code) {
+function authnet_avs($code) {
   $codes = array(
     'A' => t('Address (Street) matches, ZIP does not'),
     'B' => t('Address information not provided for AVS check'),
@@ -132,7 +132,7 @@ function authnet_uc_avs($code) {
 /**
  * Returns the message text for a CVV match.
  */
-function authnet_uc_cvv($code) {
+function authnet_cvv($code) {
   $codes = array(
     'M' => t('Match'),
     'N' => t('No Match'),
