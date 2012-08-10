@@ -226,7 +226,7 @@ function authnet_cim_payment_profile_load($customerProfileId, $customerPaymentPr
  *   The payment profile object to be saved, passed by reference.
  *
  * @return
- *   Returns an AuthorizeNetPaymentProfile object if available, FALSE otherwise.
+ *   Returns TRUE if the save was successful, FALSE otherwise.
  */
 function authnet_cim_payment_profile_save($customerProfileId, AuthorizeNetPaymentProfile &$paymentProfile) {
 
