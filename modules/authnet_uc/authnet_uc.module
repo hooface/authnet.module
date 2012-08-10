@@ -161,6 +161,49 @@ function authnet_uc_payment_method_alter(&$methods) {
   }
 }
 
+/**
+ * Implementation of hook_uc_checkout_complete().
+ */
+function authnet_uc_uc_checkout_complete($order, $account) {
+
+  /**
+   * During checkout, it's possible that a CIM profile was created for the user, but was
+   * assigned to the order instead (if the user was anonymous and the default checkout
+   * transaction type is set to 'Set a reference only').
+   *
+   * If that's the case, we want to move the CIM profile from the order to the customer.
+   *
+   * We can tell by looking at the customer profile that was saved for the order, and checking
+   * to see if is present in the order's list of references. If it isn't, then it should be assigned
+   * to the order's user instead.
+   */
+
+  // If the order's payment method is 'credit'...
+  if ($order->payment_method == 'credit') {
+
+    // Load the customer profile id for this order from the database.
+    $customer_profile_id = authnet_cim_entity_profile_id_load('order', $order->order_id);
+
+    // If a customer profile id is available, and:
+    //   a) there are no references on the order, or
+    //   b) the customer profile id is not one of the reference keys...
+    if ($customer_profile_id && (empty($order->data['cc_txns']['references']) || !array_key_exists($customer_profile_id, $order->data['cc_txns']['references']))) {
+
+      // Load the customer profile from Authorize.net.
+      $customer_profile = authnet_cim_profile_load($customer_profile_id);
+
+      // Pass it through the authnet_user module's helper function to change the merchant customer id, description, and email to match that of the user.
+      $customer_profile = authnet_user_customer_profile_new($account->uid, FALSE, $customer_profile);
+
+      // Save the updated profile to Authorize.net.
+      authnet_cim_profile_save($customer_profile);
+
+      // Update the database record for the customer profile.
+      db_query('UPDATE {authnet_cim_entity} SET type="user", id=%d WHERE customer_profile_id=%d', array($account->uid, $customer_profile_id));
+    }
+  }
+}
+
 /* ******************************************************************************
  * Form functions
  * *****************************************************************************/
