@@ -483,7 +483,7 @@ function authnet_uc_payment_method_credit($op, &$arg1, $silent = FALSE) {
 
         // If the normal function failed, we should too.
         if (!$result) {
-          return FALSE;
+          return $result;
         }
 
         // Add the 'save_card' variable to the payment details on the order.
