@@ -533,11 +533,13 @@ function authnet_uc_translate_txn_type($type) {
     UC_CREDIT_CREDIT => AUTHNET_METHOD_CREDIT,
     UC_CREDIT_VOID => AUTHNET_METHOD_VOID,
 
+    // Reference transaction are 'Authorize and capture'.
+    UC_CREDIT_REFERENCE_TXN => AUTHNET_METHOD_AUTH_CAPTURE,
+
     /**
-     * There is no equivalent for Ubercart's reference transactions, so we handle these specially in the authnet_uc_charge() function.
+     * There is no equivalent for Ubercart's other reference transactions, so we handle these specially in the authnet_uc_charge() function.
      */
     // UC_CREDIT_REFERENCE_SET => 0,
-    // UC_CREDIT_REFERENCE_TXN => 0,
     // UC_CREDIT_REFERENCE_REMOVE => 0,
     // UC_CREDIT_REFERENCE_CREDIT => 0,
   );
