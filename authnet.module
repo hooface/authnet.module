@@ -108,6 +108,42 @@ function authnet_sdk_include() {
  * *****************************************************************************/
 
 /**
+ * Returns the message text for an AVS response code.
+ */
+function authnet_uc_avs($code) {
+  $codes = array(
+    'A' => t('Address (Street) matches, ZIP does not'),
+    'B' => t('Address information not provided for AVS check'),
+    'E' => t('AVS error'),
+    'G' => t('Non-U.S. Card Issuing Bank'),
+    'N' => t('No Match on Address (Street) or ZIP'),
+    'P' => t('AVS not applicable for this transaction'),
+    'R' => t('Retry – System unavailable or timed out'),
+    'S' => t('Service not supported by issuer'),
+    'U' => t('Address information is unavailable'),
+    'W' => t('Nine digit ZIP matches, Address (Street) does not'),
+    'X' => t('Address (Street) and nine digit ZIP match'),
+    'Y' => t('Address (Street) and five digit ZIP match'),
+    'Z' => t('Five digit ZIP matches, Address (Street) does not'),
+  );
+  return $code . ' - ' . $codes[$code];
+}
+
+/**
+ * Returns the message text for a CVV match.
+ */
+function authnet_uc_cvv($code) {
+  $codes = array(
+    'M' => t('Match'),
+    'N' => t('No Match'),
+    'P' => t('Not Processed'),
+    'S' => t('Should have been present'),
+    'U' => t('Issuer unable to process request'),
+  );
+  return $code . ' - ' . $codes[$code];
+}
+
+/**
  * Returns an array of credit card transaction types available to Authorize.net.
  */
 function authnet_transaction_types() {
