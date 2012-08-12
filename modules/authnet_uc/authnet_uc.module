@@ -64,6 +64,7 @@ function authnet_uc_form_alter(&$form, &$form_state, $form_id) {
       $form['authnet_payment_profiles']['charge'] = array(
         '#type' => 'submit',
         '#value' => t('Charge amount to this profile'),
+        '#validate' => array('authnet_uc_payment_profile_charge_validate'),
         '#submit' => array('authnet_uc_payment_profile_charge_submit'),
       );
     }
@@ -283,6 +284,17 @@ function authnet_uc_payment_method_credit_checkout_form($form_state, $order, $cu
 
   // Return the form.
   return $form;
+}
+
+/**
+ * Validate function for the order admin payment profile charge button.
+ */
+function authnet_uc_payment_profile_charge_validate($form, &$form_state) {
+
+  // Make sure the user entered an amount.
+  if (empty($form_state['values']['amount'])) {
+    form_set_error('amount', 'You must enter a positive number for the amount.');
+  }
 }
 
 /**
