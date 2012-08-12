@@ -413,8 +413,11 @@ function _authnet_uc_cim_transaction($order, $customer_profile_id, $payment_prof
   );
   $transaction = authnet_transaction_new($values);
 
+  // Translate the method to it's Authorize.net equivalent.
+  $authnet_method = authnet_uc_translate_txn_type($method);
+
   // Send the transaction and get the result (translate the method to it's Authorize.net equivalent).
-  $success = authnet_cim_transaction($transaction, authnet_uc_translate_txn_type($method));
+  $success = authnet_cim_transaction($transaction, $authnet_method);
 
   // If the transaction failed...
   if (!$success) {
@@ -432,14 +435,14 @@ function _authnet_uc_cim_transaction($order, $customer_profile_id, $payment_prof
       'revision' => 'formatted-original',
       'type' => 'amount',
     );
-    $message = t('<b>@type:</b> @amount', array('@type' => $types[$method], '@amount' => uc_price($amount, $context)));
+    $message = t('<b>@type:</b> @amount', array('@type' => $types[$authnet_method], '@amount' => uc_price($amount, $context)));
   }
 
   // Add an admin order comment.
   uc_order_comment_save($order->order_id, $user->uid, $message, 'admin');
 
   // Return the result.
-  return _authnet_uc_transaction_result($success, $message, $method, $payment_profile_id);
+  return _authnet_uc_transaction_result($success, $message, $authnet_method, $payment_profile_id);
 }
 
 /**
