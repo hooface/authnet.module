@@ -355,10 +355,10 @@ function _authnet_uc_charge($order_id, $amount, $data) {
         }
         // We don't break here so that the payment_profile_id that was found can be charged in the next case...
 
-      // If the transaction type is any of the other three...
+      // If the transaction type is 'Authorize and Capture', check to see if we have a customer and payment profile.
+      // If so, send the transaction via CIM.
+      // If not, move to the next case, which will send the transaction via AIM.
       case UC_CREDIT_AUTH_CAPTURE:
-      case UC_CREDIT_PRIOR_AUTH_CAPTURE:
-      case UC_CREDIT_AUTH_ONLY:
 
         // If a customer profile id and a payment profile id are set, perform the transaction via CIM.
         if (!empty($customer_profile_id) && !empty($payment_profile_id)) {
@@ -366,11 +366,14 @@ function _authnet_uc_charge($order_id, $amount, $data) {
           // Perform the transaciton.
           return _authnet_uc_cim_transaction($order, $customer_profile_id, $payment_profile_id, $amount, $data['txn_type']);
         }
+        // We don't break here so that the payment_profile_id that was found can be charged in the next case...
 
-        // Otherwise, perform the transaction via AIM.
-        else {
-          return _authnet_uc_aim_transaction($order, $amount, $data);
-        }
+      // If the transaction type is 'Authorize Only' or 'Prior authorization capture',
+      // or, if a customer profile id and payment profile id weren't found in the case above,
+      // send the transaction via AIM.
+      case UC_CREDIT_AUTH_ONLY:
+      case UC_CREDIT_PRIOR_AUTH_CAPTURE:
+        return _authnet_uc_aim_transaction($order, $amount, $data);
     }
   }
 
