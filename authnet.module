@@ -210,7 +210,7 @@ function authnet_get_error_message() {
 
   // If the request was not successful, return the error message.
   if (!$status['success']) {
-    return $message;
+    return $status['message'];
   }
 
   // Otherwise return FALSE
