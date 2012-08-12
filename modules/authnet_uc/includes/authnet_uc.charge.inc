@@ -72,6 +72,14 @@ function _authnet_uc_charge($order_id, $amount, $data) {
     $payment_profile_id = $order->payment_details['payment_profile_id'];
   }
 
+  // If a payment profile id is set, load the customer profile id.
+  if ($payment_profile_id) {
+    $record = authnet_cim_entity_payment_profile_load($payment_profile_id);
+    if ($record) {
+      $customer_profile_id = $record['customer_profile_id'];
+    }
+  }
+
   /**
    * Step 2: Deal with Ubercart's special reference transaction types.
    *
