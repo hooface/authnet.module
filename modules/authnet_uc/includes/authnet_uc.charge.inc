@@ -15,6 +15,9 @@
 function _authnet_uc_charge($order_id, $amount, $data) {
   global $user;
 
+  // Variables to contain the success status and a message to be printed at the end.
+  $success = FALSE;  // Default pessimism.
+
   /**
    * Summary of steps:
    *   1) Gather information.
@@ -206,6 +209,9 @@ function _authnet_uc_charge($order_id, $amount, $data) {
           return _authnet_uc_transaction_result(FALSE, $message);
         }
 
+        // So far so good...
+        $success = TRUE;
+
         // Add an admin order comment.
         uc_order_comment_save($order->order_id, $user->uid, t('Authorize.Net: CIM profile created - @id', array('@id' => $customer_profile->customerProfileId)), 'admin');
       }
@@ -235,6 +241,9 @@ function _authnet_uc_charge($order_id, $amount, $data) {
       // Return.
       return _authnet_uc_transaction_result(FALSE, $message);
     }
+
+    // So far so good...
+    $success = TRUE;
 
     // Add an admin order comment.
     uc_order_comment_save($order->order_id, $user->uid, t('Authorize.Net: CIM profile created - @id', array('@id' => $customer_profile->customerProfileId)), 'admin');
@@ -276,6 +285,9 @@ function _authnet_uc_charge($order_id, $amount, $data) {
       // Return.
       return _authnet_uc_transaction_result(FALSE, $message);
     }
+
+    // So far so good...
+    $success = TRUE;
 
     // Add an admin order comment.
     uc_order_comment_save($order->order_id, $user->uid, t('Authorize.Net: CIM payment profile created - @id', array('@id' => $payment_profile->customerPaymentProfileId)), 'admin');
