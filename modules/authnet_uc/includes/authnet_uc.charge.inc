@@ -196,8 +196,8 @@ function _authnet_uc_charge($order_id, $amount, $data) {
         // Create a new customer profile on the user.
         $customer_profile = _authnet_uc_cim_profile_create('user', $uid);
 
-        // If the customer profile didn't save and the transaction type is UC_CREDIT_REFERENCE_SET, bail!
-        if (!$customer_profile && $data['txn_type'] == UC_CREDIT_REFERENCE_SET) {
+        // If the customer profile didn't save, bail!
+        if (!$customer_profile) {
 
           // Build a message.
           $message = t('Authorize.Net: Creating CIM profile failed.<br />@text', array('@text' => authnet_get_error_message()));
@@ -226,8 +226,8 @@ function _authnet_uc_charge($order_id, $amount, $data) {
     // Create a new customer profile on the order.
     $customer_profile = _authnet_uc_cim_profile_create('order', $order->order_id);
 
-    // If the customer profile didn't save and the transaction type is UC_CREDIT_REFERENCE_SET, bail!
-    if (!$customer_profile && $data['txn_type'] == UC_CREDIT_REFERENCE_SET) {
+    // If the customer profile didn't save, bail!
+    if (!$customer_profile) {
 
       // Build a message.
       $message = t('Authorize.Net: Creating CIM profile failed.<br />@text', array('@text' => authnet_get_error_message()));
@@ -267,8 +267,8 @@ function _authnet_uc_charge($order_id, $amount, $data) {
     // Create the new payment profile.
     $payment_profile = _authnet_uc_cim_payment_profile_create($customer_profile_id, $order);
 
-    // If the payment profile didn't save and the transaction type is UC_CREDIT_REFERENCE_SET, bail!
-    if (!$payment_profile && $data['txn_type'] == UC_CREDIT_REFERENCE_SET) {
+    // If the payment profile didn't save, bail!
+    if (!$payment_profile) {
 
       // Build a message.
       $message = t('Authorize.Net: Creating CIM payment profile failed.<br />@text', array('@text' => authnet_get_error_message()));
