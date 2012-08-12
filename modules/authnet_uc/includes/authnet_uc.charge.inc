@@ -113,7 +113,7 @@ function _authnet_uc_charge($order_id, $amount, $data) {
     UC_CREDIT_REFERENCE_REMOVE,
     UC_CREDIT_REFERENCE_CREDIT,
   );
-  if (in_array($reference_types, $data['txn_type'])) {
+  if (in_array($data['txn_type'], $reference_types)) {
     switch ($data['txn_type']) {
 
       // Set a reference.
@@ -456,7 +456,7 @@ function _authnet_uc_aim_transaction($order, $amount, $data) {
   // Build a description of the order for logging in Auth.Net.
   $description = array();
   foreach ((array) $order->products as $product) {
-    $description[] = $product->qty .'x '. $product->model;
+    $description[] = $product->qty . 'x ' . $product->model;
   }
 
   $billing_country = uc_get_country_data(array('country_id' => $order->billing_country));
@@ -567,7 +567,7 @@ function _authnet_uc_aim_transaction($order, $amount, $data) {
     if ($method == AUTHNET_METHOD_AUTH_ONLY) {
 
       // Log the authorization to the order.
-      uc_credit_log_authorization($order->order_id, $response->transaction, $amount);
+      uc_credit_log_authorization($order->order_id, $response->transaction_id, $amount);
     }
 
     // Or, if this was a prior authorization capture...
@@ -686,7 +686,7 @@ function _authnet_uc_transaction_result($success = NULL, $message = NULL, $metho
 
   // If an authorization code is set, add it to the data.
   if ($authcode) {
-    $result['txn_authcode'] = $authcode;
+    $result['data']['txn_authcode'] = $authcode;
   }
 
   // Return the result.
