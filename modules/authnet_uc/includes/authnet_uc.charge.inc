@@ -263,7 +263,7 @@ function _authnet_uc_charge($order_id, $amount, $data) {
   }
 
   // If a customer profile was created, remember the new customer profile id.
-  if ($customer_profile) {
+  if (!empty($customer_profile)) {
     $customer_profile_id = $customer_profile->customerProfileId;
   }
 
