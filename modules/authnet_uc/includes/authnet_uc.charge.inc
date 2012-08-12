@@ -422,6 +422,9 @@ function _authnet_uc_cim_transaction($order, $customer_profile_id, $payment_prof
   // Send the transaction and get the result (translate the method to it's Authorize.net equivalent).
   $success = authnet_cim_transaction($transaction, $authnet_method);
 
+  // Get the CIM response object.
+  $response = authnet_get_response();
+
   // If the transaction failed...
   if (!$success) {
 
@@ -439,6 +442,17 @@ function _authnet_uc_cim_transaction($order, $customer_profile_id, $payment_prof
       'type' => 'amount',
     );
     $message = t('<b>@type:</b> @amount', array('@type' => $types[$authnet_method], '@amount' => uc_price($amount, $context)));
+
+    // If this was an authorization only transaction...
+    if ($authnet_method == AUTHNET_METHOD_AUTH_ONLY) {
+
+      // Get the transaction response.
+      $transaction_response = $response->getTransactionResponse();
+      $transaction_id = $transaction_response->transaction_id;
+
+      // Log the authorization to the order.
+      uc_credit_log_authorization($order->order_id, $transaction_response->transaction_id, $amount);
+    }
   }
 
   // Add an admin order comment.
