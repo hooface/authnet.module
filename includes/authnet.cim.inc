@@ -75,6 +75,13 @@ function authnet_cim_profile_save(AuthorizeNetCustomer &$customerProfile) {
 
   // If the $customerProfile->customerProfileId propery is set, then update an existing profile.
   if (isset($customerProfile->customerProfileId) && !empty($customerProfile->customerProfileId)) {
+
+    // Authorize.net does not accept payment profiles or ship to addresses when updating a profile, so unset them here.
+    // They will be reloaded later.
+    unset($customerProfile->paymentProfiles);
+    unset($customerProfile->shipToList);
+
+    // Send the request.
     $response = $request->updateCustomerProfile($customerProfile->customerProfileId, $customerProfile);
     $new = FALSE;
   }
@@ -125,6 +132,9 @@ function authnet_cim_profile_save(AuthorizeNetCustomer &$customerProfile) {
 
     // If the profile is being updated...
     else {
+
+      // Load the full customer profile object with another call to Authorize.net.
+      $customerProfile = authnet_cim_profile_load($customerProfile->customerProfileId);
 
       // Invoke hook_authnet_cim_profile_update and pass in the customer profile object.
       module_invoke_all('authnet_cim_profile_update', $customerProfile);
