@@ -607,19 +607,27 @@ function _authnet_uc_aim_transaction($order, $amount, $data) {
     'revision' => 'formatted-original',
     'type' => 'amount',
   );
-  $admin_comment = t('<b>@type</b><br /><b>@status:</b> @message<br />Amount: @amount<br />AVS response: @avs',
+  $admin_comment = t('<b>@type</b><br /><b>@status:</b> @message<br />Amount: @amount',
     array(
       '@type' => $types[$method],
       '@status' => $success ? t('ACCEPTED') : t('REJECTED'),
       '@message' => $response->response_reason_text,
       '@amount' => uc_price($response->amount, $context),
-      '@avs' => authnet_avs($response->avs_response),
     )
   );
 
-  // Add the CVV response if enabled.
-  if (variable_get('uc_credit_cvv_enabled', TRUE)) {
-    $admin_comment .= '<br />' . t('CVV match: @cvv', array('@cvv' => authnet_cvv($response->card_code_response)));
+  // If there was an error, add more information to the admin comment.
+  if (!$success) {
+
+    // Add the AVS response, if available.
+    if (!empty($response->avs_response)) {
+      $admin_comment .= '<br />' . t('AVS response: @avs', array('@avs' => authnet_avs($response->avs_response)));
+    }
+
+    // Add the CVV response, if available and enabled.
+    if (!empty($response->card_code_response) && variable_get('uc_credit_cvv_enabled', TRUE)) {
+      $admin_comment .= '<br />' . t('CVV match: @cvv', array('@cvv' => authnet_cvv($response->card_code_response)));
+    }
   }
 
   // Add an admin order comment.
