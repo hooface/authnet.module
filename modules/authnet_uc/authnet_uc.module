@@ -310,21 +310,23 @@ function authnet_uc_payment_profile_charge_submit($form, &$form_state) {
   // Set the Authorize.net payment profile id to charge to.
   $data['payment_profile_id'] = $payment_profile_id;
 
-  // Process the payment
+  // Process the payment.
   $result = uc_payment_process('credit', $form_state['values']['order_id'], $form_state['values']['amount'], $data, TRUE, NULL, FALSE);
 
   // If the payment was processed successfully...
   if ($result) {
+
+    // Set a message.
     drupal_set_message(t('The credit card was processed successfully. See the admin comments for more details.'));
+
+    // Redirect to the order view.
+    $form_state['redirect'] = 'admin/store/orders/'. $form_state['values']['order_id'];
   }
 
   // If an error occurred during processing...
   else {
     drupal_set_message(t('There was an error processing the credit card. See the admin comments for details.'), 'error');
   }
-
-  // Redirect to the order view.
-  $form_state['redirect'] = 'admin/store/orders/'. $form_state['values']['order_id'];
 }
 
 /**
@@ -420,7 +422,7 @@ function theme_authnet_uc_payment_method_credit_checkout_form($form) {
  * *****************************************************************************/
 
 /**
- * Callback for payment gateway settings.
+ * Callback for payment gateway charge function.
  */
 function authnet_uc_charge($order_id, $amount, $data) {
   module_load_include('inc', 'authnet_uc', 'includes/authnet_uc.charge');
