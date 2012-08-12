@@ -788,15 +788,15 @@ function _authnet_uc_payment_profile_from_order($order) {
   return array(
     'customerType' => !empty($order->billing_company) ? 'business' : 'individual',
     'billTo' => array(
-      'firstName' => substr($order->{$type . '_first_name'}, 0, 50),
-      'lastName' => substr($order->{$type . '_last_name'}, 0, 50),
-      'company' => substr($order->{$type . '_company'}, 0, 50),
-      'address' => substr($order->{$type . '_street1'}, 0, 60),
-      'city' => substr($order->{$type . '_city'}, 0, 40),
-      'state' => substr(uc_get_zone_code($order->{$type . '_zone'}), 0, 2),
-      'zip' => substr($order->{$type . '_postal_code'}, 0, 20),
-      'country' => substr(uc_country_get_by_id($order->{$type . '_country'}), 0, 60),
-      'phoneNumber' => substr(check_plain($order->{$type . '_phone'}), 0, 25),
+      'firstName' => substr($order->billing_first_name, 0, 50),
+      'lastName' => substr($order->billing_last_name, 0, 50),
+      'company' => substr($order->billing_company, 0, 50),
+      'address' => substr($order->billing_street1, 0, 60),
+      'city' => substr($order->billing_city, 0, 40),
+      'state' => substr(uc_get_zone_code($order->billing_zone), 0, 2),
+      'zip' => substr($order->billing_postal_code, 0, 20),
+      'country' => substr(uc_country_get_by_id($order->billing_country), 0, 60),
+      'phoneNumber' => substr(check_plain($order->billing_phone), 0, 25),
     ),
     'payment' => array(
       'creditCard' => array(
