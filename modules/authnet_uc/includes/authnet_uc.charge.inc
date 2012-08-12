@@ -37,12 +37,11 @@ function _authnet_uc_charge($order_id, $amount, $data) {
    *    a 'save_card' variable is passed in.
    *
    * The storage of those pieces of information varies based on where it's coming from.
-   *   -Order admin terminal
+   *   -Order admin terminal ($data as returned by authnet_uc_charge_data_get())
    *     -Information about an existing payment profile that was selected will be available in:
-   *       $data['customer_profile_id'] (the customer profile id)
    *       $data['payment_profile_id'] (the payment profile id)
    *     -The boolean for saving a new card will be in:
-   *       $data['save_card'] (as returned by authnet_uc_charge_data_get())
+   *       $data['save_card'] (whether or not a card is to be saved)
    *   -Checkout
    *     -Existing payment profile to be charged will be available in:
    *       $order->payment_details['payment_profile_id']
@@ -96,8 +95,10 @@ function _authnet_uc_charge($order_id, $amount, $data) {
    * that was saved to the order. The customer profile id will be passed in via $data['ref_id'].
    */
 
-  // If the transaction type is one of Ubercart's special reference types...
+  // Create a flag to indicate whether or not a card needs to be saved on the order.
   $save_card_on_order = FALSE;
+
+  // If the transaction type is one of Ubercart's special reference types...
   $reference_types = array(
     UC_CREDIT_REFERENCE_SET,
     UC_CREDIT_REFERENCE_TXN,
@@ -205,7 +206,7 @@ function _authnet_uc_charge($order_id, $amount, $data) {
       }
     }
 
-    // Otherwise, set $save_card_on_order to TRUE so we can save the card to the order later.
+    // Otherwise, if we couldn't find a user id, set $save_card_on_order to TRUE so we can save the card to the order instead.
     else {
       $save_card_on_order = TRUE;
     }
@@ -233,11 +234,16 @@ function _authnet_uc_charge($order_id, $amount, $data) {
     // Add an admin order comment.
     uc_order_comment_save($order->order_id, $user->uid, t('Authorize.Net: CIM profile created - @id', array('@id' => $customer_profile->customerProfileId)), 'admin');
 
-    // If the profile was successfully created, and the user didn't select 'save card', add the customer profile as a reference on the order.
     /**
+     * If the profile was successfully created, and the user didn't select 'save card', add the customer profile as a reference on the order.
      * @see authnet_uc_uc_checkout_complete()
+     *
+     * There has been some discussion as to whether we should ALWAYS save a reference to the order, no matter what kind of transaction this is.
+     * Currently, however, the reference id used in order references in the customer_profile_id, not the payment_profile_id. So adding a reference
+     * would not tell you exactly what payment profile was charged.
+     *   ... to be continued!
      */
-    if ($customer_profile && !$save_card) {
+    if (!$save_card) {
       uc_credit_log_reference($order->order_id, $customer_profile->customerProfileId, $order->payment_details['cc_number']);
     }
   }
@@ -283,7 +289,7 @@ function _authnet_uc_charge($order_id, $amount, $data) {
    *   Process a transaction on a reference (UC_CREDIT_REFERENCE_TXN)
    *
    * If the transaction type is UC_CREDIT_REFERENCE_TXN, we just want to do one thing: load the customer profile and charge the first
-   * payment profile we can find.
+   * payment profile we can find. (more on that in a moment...)
    *
    * If a customer profile id and payment profile id are set, send the transaction to Authorize.net via CIM.
    *
