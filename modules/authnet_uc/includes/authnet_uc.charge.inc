@@ -335,7 +335,7 @@ function _authnet_uc_charge($order_id, $amount, $data) {
         if (!empty($customer_profile_id)) {
 
           // Load the customer profile from Authorize.net.
-          $customer_profile = authnet_cim_customer_profile_load($customer_profile_id);
+          $customer_profile = authnet_cim_profile_load($customer_profile_id);
 
           // If a customer profile wasn't loaded, or it doesn't have any payment profiles, bail.
           if (!$customer_profile || empty($customer_profile->paymentProfiles)) {
