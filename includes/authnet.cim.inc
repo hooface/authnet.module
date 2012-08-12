@@ -75,7 +75,7 @@ function authnet_cim_profile_save(AuthorizeNetCustomer &$customerProfile) {
 
   // If the $customerProfile->customerProfileId propery is set, then update an existing profile.
   if (isset($customerProfile->customerProfileId) && !empty($customerProfile->customerProfileId)) {
-    $response = $request->updateCustomerProfile($customerProfile->customerProfileId, $customerProfile, $validation);
+    $response = $request->updateCustomerProfile($customerProfile->customerProfileId, $customerProfile);
     $new = FALSE;
   }
 
