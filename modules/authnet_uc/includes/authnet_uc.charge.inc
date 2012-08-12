@@ -123,9 +123,6 @@ function _authnet_uc_charge($order_id, $amount, $data) {
         if (!$save_card) {
           $save_card_on_order = TRUE;
         }
-
-        // In either case, we don't want to log the payment, because we're just setting a reference.
-        $result['log_payment'] = FALSE;
         break;
 
       // Perform a transaction on a given reference.
@@ -366,7 +363,7 @@ function _authnet_uc_charge($order_id, $amount, $data) {
   }
 
   // Return the result. This will only run if nothing else above returns first.
-  return _authnet_uc_transaction_result($success, $message);
+  return _authnet_uc_transaction_result($success, $message, authnet_uc_translate_txn_type($data['txn_type']));
 }
 
 /* ******************************************************************************
