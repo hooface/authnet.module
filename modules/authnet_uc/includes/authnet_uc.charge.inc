@@ -75,6 +75,20 @@ function _authnet_uc_charge($order_id, $amount, $data) {
     $payment_profile_id = $order->payment_details['payment_profile_id'];
   }
 
+  // If an authorization id is set, set it as the transaction id.
+  if (!empty($data['auth_id'])) {
+    $transaction_id = $data['auth_id'];
+  }
+
+  // If this is a 'prior authorization capture' transaction...
+  if ($data['txn_type'] == UC_CREDIT_PRIOR_AUTH_CAPTURE && !empty($data['auth_id'])) {
+
+    // Check to see if the payment profile id was included with the authorization (indicating that it's a CIM authorization).
+    if (!empty($order->data['cc_txns']['authorizations'][$data['auth_id']]['payment_profile_id'])) {
+      $payment_profile_id = $order->data['cc_txns']['authorizations'][$data['auth_id']]['payment_profile_id'];
+    }
+  }
+
   // If a payment profile id is set, load the customer profile id.
   if ($payment_profile_id) {
     $record = authnet_cim_entity_payment_profile_load($payment_profile_id);
@@ -363,7 +377,7 @@ function _authnet_uc_charge($order_id, $amount, $data) {
         if (!empty($customer_profile_id) && !empty($payment_profile_id)) {
 
           // Perform the transaciton.
-          return _authnet_uc_cim_transaction($order, $customer_profile_id, $payment_profile_id, $amount, $data['txn_type']);
+          return _authnet_uc_cim_transaction($order, $customer_profile_id, $payment_profile_id, $amount, $data['txn_type'], $transaction_id);
         }
 
         // Otherwise, send via AIM.
@@ -394,11 +408,13 @@ function _authnet_uc_charge($order_id, $amount, $data) {
  *   The amount of the transaction.
  * @param $method
  *   The Authorize.net method to use.
+ * @param $transaction_id
+ *   The transaction id, if this is a 'prior authorization capture' transaction. (optional)
  *
  * @return
  *   Returns a result array for the charge function.
  */
-function _authnet_uc_cim_transaction($order, $customer_profile_id, $payment_profile_id, $amount, $method) {
+function _authnet_uc_cim_transaction($order, $customer_profile_id, $payment_profile_id, $amount, $method, $transaction_id=NULL) {
   global $user;
 
   // Assemble the new transaction.
@@ -411,6 +427,11 @@ function _authnet_uc_cim_transaction($order, $customer_profile_id, $payment_prof
     ),
   );
   $transaction = authnet_transaction_new($values);
+
+  // If a $transaction_id was passed in, and the transaction method is 'Prior authorization capture', add it to the transaction.
+  if (!empty($transaction_id) && $method == AUTHNET_METHOD_PRIOR_AUTH_CAPTURE) {
+    $transaction->transId = $transaction_id;
+  }
 
   // Translate the method to it's Authorize.net equivalent.
   $authnet_method = authnet_uc_translate_txn_type($method);
@@ -447,15 +468,27 @@ function _authnet_uc_cim_transaction($order, $customer_profile_id, $payment_prof
       $transaction_id = $transaction_response->transaction_id;
 
       // Log the authorization to the order.
-      uc_credit_log_authorization($order->order_id, $transaction_response->transaction_id, $amount);
+      authnet_uc_log_cim_authorization($order->order_id, $payment_profile_id, $transaction_response->transaction_id, $amount);
     }
+
+    // Or, if this was a prior authorization capture...
+    elseif ($method == AUTHNET_METHOD_PRIOR_AUTH_CAPTURE) {
+
+      // Log the prior authorization capture on the order.
+      uc_credit_log_prior_auth_capture($order->order_id, $transaction_id);
+    }
+  }
+
+  // If a transaction id is not present, use the payment profile id.
+  if (empty($transaction_id)) {
+    $transaction_id = $payment_profile_id;
   }
 
   // Add an admin order comment.
   uc_order_comment_save($order->order_id, $user->uid, $message, 'admin');
 
   // Return the result.
-  return _authnet_uc_transaction_result($success, $message, $authnet_method, $payment_profile_id);
+  return _authnet_uc_transaction_result($success, $message, $authnet_method, $transaction_id);
 }
 
 /**
