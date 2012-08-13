@@ -612,3 +612,37 @@ function authnet_uc_translate_txn_type($type) {
   // If all else fails, return FALSE.
   return FALSE;
 }
+
+/**
+ * Stores a CIM authorization to an order's data array.
+ * Copied and modified from uc_credit_log_authorization().
+ *
+ * @param $order_id
+ *   The order associated with the credit card capture.
+ * @param $payment_profile_id
+ *   The ID of the payment profile that the authorization was made under.
+ * @param $auth_id
+ *   The payment service's ID for the authorization.
+ * @param $amount
+ *   The amount that was authorized on the card.
+ *
+ * @return
+ *   The entire updated data array for the order.
+ */
+function authnet_uc_log_cim_authorization($order_id, $payment_profile_id, $auth_id, $amount){
+  // Load the existing order data array.
+  $data = db_result(db_query("SELECT data FROM {uc_orders} WHERE order_id = %d", $order_id));
+  $data = unserialize($data);
+
+  // Add the authorization to the cc_txns.
+  $data['cc_txns']['authorizations'][$auth_id] = array(
+    'payment_profile_id' => $payment_profile_id,
+    'amount' => $amount,
+    'authorized' => time(),
+  );
+
+  // Save the updated data array to the database.
+  db_query("UPDATE {uc_orders} SET data = '%s' WHERE order_id = %d", serialize($data), $order_id);
+
+  return $data;
+}
