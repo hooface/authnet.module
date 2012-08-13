@@ -428,13 +428,18 @@ function _authnet_uc_cim_transaction($order, $customer_profile_id, $payment_prof
   );
   $transaction = authnet_transaction_new($values);
 
-  // If a $transaction_id was passed in, and the transaction method is 'Prior authorization capture', add it to the transaction.
-  if (!empty($transaction_id) && $method == AUTHNET_METHOD_PRIOR_AUTH_CAPTURE) {
-    $transaction->transId = $transaction_id;
-  }
-
   // Translate the method to it's Authorize.net equivalent.
   $authnet_method = authnet_uc_translate_txn_type($method);
+
+  // If the transaction method is 'Prior authorization capture'...
+  if ($authnet_method == AUTHNET_METHOD_PRIOR_AUTH_CAPTURE) {
+
+    // Set the transaction id.
+    $transaction->transId = $transaction_id;
+
+    // Unset the order information (Authorize.net doesn't want it).
+    unset($transaction->order);
+  }
 
   // Send the transaction and get the result (translate the method to it's Authorize.net equivalent).
   $success = authnet_cim_transaction($transaction, $authnet_method);
