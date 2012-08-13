@@ -89,6 +89,7 @@ function authnet_uc_form_alter(&$form, &$form_state, $form_id) {
       '#type' => 'checkbox',
       '#title' => t('Add this credit card to the customer\'s payment profiles.'),
       '#description' => t('When this is checked, the buttons below it will work normally, but they will also save the credit card to the customer\'s list of payment profiles above. The only exception is the "Set reference" button, which will only add the new customer payment profile. If you want to "Set a reference" on this order alone, leave this unchecked.'),
+      '#default_value' => TRUE,
       '#weight' => -1,
     );
 
