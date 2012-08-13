@@ -15,9 +15,6 @@
 function _authnet_uc_charge($order_id, $amount, $data) {
   global $user;
 
-  // Variables to contain the success status and a message to be printed at the end.
-  $success = FALSE;  // Default pessimism.
-
   /**
    * Summary of steps:
    *   1) Gather information.
@@ -52,9 +49,12 @@ function _authnet_uc_charge($order_id, $amount, $data) {
    *       $order->payment_details['save_card']
    */
 
-  // Container variables for charging/saving an Authnet payment profile.
-  $payment_profile_id = FALSE;
-  $save_card = FALSE;
+  // Container variables:
+  $success = FALSE;  // Keep track of our success. Default pessimism.
+  $payment_profile_id = FALSE;  // Authorize.net CIM payment profile id.
+  $transaction_id = FALSE;  // AIM or CIM transaction id.
+  $save_card = FALSE;  // Whether or not to save the card as a CIM profile on the user.
+  $save_card_on_order = FALSE;  // Whether or not to save the card as a CIM profile on the order.
 
   // Load the order.
   $order = uc_order_load($order_id);
@@ -105,9 +105,6 @@ function _authnet_uc_charge($order_id, $amount, $data) {
    * If the type is UC_CREDIT_REFERENCE_TXN, our job is pretty simple: we just need to create a transaction on the CIM profile
    * that was saved to the order. The customer profile id will be passed in via $data['ref_id'].
    */
-
-  // Create a flag to indicate whether or not a card needs to be saved on the order.
-  $save_card_on_order = FALSE;
 
   // If the transaction type is one of Ubercart's special reference types...
   $reference_types = array(
