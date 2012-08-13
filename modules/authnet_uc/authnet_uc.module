@@ -64,8 +64,14 @@ function authnet_uc_form_alter(&$form, &$form_state, $form_id) {
       $form['authnet_payment_profiles']['charge'] = array(
         '#type' => 'submit',
         '#value' => t('Charge amount to this profile'),
-        '#validate' => array('authnet_uc_payment_profile_charge_validate'),
+        '#validate' => array('authnet_uc_payment_profile_form_validate'),
         '#submit' => array('authnet_uc_payment_profile_charge_submit'),
+      );
+      $form['authnet_payment_profiles']['authorize'] = array(
+        '#type' => 'submit',
+        '#value' => t('Authorize amount only on this profile'),
+        '#validate' => array('authnet_uc_payment_profile_form_validate'),
+        '#submit' => array('authnet_uc_payment_profile_authorize_submit'),
       );
     }
 
@@ -287,9 +293,9 @@ function authnet_uc_payment_method_credit_checkout_form($form_state, $order, $cu
 }
 
 /**
- * Validate function for the order admin payment profile charge button.
+ * Validate function for the order admin payment profile form buttons.
  */
-function authnet_uc_payment_profile_charge_validate($form, &$form_state) {
+function authnet_uc_payment_profile_form_validate($form, &$form_state) {
 
   // Make sure the user entered an amount.
   if (empty($form_state['values']['amount'])) {
@@ -338,6 +344,50 @@ function authnet_uc_payment_profile_charge_submit($form, &$form_state) {
   // If an error occurred during processing...
   else {
     drupal_set_message(t('There was an error processing the credit card. See the admin comments for details.'), 'error');
+  }
+}
+
+/**
+ * Submit function for the order admin payment profile authorize-only button.
+ */
+function authnet_uc_payment_profile_authorize_submit($form, &$form_state) {
+
+  // Get the pid of the payment profile that was selected.
+  $pid = $form_state['values']['payment_profile'];
+
+  // If no payment profile was selected, don't do anything.
+  if (!$pid) {
+    return;
+  }
+
+  // Load the payment profile id.
+  $payment_profile_id = authnet_cim_entity_payment_profile_id_load($pid);
+
+  // Build the data array passed on to the payment gateway.
+  $data = array();
+
+  // Set the transaction type to "Authorize only"
+  $data['txn_type'] = UC_CREDIT_AUTH_ONLY;
+
+  // Set the Authorize.net payment profile id to charge to.
+  $data['payment_profile_id'] = $payment_profile_id;
+
+  // Process the payment.
+  $result = uc_payment_process('credit', $form_state['values']['order_id'], $form_state['values']['amount'], $data, TRUE, NULL, FALSE);
+
+  // If the payment was processed successfully...
+  if ($result) {
+
+    // Set a message.
+    drupal_set_message(t('The credit card was authorized successfully. See the admin comments for more details.'));
+
+    // Redirect to the order view.
+    $form_state['redirect'] = 'admin/store/orders/'. $form_state['values']['order_id'];
+  }
+
+  // If an error occurred during processing...
+  else {
+    drupal_set_message(t('There was an error authorizing the credit card. See the admin comments for details.'), 'error');
   }
 }
 
