@@ -402,8 +402,13 @@ function authnet_uc_payment_profile_add_validate($form, &$form_state) {
     'save_card' => FALSE,
   );
 
-  // We only need validation if the 'save_card' checkbox was checked.
-  if (!empty($form_state['values']['save_card'])) {
+  // We only need validation if one of the three credit card fieldset buttons were clicked and the 'save_card' checkbox was checked.
+  $cc_buttons = array(
+    t('Charge amount'),
+    t('Authorize amount only'),
+    t('Set a reference only'),
+  );
+  if (in_array($form_state['values']['op'], $cc_buttons) && !empty($form_state['values']['save_card'])) {
 
     // Set the data value to TRUE.
     $data['save_card'] = TRUE;
