@@ -68,7 +68,7 @@ function _authnet_uc_charge($order_id, $amount, $data) {
   }
 
   // If a payment profile id was passed in via the terminal or via checkout, remember it.
-  if (!empty($data['payment_profile_id'])){
+  if (!empty($data['payment_profile_id'])) {
     $payment_profile_id = $data['payment_profile_id'];
   }
   elseif (!empty($order->payment_details['payment_profile_id'])) {
@@ -174,10 +174,10 @@ function _authnet_uc_charge($order_id, $amount, $data) {
    *   1) It's possible that the user already has an account (and maybe a customer profile), but they aren't logged in.
    *      If that's the case, Ubercart will assign this order to that user, based on their email address. So we'll use the same
    *      logic here to look up the user id based on the email address.
-   *   2) If the user is brand new (their email address doesn't exist), then we'll create a new customer profile, but we'll assign 
+   *   2) If the user is brand new (their email address doesn't exist), then we'll create a new customer profile, but we'll assign
    *      it to the order rather than the user. Then, in hook_uc_checkout_complete(), we'll move it to the user.
    *
-   * The second scenario will be triggered if a) the user doesn't want to save the card, or b) a user wasn't found to save the card to in the 
+   * The second scenario will be triggered if a) the user doesn't want to save the card, or b) a user wasn't found to save the card to in the
    * first scenario. In this case, we'll save the card to a new customer profile on the order.
    */
 
@@ -337,7 +337,7 @@ function _authnet_uc_charge($order_id, $amount, $data) {
   if (in_array($data['txn_type'], $transaction_types)) {
 
     // Switch through the transaction types.
-    switch($data['txn_type']) {
+    switch ($data['txn_type']) {
 
       // If the transaction type is UC_CREDIT_REFERENCE_TXN...
       case UC_CREDIT_REFERENCE_TXN:

@@ -119,7 +119,7 @@ function authnet_user_payment_profile_form(&$form_state, $user, $payment_profile
   $form = array();
 
   /**
-   * Save the user id value to the form. This will be used to generate information for the Authorize.net 
+   * Save the user id value to the form. This will be used to generate information for the Authorize.net
    * customer profile, if one doesn't exist already.
    * @see authnet_user_authnet_ui_form_customer_profile_new()
    */

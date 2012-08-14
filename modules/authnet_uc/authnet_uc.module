@@ -3,7 +3,7 @@
 /**
  * @file
  * Authorize.net - Ubercart Integration
- * A replacement for uc_authorizenet. Process payments using Authorize.net 
+ * A replacement for uc_authorizenet. Process payments using Authorize.net
  */
 
 /* ******************************************************************************
@@ -702,7 +702,7 @@ function authnet_uc_translate_txn_type($type) {
  * @return
  *   The entire updated data array for the order.
  */
-function authnet_uc_log_cim_authorization($order_id, $payment_profile_id, $auth_id, $amount){
+function authnet_uc_log_cim_authorization($order_id, $payment_profile_id, $auth_id, $amount) {
   // Load the existing order data array.
   $data = db_result(db_query("SELECT data FROM {uc_orders} WHERE order_id = %d", $order_id));
   $data = unserialize($data);
