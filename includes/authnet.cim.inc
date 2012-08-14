@@ -12,19 +12,19 @@
 /**
  * Load an existing customer profile from Authorize.net.
  *
- * @param $customerProfileId
+ * @param $customer_profile_id
  *   The customer profile id.
  *
  * @return
  *   Returns an AuthorizeNetCustomer object if available, FALSE otherwise.
  */
-function authnet_cim_profile_load($customerProfileId) {
+function authnet_cim_profile_load($customer_profile_id) {
 
   // Create an Authorize.net request object.
   $request = authnet_request_new('CIM');
 
   // Retrieve the customer profile.
-  $response = $request->getCustomerProfile($customerProfileId);
+  $response = $request->getCustomerProfile($customer_profile_id);
 
   // Log the response object.
   authnet_log_response($response);
@@ -36,13 +36,13 @@ function authnet_cim_profile_load($customerProfileId) {
     $nonunique = array('paymentProfiles', 'shipToList');
 
     // Convert the profile from a SimpleXMLElement to an AuthorizeNetCustomer object.
-    $customerProfile = authnet_customer_profile_new(_authnet_simplexml_to_array($response->xml->profile, $nonunique));
+    $customer_profile = authnet_customer_profile_new(_authnet_simplexml_to_array($response->xml->profile, $nonunique));
 
     // Invoke hook_authnet_cim_profile_load and pass in the customer profile object.
-    module_invoke_all('authnet_cim_profile_load', $customerProfile);
+    module_invoke_all('authnet_cim_profile_load', $customer_profile);
 
     // Return the profile.
-    return $customerProfile;
+    return $customer_profile;
   }
 
   // Return FALSE if the above didn't return anything else.
@@ -51,16 +51,16 @@ function authnet_cim_profile_load($customerProfileId) {
 
 /**
  * Save a customer profile to Authorize.net.
- * If the $customerProfile->customerProfileId propery is set, then the profile will be updated.
+ * If the $customer_profile->customerProfileId propery is set, then the profile will be updated.
  * Otherwise, a new one will be saved.
  *
- * @param AuthorizeNetCustomer &$customerProfile
+ * @param AuthorizeNetCustomer &$customer_profile
  *   The customer profile object to be saved, passed by reference.
  *
  * @return
  *   Returns TRUE if the save was successful, FALSE otherwise.
  */
-function authnet_cim_profile_save(AuthorizeNetCustomer &$customerProfile) {
+function authnet_cim_profile_save(AuthorizeNetCustomer &$customer_profile) {
 
   // Create an Authorize.net request object.
   $request = authnet_request_new('CIM');
@@ -73,16 +73,16 @@ function authnet_cim_profile_save(AuthorizeNetCustomer &$customerProfile) {
    * Use $response->getValidationResponses() to retrieve validation responses, and then parse/display them.
    */
 
-  // If the $customerProfile->customerProfileId propery is set, then update an existing profile.
-  if (isset($customerProfile->customerProfileId) && !empty($customerProfile->customerProfileId)) {
+  // If the $customer_profile->customerProfileId propery is set, then update an existing profile.
+  if (isset($customer_profile->customerProfileId) && !empty($customer_profile->customerProfileId)) {
 
     // Authorize.net does not accept payment profiles or ship to addresses when updating a profile, so unset them here.
     // They will be reloaded later.
-    unset($customerProfile->paymentProfiles);
-    unset($customerProfile->shipToList);
+    unset($customer_profile->paymentProfiles);
+    unset($customer_profile->shipToList);
 
     // Send the request.
-    $response = $request->updateCustomerProfile($customerProfile->customerProfileId, $customerProfile);
+    $response = $request->updateCustomerProfile($customer_profile->customerProfileId, $customer_profile);
     $new = FALSE;
   }
 
@@ -90,12 +90,12 @@ function authnet_cim_profile_save(AuthorizeNetCustomer &$customerProfile) {
   else {
 
     // Only use validation if there are payment profiles assigned to this new customer profile.
-    if (empty($customerProfile->paymentProfiles)) {
+    if (empty($customer_profile->paymentProfiles)) {
       $validation = 'none';
     }
 
     // Send the request.
-    $response = $request->createCustomerProfile($customerProfile, $validation);
+    $response = $request->createCustomerProfile($customer_profile, $validation);
     $new = TRUE;
   }
 
@@ -109,42 +109,42 @@ function authnet_cim_profile_save(AuthorizeNetCustomer &$customerProfile) {
     if ($new) {
 
       // Get the new profile id from the response.
-      $customerProfileId = $response->getCustomerProfileId();
+      $customer_profile_id = $response->getCustomerProfileId();
 
       // If the new customer profile has payment profiles with credit cards, save their expiration date information so that it's available in the insert hook after reloading the profile.
       $expiration_dates = array();
-      if (!empty($customerProfile->paymentProfiles)) {
-        foreach ($customerProfile->paymentProfiles as $paymentProfile) {
-          if (!empty($paymentProfile->payment->creditCard->expirationDate)) {
-            $expiration_dates[$paymentProfile->customerPaymentProfileId] = $paymentProfile->payment->creditCard->expirationDate;
+      if (!empty($customer_profile->paymentProfiles)) {
+        foreach ($customer_profile->paymentProfiles as $payment_profile) {
+          if (!empty($payment_profile->payment->creditCard->expirationDate)) {
+            $expiration_dates[$payment_profile->customerPaymentProfileId] = $payment_profile->payment->creditCard->expirationDate;
           }
         }
       }
 
       // Load the full customer profile object with another call to Authorize.net.
-      $customerProfile = authnet_cim_profile_load($customerProfileId);
+      $customer_profile = authnet_cim_profile_load($customer_profile_id);
 
       // Restore the expiration dates.
-      if (!empty($customerProfile->paymentProfiles)) {
-        foreach ($customerProfile->paymentProfiles as $paymentProfile) {
-          if (!empty($expiration_dates[$paymentProfile->customerPaymentProfileId])) {
-            $paymentProfile->payment->creditCard->expirationDate = $expiration_dates[$paymentProfile->customerPaymentProfileId];
+      if (!empty($customer_profile->paymentProfiles)) {
+        foreach ($customer_profile->paymentProfiles as $payment_profile) {
+          if (!empty($expiration_dates[$payment_profile->customerPaymentProfileId])) {
+            $payment_profile->payment->creditCard->expirationDate = $expiration_dates[$payment_profile->customerPaymentProfileId];
           }
         }
       }
 
       // Invoke hook_authnet_cim_profile_insert and pass in the customer profile object.
-      module_invoke_all('authnet_cim_profile_insert', $customerProfile);
+      module_invoke_all('authnet_cim_profile_insert', $customer_profile);
     }
 
     // If the profile is being updated...
     else {
 
       // Load the full customer profile object with another call to Authorize.net.
-      $customerProfile = authnet_cim_profile_load($customerProfile->customerProfileId);
+      $customer_profile = authnet_cim_profile_load($customer_profile->customerProfileId);
 
       // Invoke hook_authnet_cim_profile_update and pass in the customer profile object.
-      module_invoke_all('authnet_cim_profile_update', $customerProfile);
+      module_invoke_all('authnet_cim_profile_update', $customer_profile);
     }
 
     // Return TRUE.
@@ -158,19 +158,19 @@ function authnet_cim_profile_save(AuthorizeNetCustomer &$customerProfile) {
 /**
  * Delete a customer profile from Authorize.net
  *
- * @param $customerProfileId
+ * @param $customer_profile_id
  *   The id of the customer profile to be deleted.
  *
  * @return
  *   Returns TRUE on success, FALSE otherwise.
  */
-function authnet_cim_profile_delete($customerProfileId) {
+function authnet_cim_profile_delete($customer_profile_id) {
 
   // Create an Authorize.net request object.
   $request = authnet_request_new('CIM');
 
   // Delete the profile.
-  $response = $request->deleteCustomerProfile($customerProfileId);
+  $response = $request->deleteCustomerProfile($customer_profile_id);
 
   // Log the response object.
   authnet_log_response($response);
@@ -179,7 +179,7 @@ function authnet_cim_profile_delete($customerProfileId) {
   if ($response->isOk()) {
 
     // Invoke hook_authnet_cim_profile_delete and pass in the customer profile id.
-    module_invoke_all('authnet_cim_profile_delete', $customerProfileId);
+    module_invoke_all('authnet_cim_profile_delete', $customer_profile_id);
 
     // Return TRUE.
     return TRUE;
@@ -196,21 +196,21 @@ function authnet_cim_profile_delete($customerProfileId) {
 /**
  * Load an existing customer payment profile from Authorize.net.
  *
- * @param $customerProfileId
+ * @param $customer_profile_id
  *   The customer profile id.
- * @param $customerPaymentProfileId
+ * @param $payment_profile_id
  *   The customer payment profile id.
  *
  * @return
  *   Returns an AuthorizeNetPaymentProfile object if available, FALSE otherwise.
  */
-function authnet_cim_payment_profile_load($customerProfileId, $customerPaymentProfileId) {
+function authnet_cim_payment_profile_load($customer_profile_id, $payment_profile_id) {
 
   // Create an Authorize.net request object.
   $request = authnet_request_new('CIM');
 
   // Retrieve the customer profile.
-  $response = $request->getCustomerPaymentProfile($customerProfileId, $customerPaymentProfileId);
+  $response = $request->getCustomerPaymentProfile($customer_profile_id, $payment_profile_id);
 
   // Log the response object.
   authnet_log_response($response);
@@ -219,13 +219,13 @@ function authnet_cim_payment_profile_load($customerProfileId, $customerPaymentPr
   if ($response->isOK()) {
 
     // Convert the payment profile from a SimpleXMLElement to an AuthorizeNetPaymentProfile object.
-    $paymentProfile = authnet_payment_profile_new(_authnet_simplexml_to_array($response->xml->paymentProfile));
+    $payment_profile = authnet_payment_profile_new(_authnet_simplexml_to_array($response->xml->paymentProfile));
 
     // Invoke hook_authnet_cim_payment_profile_load and pass in the payment profile object.
-    module_invoke_all('authnet_cim_payment_profile_load', $customerProfileId, $paymentProfile);
+    module_invoke_all('authnet_cim_payment_profile_load', $customer_profile_id, $payment_profile);
 
     // Return the profile.
-    return $paymentProfile;
+    return $payment_profile;
   }
 
   // Return FALSE if the above didn't return anything else.
@@ -234,18 +234,18 @@ function authnet_cim_payment_profile_load($customerProfileId, $customerPaymentPr
 
 /**
  * Save a payment profile to Authorize.net.
- * If the $paymentProfile->customerPaymentProfileId propery is set, then the profile will be updated.
+ * If the $payment_profile->customerPaymentProfileId propery is set, then the profile will be updated.
  * Otherwise, a new one will be saved.
  *
- * @param $customerProfileId
+ * @param $customer_profile_id
  *   The customer profile id.
- * @param AuthorizeNetPaymentProfile &$paymentProfile
+ * @param AuthorizeNetPaymentProfile &$payment_profile
  *   The payment profile object to be saved, passed by reference.
  *
  * @return
  *   Returns TRUE if the save was successful, FALSE otherwise.
  */
-function authnet_cim_payment_profile_save($customerProfileId, AuthorizeNetPaymentProfile &$paymentProfile) {
+function authnet_cim_payment_profile_save($customer_profile_id, AuthorizeNetPaymentProfile &$payment_profile) {
 
   // Create an Authorize.net request object.
   $request = authnet_request_new('CIM');
@@ -258,15 +258,15 @@ function authnet_cim_payment_profile_save($customerProfileId, AuthorizeNetPaymen
    * Use $response->getValidationResponses() to retrieve validation responses, and then parse/display them.
    */
 
-  // If the $paymentProfile->customerPaymentProfileId propery is set, then the profile will be updated.
-  if (isset($paymentProfile->customerPaymentProfileId) && !empty($paymentProfile->customerPaymentProfileId)) {
-    $response = $request->updateCustomerPaymentProfile($customerProfileId, $paymentProfile->customerPaymentProfileId, $paymentProfile, $validation);
+  // If the $payment_profile->customerPaymentProfileId propery is set, then the profile will be updated.
+  if (isset($payment_profile->customerPaymentProfileId) && !empty($payment_profile->customerPaymentProfileId)) {
+    $response = $request->updateCustomerPaymentProfile($customer_profile_id, $payment_profile->customerPaymentProfileId, $payment_profile, $validation);
     $new = FALSE;
   }
 
   // Otherwise, save a new payment profile.
   else {
-    $response = $request->createCustomerPaymentProfile($customerProfileId, $paymentProfile, $validation);
+    $response = $request->createCustomerPaymentProfile($customer_profile_id, $payment_profile, $validation);
     $new = TRUE;
   }
 
@@ -280,31 +280,31 @@ function authnet_cim_payment_profile_save($customerProfileId, AuthorizeNetPaymen
     if ($new) {
 
       // Get the new profile id from the response.
-      $customerPaymentProfileId = $response->getPaymentProfileId();
+      $payment_profile_id = $response->getPaymentProfileId();
 
       // If the new payment profile has a credit card expiration date, save it so that it's available in the insert hook after reloading the profile.
       $expiration_date = '';
-      if (!empty($paymentProfile->payment->creditCard->expirationDate)) {
-        $expiration_date = $paymentProfile->payment->creditCard->expirationDate;
+      if (!empty($payment_profile->payment->creditCard->expirationDate)) {
+        $expiration_date = $payment_profile->payment->creditCard->expirationDate;
       }
 
       // Load the full payment profile object with another call to Authorize.net.
-      $paymentProfile = authnet_cim_payment_profile_load($customerProfileId, $customerPaymentProfileId);
+      $payment_profile = authnet_cim_payment_profile_load($customer_profile_id, $payment_profile_id);
 
       // Restore the expiration date.
       if (!empty($expiration_date)) {
-        $paymentProfile->payment->creditCard->expirationDate = $expiration_date;
+        $payment_profile->payment->creditCard->expirationDate = $expiration_date;
       }
 
       // Invoke hook_authnet_cim_payment_profile_insert and pass in the payment profile object.
-      module_invoke_all('authnet_cim_payment_profile_insert', $customerProfileId, $paymentProfile);
+      module_invoke_all('authnet_cim_payment_profile_insert', $customer_profile_id, $payment_profile);
     }
 
     // If the profile is being updated...
     else {
 
       // Invoke hook_authnet_cim_payment_profile_update and pass in the payment profile object.
-      module_invoke_all('authnet_cim_payment_profile_update', $customerProfileId, $paymentProfile);
+      module_invoke_all('authnet_cim_payment_profile_update', $customer_profile_id, $payment_profile);
     }
 
     // Return TRUE.
@@ -318,21 +318,21 @@ function authnet_cim_payment_profile_save($customerProfileId, AuthorizeNetPaymen
 /**
  * Delete a payment profile from Authorize.net
  *
- * @param $customerProfileId
+ * @param $customer_profile_id
  *   The customer profile id.
- * @param $customerPaymentProfileId
- *   The id of the profile profile to be deleted.
+ * @param $payment_profile_id
+ *   The id of the payment profile to be deleted.
  *
  * @return
  *   Returns TRUE if successful, FALSE otherwise.
  */
-function authnet_cim_payment_profile_delete($customerProfileId, $customerPaymentProfileId) {
+function authnet_cim_payment_profile_delete($customer_profile_id, $payment_profile_id) {
 
   // Create an Authorize.net request object.
   $request = authnet_request_new('CIM');
 
   // Delete the profile.
-  $response = $request->deleteCustomerPaymentProfile($customerProfileId, $customerPaymentProfileId);
+  $response = $request->deleteCustomerPaymentProfile($customer_profile_id, $payment_profile_id);
 
   // Log the response object.
   authnet_log_response($response);
@@ -341,7 +341,7 @@ function authnet_cim_payment_profile_delete($customerProfileId, $customerPayment
   if ($response->isOk()) {
 
     // Invoke hook_authnet_cim_payment_profile_delete and pass in the payment profile id.
-    module_invoke_all('authnet_cim_payment_profile_delete', $customerProfileId, $customerPaymentProfileId);
+    module_invoke_all('authnet_cim_payment_profile_delete', $customer_profile_id, $payment_profile_id);
 
     // Return TRUE.
     return TRUE;
@@ -358,21 +358,21 @@ function authnet_cim_payment_profile_delete($customerProfileId, $customerPayment
 /**
  * Load an existing customer shipping address from Authorize.net.
  *
- * @param $customerProfileId
+ * @param $customer_profile_id
  *   The customer profile id.
- * @param $customerAddressId
+ * @param $customer_address_id
  *   The customer address id id.
  *
  * @return
  *   Returns an AuthorizeNetAddress object if available, FALSE otherwise.
  */
-function authnet_cim_shipping_address_load($customerProfileId, $customerAddressId) {
+function authnet_cim_shipping_address_load($customer_profile_id, $customer_address_id) {
 
   // Create an Authorize.net request object.
   $request = authnet_request_new('CIM');
 
   // Retrieve the customer shipping address.
-  $response = $request->getCustomerShippingAddress($customerProfileId, $customerAddressId);
+  $response = $request->getCustomerShippingAddress($customer_profile_id, $customer_address_id);
 
   // Log the response object.
   authnet_log_response($response);
@@ -396,7 +396,7 @@ function authnet_cim_shipping_address_load($customerProfileId, $customerAddressI
  * If the $address->customerAddressId propery is set, then the address will be updated.
  * Otherwise, a new one will be saved.
  *
- * @param $customerProfileId
+ * @param $customer_profile_id
  *   The customer profile id.
  * @param AuthorizeNetAddress &$address
  *   The address object to be saved, passed by reference.
@@ -404,20 +404,20 @@ function authnet_cim_shipping_address_load($customerProfileId, $customerAddressI
  * @return
  *   Returns an AuthorizeNetAddress object if available, FALSE otherwise.
  */
-function authnet_cim_shipping_address_save($customerProfileId, AuthorizeNetAddress &$address) {
+function authnet_cim_shipping_address_save($customer_profile_id, AuthorizeNetAddress &$address) {
 
   // Create an Authorize.net request object.
   $request = authnet_request_new('CIM');
 
   // If the $address->customerAddressId propery is set, then the profile will be updated.
   if (isset($address->customerAddressId) && !empty($address->customerAddressId)) {
-    $response = $request->updateCustomerShippingAddress($customerProfileId, $address->customerAddressId, $address);
+    $response = $request->updateCustomerShippingAddress($customer_profile_id, $address->customerAddressId, $address);
     $new = FALSE;
   }
 
   // Otherwise, save a new address.
   else {
-    $response = $request->createCustomerShippingAddress($customerProfileId, $address);
+    $response = $request->createCustomerShippingAddress($customer_profile_id, $address);
     $new = TRUE;
   }
 
@@ -431,10 +431,10 @@ function authnet_cim_shipping_address_save($customerProfileId, AuthorizeNetAddre
     if ($new) {
 
       // Get the new address id from the response.
-      $customerAddressId = $response->getCustomerAddressId();
+      $customer_address_id = $response->getCustomerAddressId();
 
       // Load the full address object with another call to Authorize.net.
-      $address = authnet_cim_shipping_address_load($customerProfileId, $customerAddressId);
+      $address = authnet_cim_shipping_address_load($customer_profile_id, $customer_address_id);
     }
 
     // Return the address.
@@ -448,21 +448,21 @@ function authnet_cim_shipping_address_save($customerProfileId, AuthorizeNetAddre
 /**
  * Delete a shipping address from Authorize.net
  *
- * @param $customerProfileId
+ * @param $customer_profile_id
  *   The customer profile id.
- * @param $customerAddressId
+ * @param $customer_address_id
  *   The customer address id.
  *
  * @return
  *   Returns TRUE if successful, FALSE otherwise.
  */
-function authnet_cim_shipping_address_delete($customerProfileId, $customerAddressId) {
+function authnet_cim_shipping_address_delete($customer_profile_id, $customer_address_id) {
 
   // Create an Authorize.net request object.
   $request = authnet_request_new('CIM');
 
   // Delete the address.
-  $response = $request->deleteCustomerShippingAddress($customerProfileId, $customerAddressId);
+  $response = $request->deleteCustomerShippingAddress($customer_profile_id, $customer_address_id);
 
   // Log the response object.
   authnet_log_response($response);

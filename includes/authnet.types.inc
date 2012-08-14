@@ -64,34 +64,34 @@ function authnet_customer_profile_new($values=array()) {
   authnet_sdk_include();
 
   // Create a new AuthorizeNetCustomer object.
-  $customerProfile = new AuthorizeNetCustomer;
+  $customer_profile = new AuthorizeNetCustomer;
 
   // Initialize some properties, using the $values argument if it's available.
   if (isset($values['description'])) {
-    $customerProfile->description = $values['description'];
+    $customer_profile->description = $values['description'];
   }
   if (isset($values['merchantCustomerId'])) {
-    $customerProfile->merchantCustomerId = $values['merchantCustomerId'];
+    $customer_profile->merchantCustomerId = $values['merchantCustomerId'];
   }
   if (isset($values['email'])) {
-    $customerProfile->email = $values['email'];
+    $customer_profile->email = $values['email'];
   }
   if (isset($values['customerProfileId'])) {
-    $customerProfile->customerProfileId = $values['customerProfileId'];
+    $customer_profile->customerProfileId = $values['customerProfileId'];
   }
   if (isset($values['paymentProfiles']) && !empty($values['paymentProfiles'])) {
-    foreach ($values['paymentProfiles'] as $paymentProfile) {
-      $customerProfile->paymentProfiles[] = authnet_payment_profile_new($paymentProfile);
+    foreach ($values['paymentProfiles'] as $payment_profile) {
+      $customer_profile->paymentProfiles[] = authnet_payment_profile_new($payment_profile);
     }
   }
   if (isset($values['shipToList']) && !empty($values['shipToList'])) {
-    foreach ($values['shipToList'] as $shipToList) {
-      $customerProfile->shipToList[] = authnet_address_new($shipToList);
+    foreach ($values['shipToList'] as $ship_to) {
+      $customer_profile->shipToList[] = authnet_address_new($ship_to);
     }
   }
 
   // Return the profile object.
-  return $customerProfile;
+  return $customer_profile;
 }
 
 /**
@@ -165,24 +165,24 @@ function authnet_payment_profile_new($values=array()) {
   authnet_sdk_include();
 
   // Create a new AuthorizeNetPaymentProfile object.
-  $paymentProfile = new AuthorizeNetPaymentProfile;
+  $payment_profile = new AuthorizeNetPaymentProfile;
 
   // Initialize some properties, using the $values argument if it's available.
   if (isset($values['customerPaymentProfileId'])) {
-    $paymentProfile->customerPaymentProfileId = $values['customerPaymentProfileId'];
+    $payment_profile->customerPaymentProfileId = $values['customerPaymentProfileId'];
   }
   if (isset($values['customerType'])) {
-    $paymentProfile->customerType = $values['customerType'];
+    $payment_profile->customerType = $values['customerType'];
   }
   if (isset($values['billTo'])) {
-    $paymentProfile->billTo = authnet_address_new($values['billTo']);
+    $payment_profile->billTo = authnet_address_new($values['billTo']);
   }
   if (isset($values['payment'])) {
-    $paymentProfile->payment = authnet_payment_new($values['payment']);
+    $payment_profile->payment = authnet_payment_new($values['payment']);
   }
 
   // Return the profile object.
-  return $paymentProfile;
+  return $payment_profile;
 }
 
 /**
@@ -245,8 +245,8 @@ function authnet_transaction_new($values=array()) {
     $transaction->duty = (object) $values['duty'];
   }
   if (isset($values['lineItems']) && !empty($values['lineItems'])) {
-    foreach ($values['lineItems'] as $lineItem) {
-      $transaction->lineItems[] = authnet_line_item_new($lineItem);
+    foreach ($values['lineItems'] as $line_item) {
+      $transaction->lineItems[] = authnet_line_item_new($line_item);
     }
   }
   if (isset($values['customerProfileId'])) {
