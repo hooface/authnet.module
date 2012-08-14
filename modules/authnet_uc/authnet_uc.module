@@ -206,6 +206,12 @@ function authnet_uc_uc_checkout_complete($order, $account) {
       // Save the updated profile to Authorize.net.
       authnet_cim_profile_save($customer_profile);
 
+      /**
+       * @todo
+       * We should check to see if this fails, and if so, add an order admin comment.
+       * If it succeeds, we don't need an order comment, because this whole piece is supposed to be invisible.
+       */
+
       // Update the database record for the customer profile.
       db_query('UPDATE {authnet_cim_entity} SET type="user", id=%d WHERE customer_profile_id=%d', array($account->uid, $customer_profile_id));
     }
