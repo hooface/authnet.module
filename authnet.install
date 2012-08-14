@@ -21,7 +21,8 @@ function authnet_requirements($phase) {
         'severity' => REQUIREMENT_OK,
         'value' => $t('Installed: %path', array('%path' => $library)),
       );
-    } else {
+    }
+    else {
       $requirements['authnet_sdk'] = array(
         'title' => $t('Authorize.net SDK'),
         'severity' => REQUIREMENT_ERROR,
