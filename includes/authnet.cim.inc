@@ -88,6 +88,13 @@ function authnet_cim_profile_save(AuthorizeNetCustomer &$customerProfile) {
 
   // Otherwise, save a new customer profile.
   else {
+
+    // Only use validation if there are payment profiles assigned to this new customer profile.
+    if (empty($customerProfile->paymentProfiles)) {
+      $validation = 'none';
+    }
+
+    // Send the request.
     $response = $request->createCustomerProfile($customerProfile, $validation);
     $new = TRUE;
   }
