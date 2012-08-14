@@ -11,10 +11,6 @@
  * It may not be SimpleTest, but it's better than nothing.
  */
 
-?>
-
-<?php
-
 /**
  * Create a new transaction via AIM.
  */
@@ -26,5 +22,3 @@ $sale = array(
 );
 $response = authnet_aim_transaction($sale, AUTHNET_METHOD_AUTH_ONLY);
 dpm($response);
-
-?>

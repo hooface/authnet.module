@@ -11,10 +11,6 @@
  * It may not be SimpleTest, but it's better than nothing.
  */
 
-?>
-
-<?php
-
 /**
  * Create a new customer profile based on a user
  */
@@ -55,10 +51,6 @@ dpm($cim_profile);
 authnet_cim_profile_save($cim_profile);
 dpm($cim_profile);
 
-?>
-
-<?php
-
 /**
  * Load an existing customer profile based on a customerProfileId.
  */
@@ -68,10 +60,6 @@ $customerProfileId = XXXXXXXX;
 $cim_profile = authnet_cim_profile_load($customerProfileId);
 
 dpm($cim_profile);
-
-?>
-
-<?php
 
 /**
  * Update an existing profile.
@@ -88,20 +76,12 @@ authnet_cim_profile_save($cim_profile);
 
 dpm($cim_profile);
 
-?>
-
-<?php
-
 /**
  * Delete a profile.
  */
 
 $customerProfileId = XXXXXXXX;
 authnet_cim_profile_delete($customerProfileId);
-
-?>
-
-<?php
 
 /**
  * Load a payment profile.
@@ -113,10 +93,6 @@ $customerPaymentProfileId = XXXXXXXX;
 $payment_profile = authnet_cim_payment_profile_load($customerProfileId, $customerPaymentProfileId);
 
 dpm($payment_profile);
-
-?>
-
-<?php
 
 /**
  * Save a new payment profile.
@@ -157,9 +133,7 @@ authnet_cim_payment_profile_save($customerProfileId, $paymentProfile);
 
 dpm($paymentProfile);
 
-?>
 
-<?php
 
 /**
  * Update an existing payment profile.
@@ -178,9 +152,7 @@ authnet_cim_payment_profile_save($customerProfileId, $paymentProfile);
 
 dpm($paymentProfile);
 
-?>
 
-<?php
 
 /**
  * Delete an existing payment profile.
@@ -191,9 +163,6 @@ $paymentProfileId = XXXXXXXX;
 
 $paymentProfile = authnet_cim_payment_profile_delete($customerProfileId, $paymentProfileId);
 
-?>
-
-<?php
 
 /**
  * Load a shipping address.
@@ -205,10 +174,6 @@ $customerShippingAddressId = XXXXXXXX;
 $address = authnet_cim_shipping_address_load($customerProfileId, $customerShippingAddressId);
 
 dpm($address);
-
-?>
-
-<?php
 
 /**
  * Save a new shipping address.
@@ -237,10 +202,6 @@ authnet_cim_shipping_address_save($customerProfileId, $address);
 
 dpm($address);
 
-?>
-
-<?php
-
 /**
  * Update an existing shipping address.
  */
@@ -258,10 +219,6 @@ authnet_cim_shipping_address_save($customerProfileId, $address);
 
 dpm($address);
 
-?>
-
-<?php
-
 /**
  * Delete a shipping address.
  */
@@ -271,9 +228,6 @@ $customerAddressId = XXXXXXXX;
 
 authnet_cim_shipping_address_delete($customerProfileId, $customerAddressId);
 
-?>
-
-<?php
 
 /**
  * Create a new transaction.
@@ -295,5 +249,3 @@ dpm($transaction);
 $transaction_id = authnet_cim_transaction($transaction, AUTHNET_METHOD_AUTH_ONLY);
 
 dpm($transaction_id);
-
-?>
