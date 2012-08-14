@@ -298,7 +298,7 @@ function authnet_cim_entity_payment_profile_new($customer_profile_id = NULL, $pa
     if (!empty($payment_profile->payment->creditCard->cardNumber)) {
 
       // Trim the card number to the last 4 digits.
-      $record['cc_last_four'] = substr($payment_profile->payment->creditCard->cardNumber, -4);
+      $record['cc_last_four'] = drupal_substr($payment_profile->payment->creditCard->cardNumber, -4);
 
       // Parse the expiration date. A valid date will be in the format 'YYYY-MM'. Ignore invalid dates.
       $expiration_date = explode('-', $payment_profile->payment->creditCard->expirationDate);
