@@ -455,7 +455,7 @@ function authnet_uc_payment_profile_add_validate($form, &$form_state) {
       }
     }
     if (!empty($missing)) {
-      form_set_error('', 'The order must have a valid billing address in order to add a new credit card. Please add missing fields to the order\'s billing address and try again. The following fields are missing: ' . implode(', ', $missing));
+      form_set_error('', t('The order must have a valid billing address in order to add a new credit card. Please add missing fields to the order\'s billing address and try again. The following fields are missing: ' . implode(', ', $missing)));
     }
 
     // Make sure that all the necessary credit card fields are available.
@@ -472,7 +472,7 @@ function authnet_uc_payment_profile_add_validate($form, &$form_state) {
       }
     }
     if (!empty($missing)) {
-      form_set_error('', 'Please fill in all of the credit card fields. The following fields are missing: ' . implode(', ', $missing));
+      form_set_error('', t('Please fill in all of the credit card fields. The following fields are missing: ' . implode(', ', $missing)));
     }
   }
 
@@ -546,7 +546,7 @@ function authnet_uc_payment_method_credit($op, &$arg1, $silent = FALSE) {
       if (!empty($_POST['cc_select']) && $_POST['cc_select'] != 'new') {
 
         // Load the payment profile id, based on the pid (stored in cc_select).
-        $payment_profile_id = authnet_cim_entity_payment_profile_id_load($_POST['cc_select']);
+        $payment_profile_id = authnet_cim_entity_payment_profile_id_load(check_plain($_POST['cc_select']));
 
         // Check to be sure the user has access to this payment profile.
         if ($payment_profile_id && !authnet_user_access($user, $payment_profile_id)) {
@@ -574,7 +574,7 @@ function authnet_uc_payment_method_credit($op, &$arg1, $silent = FALSE) {
         }
 
         // Add the 'save_card' variable to the payment details on the order.
-        $arg1->payment_details['save_card'] = $_POST['cc_save'] ? TRUE : FALSE;
+        $arg1->payment_details['save_card'] = check_plain($_POST['cc_save']) ? TRUE : FALSE;
       }
 
       /**
