@@ -40,6 +40,8 @@ function authnet_request_new($type, $options = array()) {
   // Enable sandbox mode, if the setting is set.
   if ($options['sandbox']) {
     $request->setSandbox(TRUE);
+  } else {
+    $request->setSandbox(FALSE);
   }
 
   // Return the request object.
