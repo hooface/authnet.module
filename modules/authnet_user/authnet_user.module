@@ -88,6 +88,23 @@ function authnet_user_theme($existing, $type, $theme, $path) {
   );
 }
 
+/**
+ * Implementation of hook_user().
+ */
+function authnet_user_user($op, &$edit, &$account, $category = NULL) {
+
+  // If a user is being deleted, delete their customer profile and payment profiles.
+  if ($op == 'delete') {
+
+    // Load their customer profile id.
+    if ($customer_profile_id = authnet_cim_entity_profile_id_load('user', $account->uid)) {
+
+      // Delete their customer profile from Authorize.net.
+      authnet_cim_profile_delete($customer_profile_id);
+    }
+  }
+}
+
 /* ******************************************************************************
  * Authnet UI hooks
  * *****************************************************************************/
