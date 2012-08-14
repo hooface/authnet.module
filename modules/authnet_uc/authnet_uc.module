@@ -212,6 +212,23 @@ function authnet_uc_uc_checkout_complete($order, $account) {
   }
 }
 
+/**
+ * Implementation of hook_order().
+ */
+function authnet_uc_order($op, &$arg1, $arg2) {
+
+  // If an order is being deleted, delete any customer profiles and payment profiles associated with it.
+  if ($op == 'delete') {
+
+    // Load the customer profile id, if available.
+    if ($customer_profile_id = authnet_cim_entity_profile_id_load('order', $arg1->order_id)) {
+
+      // Delete the customer profile from Authorize.net.
+      authnet_cim_profile_delete($customer_profile_id);
+    }
+  }
+}
+
 /* ******************************************************************************
  * Form functions
  * *****************************************************************************/
