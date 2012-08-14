@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Authorize.net - CIM test code
+ */
+
+/**
  * The following are some sample PHP snippets for testing the API wrapper functions.
  * Just paste this into the Devel module's /devel/php to test it out.
  * It may not be SimpleTest, but it's better than nothing.
