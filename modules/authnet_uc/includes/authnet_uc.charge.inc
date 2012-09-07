@@ -854,6 +854,10 @@ function _authnet_uc_cim_payment_profile_create($customer_profile_id, $order) {
   // Save the record.
   authnet_cim_entity_payment_profile_save($record);
 
+  // Save the new payment profile id to the order's payment details, so that admins know that this is the preferred profile for this order in the future.
+  $order->payment_details['payment_profile_id'] = $payment_profile->customerPaymentProfileId;
+  uc_order_save($order);
+
   // Return the payment profile.
   return $payment_profile;
 }
