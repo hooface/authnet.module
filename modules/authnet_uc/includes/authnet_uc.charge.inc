@@ -133,8 +133,14 @@ function _authnet_uc_charge($order_id, $amount, $data) {
       // Set a reference.
       case UC_CREDIT_REFERENCE_SET:
 
-        // If the user did not select the 'save card' checkbox, then save the card on the order.
-        if (!$save_card) {
+        // If a payment profile id is selected, it means we came in via checkout (and 'Set a reference only' is the default method), so we just want to set $success to TRUE.
+        if (!empty($payment_profile_id)) {
+          $success = TRUE;
+        }
+
+        // Otherwise, we assume that an admin clicked the 'Set a reference only' button in the admin terminal, which means we DO want to save a new card, either to the customer or the order.
+        // So, if $save_card is FALSE, then save the card to the order.
+        elseif (!$save_card) {
           $save_card_on_order = TRUE;
         }
         break;
