@@ -50,13 +50,33 @@ function authnet_uc_form_alter(&$form, &$form_state, $form_id) {
     // If the customer does have payment profiles, display them.
     else {
 
-      // Load the customer's default payment profile.
-      $default_pid = authnet_cim_entity_customer_payment_profile_default($customer_profile_id);
+      // Load the list of payment profiles for this customer.
+      $payment_profile_options = authnet_ui_payment_profile_options($customer_profile_id);
+
+      // If a payment profile id is set in the order's payment details, it means that it was selected as the preferred profile for this order.
+      if (!empty($order->payment_details['payment_profile_id'])) {
+
+        // Look up the payment profile's record in the database to get more information.
+        $payment_profile = authnet_cim_entity_payment_profile_load($order->payment_details['payment_profile_id']);
+
+        // Set the default pid to this profile's pid.
+        $default_pid = $payment_profile['pid'];
+
+        // Add some text to the payment profile option to indicate that it was selected.
+        if (!empty($payment_profile_options[$default_pid])) {
+          $payment_profile_options[$default_pid] .= ' - <strong>(preferred for this order)</strong>';
+        }
+      }
+
+      // Otherwise, select the customer's default payment profile, if available.
+      else {
+        $default_pid = authnet_cim_entity_customer_payment_profile_default($customer_profile_id);
+      }
 
       // Radio select list of payment profiles
       $form['authnet_payment_profiles']['payment_profile'] = array(
         '#type' => 'radios',
-        '#options' => authnet_ui_payment_profile_options($customer_profile_id),
+        '#options' => $payment_profile_options,
         '#default_value' => $default_pid,
       );
 
