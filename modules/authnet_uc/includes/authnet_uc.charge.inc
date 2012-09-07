@@ -840,9 +840,18 @@ function _authnet_uc_cim_payment_profile_create($customer_profile_id, $order) {
     return FALSE;
   }
 
-  // Load the new payment profile record from the database and resave it to include the credit card type.
+  // Load the new payment profile record from the database and resave it to include the credit card type and default status.
   $record = authnet_cim_entity_payment_profile_load($payment_profile->customerPaymentProfileId);
+
+  // Set the credit card type.
   $record['cc_type'] = check_plain($order->payment_details['cc_type']);
+
+  // If the customer doesn't have a default payment profile, set this as their default.
+  if (!authnet_cim_entity_customer_payment_profile_default($customer_profile_id)) {
+    $record['is_default'] = 1;
+  }
+
+  // Save the record.
   authnet_cim_entity_payment_profile_save($record);
 
   // Return the payment profile.
