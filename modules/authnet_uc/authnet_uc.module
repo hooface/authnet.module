@@ -599,8 +599,8 @@ function authnet_uc_payment_method_credit($op, &$arg1, $silent = FALSE) {
           return $result;
         }
 
-        // Add the 'save_card' variable to the payment details on the order.
-        $arg1->payment_details['save_card'] = check_plain($_POST['cc_save']) ? TRUE : FALSE;
+        // Add the 'checkout_save_card' variable to the payment details on the order.
+        $arg1->payment_details['checkout_save_card'] = check_plain($_POST['cc_save']) ? TRUE : FALSE;
       }
 
       /**
