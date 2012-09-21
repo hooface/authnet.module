@@ -366,6 +366,9 @@ function authnet_uc_payment_profile_charge_submit($form, &$form_state) {
   // Build the data array passed on to the payment gateway.
   $data = array();
 
+  // Set a flag to indicate that we're charging via the admin terminal.
+  $data['admin_terminal'] = TRUE;
+
   // Set the transaction type to "Authorize and Capture"
   $data['txn_type'] = UC_CREDIT_AUTH_CAPTURE;
 
@@ -409,6 +412,9 @@ function authnet_uc_payment_profile_authorize_submit($form, &$form_state) {
 
   // Build the data array passed on to the payment gateway.
   $data = array();
+
+  // Set a flag to indicate that we're authorizing via the admin terminal.
+  $data['admin_terminal'] = TRUE;
 
   // Set the transaction type to "Authorize only"
   $data['txn_type'] = UC_CREDIT_AUTH_ONLY;
