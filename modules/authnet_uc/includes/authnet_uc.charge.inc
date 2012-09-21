@@ -63,7 +63,7 @@ function _authnet_uc_charge($order_id, $amount, $data) {
   $data += authnet_uc_charge_data_get();
 
   // If $data contains the 'save_card' variable, or this wasn't initiated by the admin terminal and $order->payment_details contains the 'checkout_save_card' variable, remember that we're saving a new card.
-  if (!empty($data['save_card']) || (empty($data['admin_terminal']) && !empty($order->payment_details['checkout_save_card'])) {
+  if (!empty($data['save_card']) || (empty($data['admin_terminal']) && !empty($order->payment_details['checkout_save_card']))) {
     $save_card = TRUE;
   }
 
