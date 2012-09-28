@@ -10,11 +10,30 @@
  * *****************************************************************************/
 
 /**
+ * Implementation of hook_menu().
+ */
+function authnet_ui_menu() {
+
+  // Add our payment type ahah callback.
+  $items['authnet/ajax/payment-type'] = array(
+    'page callback' => 'authnet_ui_payment_type_ajax_callback',
+    'access arguments' => array(),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+
+/**
  * Implementation of hook_theme().
  */
 function authnet_ui_theme($existing, $type, $theme, $path) {
   return array(
     'authnet_payment_profile' => array(
+      'arguments' => array('payment_profile' => array()),
+    ),
+    'authnet_payment_type' => array(
       'arguments' => array('payment_profile' => array()),
     ),
   );
@@ -55,6 +74,35 @@ function theme_authnet_payment_profile($payment_profile) {
 
   // Return the output.
   return $output;
+}
+
+/**
+ * Theme the payment type.
+ */
+function theme_authnet_payment_type($payment_profile) {
+  switch ($payment_profile['payment_type']) {
+
+    case 'creditCard':
+      return t('Credit card');
+      break;
+
+    case 'bankAccount':
+      switch ($payment_profile['bank_account_type']) {
+
+        case 'checking':
+          return t('Checking account');
+        break;
+
+        case 'savings':
+          return t('Savings account');
+          break;
+
+        case 'businessChecking':
+          return t('Business checking account');
+          break;
+      }
+      break;
+  }
 }
 
 /* ******************************************************************************
