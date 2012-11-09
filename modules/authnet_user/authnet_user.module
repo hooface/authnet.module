@@ -266,13 +266,12 @@ function theme_authnet_user_payment_profiles_list_form($form) {
   $uid = $form['uid']['#value'];
 
   // Create a link to add a new profile.
-  $output .= l('+ Add a payment method', 'user/' . $uid . '/billing/add');
+  $output .= l('+ Add a credit card', 'user/' . $uid . '/billing/add');
 
   // Put together header and rows for the payment profile table.
   $header = array(
     t('Default'),
-    t('Payment method'),
-    t('Type'),
+    t('Credit card'),
     t('Operations'),
   );
   $rows = array();
@@ -289,14 +288,10 @@ function theme_authnet_user_payment_profiles_list_form($form) {
     // Format the payment profile title.
     $title = theme('authnet_payment_profile', $payment_profile);
 
-    // Get the type
-    $type = theme('authnet_payment_type', $payment_profile);
-
     // Add the row.
     $rows[] = array(
       drupal_render($form['payment_profiles'][$pid]['default']),
       l($title, 'user/' . $uid . '/billing/' . $pid . '/edit', array('html' => TRUE)),
-      $type,
       l('Edit', 'user/' . $uid . '/billing/' . $pid . '/edit') . ' | ' . l('Delete', 'user/' . $uid . '/billing/' . $pid . '/delete'),
     );
   }
