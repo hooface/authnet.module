@@ -266,7 +266,12 @@ function theme_authnet_user_payment_profiles_list_form($form) {
   $uid = $form['uid']['#value'];
 
   // Create a link to add a new profile.
-  $output .= l('+ Add a credit card', 'user/' . $uid . '/billing/add');
+  $options = array(
+    'attributes' => array(
+      'class' => 'authnet-add-payment-profile',
+    ),
+  );
+  $output .= l('+ Add a credit card', 'user/' . $uid . '/billing/add', $options);
 
   // Put together header and rows for the payment profile table.
   $header = array(
