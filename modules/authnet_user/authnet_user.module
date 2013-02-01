@@ -10,12 +10,18 @@
  * *****************************************************************************/
 
 /**
- * Implements hook_perm().
+ * Implements hook_permission().
  */
-function authnet_user_perm() {
+function authnet_user_permission() {
   return array(
-    'administer authnet payment profiles',
-    'manage own authnet payment profiles',
+    'administer authnet payment profiles' => array(
+      'title' => t('administer authnet payment profiles'),
+      'description' => t('TODO Add a description for \'administer authnet payment profiles\''),
+    ),
+    'manage own authnet payment profiles' => array(
+      'title' => t('manage own authnet payment profiles'),
+      'description' => t('TODO Add a description for \'manage own authnet payment profiles\''),
+    ),
   );
 }
 
