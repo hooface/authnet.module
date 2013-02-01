@@ -8,7 +8,7 @@
 /**
  * Settings form.
  */
-function authnet_settings_form() {
+function authnet_settings_form($form, &$form_state) {
 
   // General API settings
   $form['api'] = array(

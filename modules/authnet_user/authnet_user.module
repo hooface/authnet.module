@@ -248,9 +248,9 @@ function authnet_user_access($account, $payment_profile_id = NULL) {
  * @param $payment_profile_id
  *   The id of the payment profile to edit.
  */
-function authnet_user_payment_profile_form_builder(&$form_state, $user, $payment_profile_id = NULL) {
+function authnet_user_payment_profile_form_builder($form, &$form_state, $user, $payment_profile_id = NULL) {
   module_load_include('inc', 'authnet_user', 'authnet_user.pages');
-  return authnet_user_payment_profile_form($form_state, $user, $payment_profile_id);
+  return authnet_user_payment_profile_form($form, $form_state, $user, $payment_profile_id);
 }
 
 /* ******************************************************************************

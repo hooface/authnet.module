@@ -11,7 +11,7 @@
  * @param $user
  *   The user account to display payment profiles for.
  */
-function authnet_user_payment_profiles_list_form($form_state, $user) {
+function authnet_user_payment_profiles_list_form($form, $form_state, $user) {
 
   // Set the page title.
   drupal_set_title('Saved cards');
@@ -102,7 +102,7 @@ function authnet_user_payment_profiles_list_form_submit($form, &$form_state) {
  * @param $payment_profile_id
  *   The id of the payment profile to edit.
  */
-function authnet_user_payment_profile_form(&$form_state, $user, $payment_profile_id = NULL) {
+function authnet_user_payment_profile_form($form, &$form_state, $user, $payment_profile_id = NULL) {
 
   // Set the page title.
   if ($payment_profile_id) {
@@ -152,7 +152,7 @@ function authnet_user_payment_profile_form(&$form_state, $user, $payment_profile
   );
 
   // Add the Authnet UI payment profile form.
-  $form += authnet_ui_payment_profile_form($form_state, $customer_profile_id, $payment_profile_id);
+  $form += authnet_ui_payment_profile_form($form, $form_state, $customer_profile_id, $payment_profile_id);
 
   // Redirect to the user's billing list.
   $form['#redirect'] = 'user/' . $user->uid . '/billing';
@@ -169,7 +169,7 @@ function authnet_user_payment_profile_form(&$form_state, $user, $payment_profile
  * @param $pid
  *   The id of the payment profile to delete.
  */
-function authnet_user_payment_profile_delete_form(&$form_state, $user, $payment_profile_id) {
+function authnet_user_payment_profile_delete_form($form, &$form_state, $user, $payment_profile_id) {
 
   // Start an empty form array.
   $form = array();

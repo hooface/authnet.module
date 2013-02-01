@@ -69,7 +69,7 @@ function theme_authnet_payment_profile($payment_profile) {
  * @param $payment_profile_id
  *   The id of the Authorize.net payment profile (optional).
  */
-function authnet_ui_payment_profile_form($form_state, $customer_profile_id = NULL, $payment_profile_id = NULL) {
+function authnet_ui_payment_profile_form($form, &$form_state, $customer_profile_id = NULL, $payment_profile_id = NULL) {
 
   // Set the form up as a tree.
   $form = array(
