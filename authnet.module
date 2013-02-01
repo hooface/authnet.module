@@ -46,7 +46,7 @@ require_once 'includes/authnet.cim.inc';
  * Implements hook_menu().
  */
 function authnet_menu() {
-  $items['admin/settings/authnet'] = array(
+  $items['admin/config/services/authnet'] = array(
     'title' => 'Authorize.net API',
     'description' => 'Authorize.net API module settings.',
     'page callback' => 'drupal_get_form',
