@@ -6,24 +6,6 @@
  */
 
 /**
- * Implements hook_install().
- */
-function authnet_cim_entity_install() {
-
-  // Install the schema.
-  drupal_install_schema('authnet_cim_entity');
-}
-
-/**
- * Implements hook_uninstall().
- */
-function authnet_cim_entity_uninstall() {
-
-  // Uninstall the schema.
-  drupal_uninstall_schema('authnet_cim_entity');
-}
-
-/**
  * Implements hook_schema().
  */
 function authnet_cim_entity_schema() {
