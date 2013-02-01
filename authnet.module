@@ -258,7 +258,9 @@ function _authnet_response_status($response) {
     $message = 'Authorize.net CIM ';
 
     // Error Message
-    if ($response->isError()) $message .= $response->getErrorMessage();
+    if ($response->isError()) {
+      $message .= $response->getErrorMessage();
+    }
 
     // Success Message
     else {
@@ -279,7 +281,9 @@ function _authnet_response_status($response) {
     $message = 'Authorize.net AIM ';
 
     // Error message
-    if ($response->error) $message .= $response->error_message;
+    if ($response->error) {
+      $message .= $response->error_message;
+    }
 
     // Success message
     else {
