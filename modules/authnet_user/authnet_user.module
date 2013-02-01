@@ -10,7 +10,7 @@
  * *****************************************************************************/
 
 /**
- * Implementation of hook_perm().
+ * Implements hook_perm().
  */
 function authnet_user_perm() {
   return array(
@@ -20,7 +20,7 @@ function authnet_user_perm() {
 }
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
 function authnet_user_menu() {
 
@@ -78,7 +78,7 @@ function authnet_user_menu() {
 }
 
 /**
- * Implementation of hook_forms().
+ * Implements hook_forms().
  */
 function authnet_user_forms($form_id, $args) {
   $forms['authnet_user_payment_profile_form'] = array(
@@ -88,7 +88,7 @@ function authnet_user_forms($form_id, $args) {
 }
 
 /**
- * Implementation of hook_theme().
+ * Implements hook_theme().
  */
 function authnet_user_theme($existing, $type, $theme, $path) {
   return array(
@@ -99,7 +99,7 @@ function authnet_user_theme($existing, $type, $theme, $path) {
 }
 
 /**
- * Implementation of hook_user().
+ * Implements hook_user().
  */
 function authnet_user_user($op, &$edit, &$account, $category = NULL) {
 
@@ -120,7 +120,7 @@ function authnet_user_user($op, &$edit, &$account, $category = NULL) {
  * *****************************************************************************/
 
 /**
- * Implementation of hook_authnet_ui_form_customer_profile_new().
+ * Implements hook_authnet_ui_form_customer_profile_new().
  */
 function authnet_user_authnet_ui_form_customer_profile_new(&$profile, $form_state, $form_id) {
 
@@ -139,7 +139,7 @@ function authnet_user_authnet_ui_form_customer_profile_new(&$profile, $form_stat
 }
 
 /**
- * Implementation of hook_authnet_ui_payment_profile_form_submit().
+ * Implements hook_authnet_ui_payment_profile_form_submit().
  */
 function authnet_user_authnet_ui_payment_profile_form_submit($payment_profile, $form_state) {
 

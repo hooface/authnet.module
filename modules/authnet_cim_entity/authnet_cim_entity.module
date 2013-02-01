@@ -10,7 +10,7 @@
  * *****************************************************************************/
 
 /**
- * Implementation of hook_authnet_cim_profile_insert().
+ * Implements hook_authnet_cim_profile_insert().
  */
 function authnet_cim_entity_authnet_cim_profile_insert($customerProfile) {
 
@@ -37,7 +37,7 @@ function authnet_cim_entity_authnet_cim_profile_insert($customerProfile) {
 }
 
 /**
- * Implementation of hook_authnet_cim_profile_update().
+ * Implements hook_authnet_cim_profile_update().
  */
 function authnet_cim_entity_authnet_cim_profile_update($customerProfile) {
 
@@ -113,7 +113,7 @@ function authnet_cim_entity_authnet_cim_profile_update($customerProfile) {
 }
 
 /**
- * Implementation of hook_authnet_cim_profile_delete().
+ * Implements hook_authnet_cim_profile_delete().
  */
 function authnet_cim_entity_authnet_cim_profile_delete($customerProfileId) {
 
@@ -122,7 +122,7 @@ function authnet_cim_entity_authnet_cim_profile_delete($customerProfileId) {
 }
 
 /**
- * Implementation of hook_authnet_cim_payment_profile_insert().
+ * Implements hook_authnet_cim_payment_profile_insert().
  */
 function authnet_cim_entity_authnet_cim_payment_profile_insert($customerProfileId, $paymentProfile) {
 
@@ -134,7 +134,7 @@ function authnet_cim_entity_authnet_cim_payment_profile_insert($customerProfileI
 }
 
 /**
- * Implementation of hook_authnet_cim_payment_profile_update().
+ * Implements hook_authnet_cim_payment_profile_update().
  */
 function authnet_cim_entity_authnet_cim_payment_profile_update($customerProfileId, $paymentProfile) {
 
@@ -159,7 +159,7 @@ function authnet_cim_entity_authnet_cim_payment_profile_update($customerProfileI
 }
 
 /**
- * Implementation of hook_authnet_cim_payment_profile_delete().
+ * Implements hook_authnet_cim_payment_profile_delete().
  */
 function authnet_cim_entity_authnet_cim_payment_profile_delete($customerProfileId, $paymentProfileId) {
 

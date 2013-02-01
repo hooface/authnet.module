@@ -43,7 +43,7 @@ require_once 'includes/authnet.cim.inc';
  * *****************************************************************************/
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
 function authnet_menu() {
   $items['admin/settings/authnet'] = array(

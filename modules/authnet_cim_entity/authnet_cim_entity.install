@@ -6,7 +6,7 @@
  */
 
 /**
- * Implementation of hook_install().
+ * Implements hook_install().
  */
 function authnet_cim_entity_install() {
 
@@ -15,7 +15,7 @@ function authnet_cim_entity_install() {
 }
 
 /**
- * Implementation of hook_uninstall().
+ * Implements hook_uninstall().
  */
 function authnet_cim_entity_uninstall() {
 
@@ -24,7 +24,7 @@ function authnet_cim_entity_uninstall() {
 }
 
 /**
- * Implementation of hook_schema().
+ * Implements hook_schema().
  */
 function authnet_cim_entity_schema() {
   $schema['authnet_cim_entity'] = array(
