@@ -4,4 +4,4 @@ dependencies[] = authnet
 dependencies[] = authnet_cim_entity
 dependencies[] = authnet_ui
 package = Authorize.net
-core = 6.x
+core = 7.x

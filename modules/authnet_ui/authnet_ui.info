@@ -2,4 +2,4 @@ name = Authorize.net - UI
 description = Basic UI for Authorize.net
 dependencies[] = authnet
 package = Authorize.net
-core = 6.x
+core = 7.x

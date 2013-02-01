@@ -7,4 +7,4 @@ dependencies[] = authnet_user
 dependencies[] = uc_payment
 dependencies[] = uc_credit
 package = Authorize.net
-core = 6.x
+core = 7.x
