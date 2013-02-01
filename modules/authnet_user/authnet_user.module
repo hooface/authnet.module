@@ -99,7 +99,7 @@ function authnet_user_forms($form_id, $args) {
 function authnet_user_theme($existing, $type, $theme, $path) {
   return array(
     'authnet_user_payment_profiles_list_form' => array(
-      'arguments' => array('form' => NULL),
+      'render element' => 'form',
     ),
   );
 }
@@ -263,7 +263,11 @@ function authnet_user_payment_profile_form_builder($form, &$form_state, $user, $
  * Theme functions
  * *****************************************************************************/
 
-function theme_authnet_user_payment_profiles_list_form($form) {
+/**
+ * Theme function for a user's list of payment profiles.
+ */
+function theme_authnet_user_payment_profiles_list_form($variables) {
+  $form = $variables['form'];
 
   // Start with empty output.
   $output = '';
@@ -297,7 +301,7 @@ function theme_authnet_user_payment_profiles_list_form($form) {
     $payment_profile = $form['payment_profiles'][$pid]['payment_profile']['#value'];
 
     // Format the payment profile title.
-    $title = theme('authnet_payment_profile', $payment_profile);
+    $title = theme('authnet_payment_profile', array('payment_profile' => $payment_profile));
 
     // Add the row.
     $rows[] = array(
@@ -308,7 +312,7 @@ function theme_authnet_user_payment_profiles_list_form($form) {
   }
 
   // Theme the table.
-  $output .= theme('table', $header, $rows);
+  $output .= theme('table', array('header' => $header, 'rows' => $rows));
 
   // If there are no existing payment profiles, display some empty text.
   if (empty($pids)) {
@@ -316,7 +320,7 @@ function theme_authnet_user_payment_profiles_list_form($form) {
   }
 
   // Render the rest of the form.
-  $output .= drupal_render($form);
+  $output .= drupal_render_children($form);
 
   // Return the output.
   return $output;

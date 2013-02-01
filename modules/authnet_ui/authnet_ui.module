@@ -15,7 +15,7 @@
 function authnet_ui_theme($existing, $type, $theme, $path) {
   return array(
     'authnet_payment_profile' => array(
-      'arguments' => array('payment_profile' => array()),
+      'variables' => array('payment_profile' => array()),
     ),
   );
 }
@@ -27,7 +27,8 @@ function authnet_ui_theme($existing, $type, $theme, $path) {
 /**
  * Theme a payment profile description.
  */
-function theme_authnet_payment_profile($payment_profile) {
+function theme_authnet_payment_profile($variables) {
+  $payment_profile = $variables['payment_profile'];
   $parts = array();
 
   // If the payment profile has a label, start with that.
@@ -358,7 +359,7 @@ function authnet_ui_payment_profile_options($customer_profile_id) {
   foreach ($payment_profiles as $payment_profile) {
 
     // Add an option to the array with the last four digits and the street address.
-    $options[$payment_profile['pid']] = theme('authnet_payment_profile', $payment_profile);
+    $options[$payment_profile['pid']] = theme('authnet_payment_profile', array('payment_profile' => $payment_profile));
   }
   return $options;
 }
