@@ -21,7 +21,8 @@ function authnet_requirements($phase) {
         'severity' => REQUIREMENT_OK,
         'value' => $t('Installed: %path', array('%path' => $library)),
       );
-    } else {
+    }
+    else {
       $requirements['authnet_sdk'] = array(
         'title' => $t('Authorize.net SDK'),
         'severity' => REQUIREMENT_ERROR,
@@ -41,5 +42,6 @@ function authnet_uninstall() {
   // Delete module variables.
   variable_del('authnet_login_id');
   variable_del('authnet_transaction_key');
-  variable_del('authnet_validation_mode');
+  variable_del('authnet_sandbox');
+  variable_del('authnet_cim_validation_mode');
 }

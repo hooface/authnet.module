@@ -1,31 +1,25 @@
 <?php
 
 /**
+ * @file
+ * Authorize.net - CIM test code
+ */
+
+/**
  * The following are some sample PHP snippets for testing the API wrapper functions.
  * Just paste this into the Devel module's /devel/php to test it out.
  * It may not be SimpleTest, but it's better than nothing.
  */
 
-?>
-
-<?php
-
 /**
  * Create a new customer profile based on a user
  */
-$uid = 1;
+$uid = X;
 $user = user_load($uid);
-
-// Optionally load a description.
-$description = '';
-if (function_exists('content_profile_load')) {
-  $profile = content_profile_load('customer', $uid);
-  $description = $profile->title;
-}
 
 $values = array(
   'merchantCustomerId' => $user->uid,
-  'description' => $description,
+  'description' => $user->name,
   'email' => $user->mail,
   'paymentProfiles' => array(
     array(
@@ -43,46 +37,36 @@ $values = array(
         'faxNumber' => '789 123 4567',
       ),
       'payment' => array(
-        'bankAccount' => array(
-          'accountType' => 'checking',
-          'routingNumber' => '123456789',
-          'accountNumber' => '987654321',
-          'nameOnAccount' => 'John Doe',
-          'bankName' => 'Bank, Inc.',
+        'creditCard' => array(
+          'cardNumber' => '4007000000027',
+          'expirationDate' => '2012-12',
+          'cardCode' => '123',
         ),
       ),
     ),
   ),
 );
-$cim_profile = authnet_cim_profile_new($values);
+$cim_profile = authnet_customer_profile_new($values);
 dpm($cim_profile);
 authnet_cim_profile_save($cim_profile);
 dpm($cim_profile);
-
-?>
-
-<?php
 
 /**
  * Load an existing customer profile based on a customerProfileId.
  */
 
-$customerProfileId = XXXXXXXX;
+$customer_profile_id = XXXXXXXX;
 
-$cim_profile = authnet_cim_profile_load($customerProfileId);
+$cim_profile = authnet_cim_profile_load($customer_profile_id);
 
 dpm($cim_profile);
-
-?>
-
-<?php
 
 /**
  * Update an existing profile.
  */
 
-$customerProfileId = XXXXXXXX;
-$cim_profile = authnet_cim_profile_load($customerProfileId);
+$customer_profile_id = XXXXXXXX;
+$cim_profile = authnet_cim_profile_load($customer_profile_id);
 
 dpm($cim_profile);
 
@@ -92,41 +76,29 @@ authnet_cim_profile_save($cim_profile);
 
 dpm($cim_profile);
 
-?>
-
-<?php
-
 /**
  * Delete a profile.
  */
 
-$customerProfileId = XXXXXXXX;
-authnet_cim_profile_delete($customerProfileId);
-
-?>
-
-<?php
+$customer_profile_id = XXXXXXXX;
+authnet_cim_profile_delete($customer_profile_id);
 
 /**
  * Load a payment profile.
  */
 
-$customerProfileId = XXXXXXXX;
-$customerPaymentProfileId = XXXXXXXX;
+$customer_profile_id = XXXXXXXX;
+$customer_payment_profile_id = XXXXXXXX;
 
-$payment_profile = authnet_cim_payment_profile_load($customerProfileId, $customerPaymentProfileId);
+$payment_profile = authnet_cim_payment_profile_load($customer_profile_id, $customer_payment_profile_id);
 
 dpm($payment_profile);
-
-?>
-
-<?php
 
 /**
  * Save a new payment profile.
  */
 
-$customerProfileId = XXXXXXXX;
+$customer_profile_id = XXXXXXXX;
 
 $values = array(
   'customerType' => 'individual',
@@ -153,72 +125,56 @@ $values = array(
   ),
 );
 
-$paymentProfile = authnet_payment_profile_new($values);
+$payment_profile = authnet_payment_profile_new($values);
 
-dpm($paymentProfile);
+dpm($payment_profile);
 
-authnet_cim_payment_profile_save($customerProfileId, $paymentProfile);
+authnet_cim_payment_profile_save($customer_profile_id, $payment_profile);
 
-dpm($paymentProfile);
-
-?>
-
-<?php
+dpm($payment_profile);
 
 /**
  * Update an existing payment profile.
  */
 
-$customerProfileId = XXXXXXXX;
-$paymentProfileId = XXXXXXXX;
+$customer_profile_id = XXXXXXXX;
+$payment_profile_id = XXXXXXXX;
 
-$paymentProfile = authnet_cim_payment_profile_load($customerProfileId, $paymentProfileId);
+$payment_profile = authnet_cim_payment_profile_load($customer_profile_id, $payment_profile_id);
 
-dpm($paymentProfile);
+dpm($payment_profile);
 
-$paymentProfile->billTo->firstName = 'Mike';
+$payment_profile->billTo->firstName = 'Mike';
 
-authnet_cim_payment_profile_save($customerProfileId, $paymentProfile);
+authnet_cim_payment_profile_save($customer_profile_id, $payment_profile);
 
-dpm($paymentProfile);
-
-?>
-
-<?php
+dpm($payment_profile);
 
 /**
  * Delete an existing payment profile.
  */
 
-$customerProfileId = XXXXXXXX;
-$paymentProfileId = XXXXXXXX;
+$customer_profile_id = XXXXXXXX;
+$payment_profile_id = XXXXXXXX;
 
-$paymentProfile = authnet_cim_payment_profile_delete($customerProfileId, $paymentProfileId);
-
-?>
-
-<?php
+$payment_profile = authnet_cim_payment_profile_delete($customer_profile_id, $payment_profile_id);
 
 /**
  * Load a shipping address.
  */
 
-$customerProfileId = XXXXXXXX;
-$customerShippingAddressId = XXXXXXXX;
+$customer_profile_id = XXXXXXXX;
+$customer_shipping_address_id = XXXXXXXX;
 
-$address = authnet_cim_shipping_address_load($customerProfileId, $customerShippingAddressId);
+$address = authnet_cim_shipping_address_load($customer_profile_id, $customer_shipping_address_id);
 
 dpm($address);
-
-?>
-
-<?php
 
 /**
  * Save a new shipping address.
  */
 
-$customerProfileId = XXXXXXXX;
+$customer_profile_id = XXXXXXXX;
 
 $values = array(
   'firstName' => 'John',
@@ -237,67 +193,53 @@ $address = authnet_address_new($values);
 
 dpm($address);
 
-authnet_cim_shipping_address_save($customerProfileId, $address);
+authnet_cim_shipping_address_save($customer_profile_id, $address);
 
 dpm($address);
-
-?>
-
-<?php
 
 /**
  * Update an existing shipping address.
  */
 
-$customerProfileId = XXXXXXXX;
-$customerAddressId = XXXXXXXX;
+$customer_profile_id = XXXXXXXX;
+$customer_address_id = XXXXXXXX;
 
-$address = authnet_cim_shipping_address_load($customerProfileId, $customerAddressId);
+$address = authnet_cim_shipping_address_load($customer_profile_id, $customer_address_id);
 
 dpm($address);
 
 $address->firstName = 'Mike';
 
-authnet_cim_shipping_address_save($customerProfileId, $address);
+authnet_cim_shipping_address_save($customer_profile_id, $address);
 
 dpm($address);
-
-?>
-
-<?php
 
 /**
  * Delete a shipping address.
  */
 
-$customerProfileId = XXXXXXXX;
-$customerAddressId = XXXXXXXX;
+$customer_profile_id = XXXXXXXX;
+$customer_address_id = XXXXXXXX;
 
-authnet_cim_shipping_address_delete($customerProfileId, $customerAddressId);
-
-?>
-
-<?php
+authnet_cim_shipping_address_delete($customer_profile_id, $customer_address_id);
 
 /**
  * Create a new transaction.
  */
 
-$customerProfileId = XXXXXXXX;
-$customerPaymentProfileId = XXXXXXXX;
+$customer_profile_id = XXXXXXXX;
+$customer_payment_profile_id = XXXXXXXX;
 
 $values = array(
   'amount' => '100.00',
-  'customerProfileId' => $customerProfileId,
-  'customerPaymentProfileId' => $customerPaymentProfileId,
+  'customerProfileId' => $customer_profile_id,
+  'customerPaymentProfileId' => $customer_payment_profile_id,
 );
 
 $transaction = authnet_transaction_new($values);
 
 dpm($transaction);
 
-$transaction_id = authnet_cim_transaction('AuthOnly', $transaction);
+$transaction_id = authnet_cim_transaction($transaction, AUTHNET_METHOD_AUTH_ONLY);
 
 dpm($transaction_id);
-
-?>
