@@ -161,7 +161,7 @@ function authnet_user_payment_profile_form($form, &$form_state, $user, $payment_
   $form += authnet_ui_payment_profile_form($form, $form_state, $customer_profile_id, $payment_profile_id);
 
   // Redirect to the user's billing list.
-  $form['#redirect'] = 'user/' . $user->uid . '/billing';
+  $form_state['#redirect'] = 'user/' . $user->uid . '/billing';
 
   // Return the payment profile form.
   return $form;
@@ -186,12 +186,11 @@ function authnet_user_payment_profile_delete_form($form, &$form_state, $user, $p
     '#value' => $payment_profile_id,
   );
 
-  // Redirect to the user's billing list in the end.
-  $redirect = 'user/' . $user->uid . '/billing';
-  $form['#redirect'] = $redirect;
+  // If the user clicks "Cancel", return to the user's billing list.
+  $cancel_path = 'user/' . $user->uid . '/billing';
 
   // Return a confirmation form.
-  return confirm_form($form, 'Are you sure you want to delete this payment profile?', $redirect);
+  return confirm_form($form, 'Are you sure you want to delete this payment profile?', $cancel_path);
 }
 
 /**
@@ -204,4 +203,8 @@ function authnet_user_payment_profile_delete_form_submit($form, &$form_state) {
 
   // Delete the payment profile.
   authnet_cim_payment_profile_delete($payment_profile['customer_profile_id'], $payment_profile['payment_profile_id']);
+
+  // Redirect the user back to the billing list page.
+  global $user;
+  $form_state['redirect'] = 'user/' . $user->uid . '/billing';
 }
