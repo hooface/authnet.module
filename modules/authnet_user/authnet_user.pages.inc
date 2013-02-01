@@ -14,7 +14,7 @@
 function authnet_user_payment_profiles_list_form($form, $form_state, $user) {
 
   // Set the page title.
-  drupal_set_title('Saved cards');
+  drupal_set_title(t('Saved cards'));
 
   // Start an empty form.
   $form = array();
@@ -125,11 +125,10 @@ function authnet_user_payment_profile_form($form, &$form_state, $user, $payment_
   // Start with an empty form.
   $form = array();
 
-  /**
-   * Save the user id value to the form. This will be used to generate information for the Authorize.net
-   * customer profile, if one doesn't exist already.
-   * @see authnet_user_authnet_ui_form_customer_profile_new()
-   */
+  // Save the user id value to the form. This will be used to generate
+  // information for the Authorize.net customer profile, if one doesn't exist
+  // already.
+  // @see authnet_user_authnet_ui_form_customer_profile_new()
   $form['uid'] = array(
     '#type' => 'value',
     '#value' => $user->uid,
