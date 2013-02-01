@@ -194,7 +194,12 @@ function authnet_cim_entity_profile_id_load($type, $id) {
 
   // If the customer profile id of the given type and id is not known, look it up.
   if (!isset($customer_profile_ids[$type]) || !isset($customer_profile_ids[$type][$id])) {
-    $customer_profile_ids[$type][$id] = db_result(db_query('SELECT customer_profile_id FROM {authnet_cim_entity} WHERE type="%s" AND id=%d', array($type, $id)));
+    $query = db_select('authnet_cim_entity', 'ace');
+    $query->addField('ace', 'customer_profile_id');
+    $query->condition('type', $type);
+    $query->condition('id', $id);
+    $result = $query->execute();
+    $customer_profile_ids[$type][$id] = $result->fetchField();
   }
 
   // Return the requested customer profile id.
@@ -258,10 +263,14 @@ function authnet_cim_entity_profile_id_save($type, $id, $customer_profile_id) {
 function authnet_cim_entity_profile_id_delete($customer_profile_id) {
 
   // Delete the customer profile from the database.
-  db_query('DELETE FROM {authnet_cim_entity} WHERE customer_profile_id=%d', $customer_profile_id);
+  $query = db_delete('authnet_cim_entity');
+  $query->condition('customer_profile_id', $customer_profile_id);
+  $query->execute();
 
   // Delete all of the customer's payment profiles from the database.
-  db_query('DELETE FROM {authnet_cim_entity_payment_profile} WHERE customer_profile_id=%d', $customer_profile_id);
+  $query = db_delete('authnet_cim_entity_payment_profile');
+  $query->condition('customer_profile_id', $customer_profile_id);
+  $query->execute();
 }
 
 /* ******************************************************************************
@@ -328,7 +337,11 @@ function authnet_cim_entity_payment_profile_id_load($pid) {
 
   // If the payment profile id for the given pid isn't known, look it up.
   if (!isset($payment_profile_ids[$pid])) {
-    $payment_profile_ids[$pid] = db_result(db_query('SELECT payment_profile_id FROM {authnet_cim_entity_payment_profile} WHERE pid=%d', $pid));
+    $query = db_select('authnet_cim_entity_payment_profile', 'acepp');
+    $query->addField('acepp', 'payment_profile_id');
+    $query->condition('pid', $pid);
+    $result = $query->execute();
+    $payment_profile_ids[$pid] = $result->fetchField();
   }
 
   // Return the payment profile id.
@@ -347,7 +360,11 @@ function authnet_cim_entity_payment_profile_id_load($pid) {
 function authnet_cim_entity_payment_profile_load($payment_profile_id) {
 
   // Load the payment profile from the database.
-  return db_fetch_array(db_query('SELECT * FROM {authnet_cim_entity_payment_profile} WHERE payment_profile_id=%d', $payment_profile_id));
+  $query = db_select('authnet_cim_entity_payment_profile', 'acepp');
+  $query->fields('acepp');
+  $query->condition('payment_profile_id', $payment_profile_id);
+  $result = $query->execute();
+  return $result->fetchAssoc();
 }
 
 /**
@@ -365,10 +382,13 @@ function authnet_cim_entity_customer_payment_profiles_load($customer_profile_id)
   $payment_profiles = array();
 
   // Get all the payment profiles for that customer profile id.
-  $result = db_query('SELECT * FROM {authnet_cim_entity_payment_profile} WHERE customer_profile_id=%d', $customer_profile_id);
+  $query = db_select('authnet_cim_entity_payment_profile', 'acepp');
+  $query->fields('acepp');
+  $query->condition('customer_profile_id', $customer_profile_id);
+  $result = $query->execute();
 
   // Loop through the results and add them to the array.
-  while ($payment_profile = db_fetch_array($result)) {
+  while ($payment_profile = $result->fetchAssoc()) {
     $payment_profiles[$payment_profile['payment_profile_id']] = $payment_profile;
   }
 
@@ -397,7 +417,9 @@ function authnet_cim_entity_payment_profile_save($payment_profile) {
  *   The id of the payment profile to delete.
  */
 function authnet_cim_entity_payment_profile_delete($payment_profile_id) {
-  db_query('DELETE FROM {authnet_cim_entity_payment_profile} WHERE payment_profile_id=%d', $payment_profile_id);
+  $query = db_delete('authnet_cim_entity_payment_profile');
+  $query->condition('payment_profile_id', $payment_profile_id);
+  $query->execute();
 }
 
 /**
@@ -410,7 +432,12 @@ function authnet_cim_entity_customer_payment_profile_default($customer_profile_i
 
   // If the default pid for the given customer profile id isn't known, look it up.
   if (!isset($default_pids[$customer_profile_id])) {
-    $default_pids[$customer_profile_id] = db_result(db_query('SELECT pid FROM {authnet_cim_entity_payment_profile} WHERE customer_profile_id=%d AND is_default=1', $customer_profile_id));
+    $query = db_select('authnet_cim_entity_payment_profile', 'acepp');
+    $query->addField('acepp', 'pid');
+    $query->condition('customer_profile_id', $customer_profile_id);
+    $query->condition('is_default', 1);
+    $result = $query->execute();
+    $default_pids[$customer_profile_id] = $result->fetchField();
   }
 
   // Return the default pid for the customer profile id.

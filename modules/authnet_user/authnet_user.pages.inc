@@ -87,10 +87,17 @@ function authnet_user_payment_profiles_list_form_submit($form, &$form_state) {
     $customer_profile_id = $form_state['values']['customer_profile_id'];
 
     // Set all the other payment profiles for this customer to NOT default.
-    db_query('UPDATE {authnet_cim_entity_payment_profile} SET is_default=0 WHERE is_default=1 AND customer_profile_id=%d', $customer_profile_id);
+    $query = db_update('authnet_cim_entity_payment_profile');
+    $query->fields(array('is_default' => 0));
+    $query->condition('is_default', 1);
+    $query->condition('customer_profile_id', $customer_profile_id);
+    $query->execute();
 
     // Set the selected payment profile as the default.
-    db_query('UPDATE {authnet_cim_entity_payment_profile} SET is_default=1 WHERE pid=%d', $form_state['values']['default']);
+    $query = db_update('authnet_cim_entity_payment_profile');
+    $query->fields(array('is_default' => 1));
+    $query->condition('pid', $form_state['values']['default']);
+    $query->execute();
   }
 }
 
