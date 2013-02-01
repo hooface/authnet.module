@@ -105,19 +105,15 @@ function authnet_user_theme($existing, $type, $theme, $path) {
 }
 
 /**
- * Implements hook_user().
+ * Implements hook_user_delete().
  */
-function authnet_user_user($op, &$edit, &$account, $category = NULL) {
+function authnet_user_user_delete($account) {
 
-  // If a user is being deleted, delete their customer profile and payment profiles.
-  if ($op == 'delete') {
+  // Load their customer profile id.
+  if ($customer_profile_id = authnet_cim_entity_profile_id_load('user', $account->uid)) {
 
-    // Load their customer profile id.
-    if ($customer_profile_id = authnet_cim_entity_profile_id_load('user', $account->uid)) {
-
-      // Delete their customer profile from Authorize.net.
-      authnet_cim_profile_delete($customer_profile_id);
-    }
+    // Delete their customer profile from the database and Authorize.net.
+    authnet_cim_profile_delete($customer_profile_id);
   }
 }
 
