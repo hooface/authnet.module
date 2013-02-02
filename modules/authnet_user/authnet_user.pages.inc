@@ -160,11 +160,21 @@ function authnet_user_payment_profile_form($form, &$form_state, $user, $payment_
   // Add the Authnet UI payment profile form.
   $form += authnet_ui_payment_profile_form($form, $form_state, $customer_profile_id, $payment_profile_id);
 
-  // Redirect to the user's billing list.
-  $form_state['#redirect'] = 'user/' . $user->uid . '/billing';
+  // Add a submit function for redirecting.
+  $form['submit']['#submit'][] = 'authnet_user_billing_redirect';
 
   // Return the payment profile form.
   return $form;
+}
+
+/**
+ * Submit function for redirecting to the user's billing list page.
+ */
+function authnet_user_billing_redirect($form, &$form_state) {
+
+  // Redirect to the user's billing list page.
+  global $user;
+  $form_state['redirect'] = 'user/' . $user->uid . '/billing';
 }
 
 /**
