@@ -293,7 +293,10 @@ function theme_authnet_user_payment_profiles_list_form($variables) {
   $rows = array();
 
   // Get a list of all the existing payment profile primary keys.
-  $pids = element_children($form['payment_profiles']);
+  $pids = array();
+  if (!empty($form['payment_profiles'])) {
+    $pids = element_children($form['payment_profiles']);
+  }
 
   // Create a row for each existing credit card.
   foreach ($pids as $pid) {
