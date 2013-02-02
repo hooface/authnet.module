@@ -39,6 +39,7 @@ function authnet_user_menu() {
     'access arguments' => array(1),
     'type' => MENU_LOCAL_TASK,
     'file' => 'authnet_user.pages.inc',
+    'weight' => 20,
   );
   $items['user/%user/billing/list'] = array(
     'title' => 'List',
