@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * @file
+ * Authorize.net ARB Entity
+ */
+
+/* ******************************************************************************
+ * Constants
+ * *****************************************************************************/
+
+/**
+ * Authorize.net ARB Constants.
+ */
+define('AUTHNET_ARB_TOTAL_OCCURRENCES_UNLIMITED', 9999);

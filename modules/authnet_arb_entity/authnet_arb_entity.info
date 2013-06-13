@@ -1,0 +1,5 @@
+name = Authorize.net - ARB Integration
+description = Manage Authorize.net ARB subscriptions.
+dependencies[] = authnet
+package = Authorize.net
+core = 7.x

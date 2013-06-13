@@ -1,0 +1,87 @@
+<?php
+
+/**
+ * @file
+ * Authorize.net ARB Entity - Install file
+ * http://www.authorize.net/support/ARB_guide.pdf
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function authnet_arb_entity_schema() {
+  $schema['authnet_arb_entity'] = array(
+    'description' => 'Authorize.net ARB entities.',
+    'fields' => array(
+      'subscription_id' => array(
+        'description' => 'Authorize.net ARB subscription id',
+        'type' => 'varchar',
+        'length' => '13',
+        'not null' => TRUE,
+      ),
+      // Because a subscription is always associated to an account (person or business)
+      'uid' => array(
+        'description' => 'Drupal user id',
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      // Interval is needed because ARB silent post does not provide it
+      'payment_interval_length' => array(
+        'description' => 'ARB interval length',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+      ),
+      'payment_interval_unit' => array(
+        'description' => 'ARB interval unit - d for days m for months',
+        'type' => 'char',
+        'length' => '1',
+        'not null' => TRUE,
+      ),
+      // Following the format of YYYY-MM-DD
+      'payment_start_date' => array(
+        'description' => 'ARB start date YYYY-MM-DD',
+        'type' => 'varchar',
+        'length' => '10',
+        'not null' => TRUE,
+      ),
+      'payment_total_occurrences' => array(
+        'description' => 'ARB total number of payments to make',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+      ),
+      'payment_trial_occurrences' => array(
+        'description' => 'ARB total number of payments in the trial period',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+      ),
+      'payment_amount' => array(
+        'description' => 'ARB normal recurring payment amount',
+        'type' => 'float',
+        'not null' => TRUE,
+      ),
+      'payment_trial_amount' => array(
+        'description' => 'ARB trial payment amount',
+        'type' => 'float',
+        'not null' => TRUE,
+      ),
+      'invoice_number' => array(
+        'description' => 'ARB invoice number',
+        'type' => 'varchar',
+        'length' => 20,
+      ),
+      'description' => array(
+        'description' => 'ARB description',
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+    ),
+    'primary key' => array('subscription_id'),
+    'indexes' => array(
+      'uid' => array('uid'),
+    ),
+  );
+  return $schema;
+}
