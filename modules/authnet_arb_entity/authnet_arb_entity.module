@@ -68,6 +68,29 @@ function authnet_arb_entity_load($subscription_id) {
   return $result;
 }
 
+/**
+ * Save an ARB transaction from Silent Post to the database.
+ *
+ * @param $subscription_id
+ *   ARB subscription id.
+ * @param $trans_id
+ *   Transaction id from silent post.
+ * @param $response_code
+ *   Response code from silent post.
+ */
+function authnet_arb_entity_silentpost_save($subscription_id, $trans_id, $response_code) {
+
+  // Build the record.
+  $record = array(
+    'subscription_id' => $subscription_id,
+    'trans_id' => $trans_id,
+    'response_code' => $response_code,
+  );
+
+  // Write the record.
+  drupal_write_record('authnet_arb_transactions', $record);
+}
+
 /* ******************************************************************************
  * Silent POST functions
  * *****************************************************************************/
@@ -96,6 +119,7 @@ function authnet_arb_entity_silentpost () {
       if (is_array($append_post)) {
         $post += $append_post;
       }
+      authnet_arb_entity_silentpost_save($post['x_subscription_id'], $post['x_trans_id'], $post['x_response_code']);
       module_invoke_all('arb_silentpost', $post);
     }
     else {
