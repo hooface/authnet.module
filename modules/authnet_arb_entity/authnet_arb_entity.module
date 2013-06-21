@@ -50,6 +50,25 @@ function authnet_arb_entity_form_authnet_settings_form_alter(&$form, &$form_stat
 }
 
 /* ******************************************************************************
+ * Database functions
+ * *****************************************************************************/
+
+/**
+ * Load an ARB subscription from the database.
+ *
+ * @param $subscription_id
+ *  The ARB subscription id to load.
+ *
+ * @return
+ *   Returns an ARB record.
+ */
+function authnet_arb_entity_load($subscription_id) {
+  $query = db_query("SELECT * FROM {authnet_arb_entity} WHERE subscription_id = :subscription_id", array(':subscription_id' => $subscription_id));
+  $result = $query->fetchAssoc();
+  return $result;
+}
+
+/* ******************************************************************************
  * Silent POST functions
  * *****************************************************************************/
 
@@ -69,10 +88,14 @@ function authnet_arb_entity_silentpost () {
 
     // Verify the MD5Hash
     $verify = md5($hash_key . $post['x_trans_id'] . $post['x_amount']);
-    $is_valid = (strtoupper($post['x_MD5_Hash']) === strtoupper($verify)) ? TRUE : FALSE;
+    $is_valid_transaction = (strtoupper($post['x_MD5_Hash']) === strtoupper($verify)) ? TRUE : FALSE;
 
-    // Call modules passing POST data or bail
-    if ($is_valid) {
+    // Call modules passing POST data (plus subscription data) or bail
+    if ($is_valid_transaction) {
+      $append_post = authnet_arb_entity_load($post['x_subscription_id']);
+      if (is_array($append_post)) {
+        $post += $append_post;
+      }
       module_invoke_all('arb_silentpost', $post);
     }
     else {
