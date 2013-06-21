@@ -48,7 +48,7 @@ function authnet_arb_entity_schema() {
       'payment_total_occurrences' => array(
         'description' => 'ARB total number of payments to make',
         'type' => 'int',
-        'size' => 'tiny',
+        'size' => 'small',
         'not null' => TRUE,
       ),
       'payment_trial_occurrences' => array(
