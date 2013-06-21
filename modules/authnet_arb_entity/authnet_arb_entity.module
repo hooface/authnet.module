@@ -13,3 +13,72 @@
  * Authorize.net ARB Constants.
  */
 define('AUTHNET_ARB_TOTAL_OCCURRENCES_UNLIMITED', 9999);
+
+
+/* ******************************************************************************
+ * Drupal hooks
+ * *****************************************************************************/
+
+/**
+ * Implements hook_menu().
+ */
+function authnet_arb_entity_menu() {
+  $items['authnet/silentpost'] = array(
+    'type' => MENU_CALLBACK,
+    'page callback' => 'authnet_arb_entity_silentpost',
+    'access callback' => TRUE,
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function authnet_arb_entity_form_authnet_settings_form_alter(&$form, &$form_state, $form_id) {
+  // ARB settings
+  $form['arb_settings'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('ARB settings'),
+    '#description' => t('These settings pertain to the Authorize.Net Automated Recurring Billing service.'),
+  );
+  $form['arb_settings']['authnet_arb_md5'] = array(
+    '#type' => 'textfield',
+    '#title' => t('MD5 Hash'),
+    '#default_value' => variable_get('authnet_arb_md5', ''),
+    '#description' => t('The MD5 Hash is used to verify inbound Silent Post responses for transactions processed via ARB. More information in the <a href="@arb_guide">ARB Guide.pdf</a>', array('@arb_guide' => 'http://www.authorize.net/support/ARB_guide.pdf')),
+  );
+}
+
+/* ******************************************************************************
+ * Silent POST functions
+ * *****************************************************************************/
+
+function authnet_arb_entity_silentpost () {
+    $hash_key = variable_get('authnet_arb_md5', '');
+    $post = array();
+
+    // Process POST values for cleaning
+    foreach ($_POST as $key => $value) {
+      $post[check_plain($key)] = check_plain($value);
+    }
+
+    // Bail if not an ARB subscription or no hash key
+    if (!isset($post['x_subscription_id']) || empty($hash_key)) {
+      return;
+    }
+
+    // Verify the MD5Hash
+    $verify = md5($hash_key . $post['x_trans_id'] . $post['x_amount']);
+    $is_valid = (strtoupper($post['x_MD5_Hash']) === strtoupper($verify)) ? TRUE : FALSE;
+
+    // Call modules passing POST data or bail
+    if ($is_valid) {
+      module_invoke_all('arb_silentpost', $post);
+    }
+    else {
+      // @todo make a watchdog entry?
+      drupal_send_headers();
+      header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', TRUE, 500);
+      exit();
+    }
+}
