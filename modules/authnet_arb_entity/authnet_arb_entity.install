@@ -83,5 +83,32 @@ function authnet_arb_entity_schema() {
       'uid' => array('uid'),
     ),
   );
+// We only need the basic info for processing - Transactions Details can be pulled at any time
+$schema['authnet_arb_transactions'] = array(
+  'description' => 'Authorize.net ARB transactions.',
+  'fields' => array(
+    'subscription_id' => array(
+      'description' => 'Authorize.net ARB subscription id',
+      'type' => 'varchar',
+      'length' => '13',
+      'not null' => TRUE,
+    ),
+    'trans_id' => array(
+      'description' => 'Authorize.net ARB transaction id',
+      'type' => 'int',
+      'size' => 'big',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+    ),
+    'response_code' => array(
+      'description' => 'Authorize.net ARB response code',
+      'type' => 'int',
+      'not null' => TRUE,
+    ),
+  ),
+  'indexes' => array(
+    'subscription_id' => array('subscription_id'),
+  ),
+);
   return $schema;
 }
