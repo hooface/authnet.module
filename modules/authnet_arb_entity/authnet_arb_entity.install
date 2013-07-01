@@ -19,13 +19,13 @@ function authnet_arb_entity_schema() {
         'length' => '13',
         'not null' => TRUE,
       ),
-      // Because a subscription is always associated to an account (person or business)
+      // Because a subscription is always associated to an account (person or business).
       'uid' => array(
         'description' => 'Drupal user id',
         'type' => 'int',
         'not null' => TRUE,
       ),
-      // Interval is needed because ARB silent post does not provide it
+      // Interval is needed because ARB silent post does not provide it.
       'payment_interval_length' => array(
         'description' => 'ARB interval length',
         'type' => 'int',
@@ -83,7 +83,7 @@ function authnet_arb_entity_schema() {
       'uid' => array('uid'),
     ),
   );
-// We only need the basic info for processing - Transactions Details can be pulled at any time
+// We only need the basic info for processing - Transactions Details can be pulled at any time.
 $schema['authnet_arb_transactions'] = array(
   'description' => 'Authorize.net ARB transactions.',
   'fields' => array(
