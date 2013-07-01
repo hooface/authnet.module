@@ -19,6 +19,14 @@ define('AUTHNET_METHOD_CAPTURE_ONLY', 'CAPTURE_ONLY');
 define('AUTHNET_METHOD_CREDIT', 'CREDIT');
 define('AUTHNET_METHOD_VOID', 'VOID');
 
+/**
+ * Authorize.net gateway responses.
+ */
+define('AUTHNET_TRANSACTION_APPROVED', 1);
+define('AUTHNET_TRANSACTION_DECLINED', 2);
+define('AUTHNET_TRANSACTION_ERROR', 3);
+define('AUTHNET_TRANSACTION_HELD_FOR_REVIEW', 4);
+
 /* ******************************************************************************
  * Includes
  * *****************************************************************************/
