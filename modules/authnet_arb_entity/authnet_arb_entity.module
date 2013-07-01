@@ -95,6 +95,12 @@ function authnet_arb_entity_silentpost_save($subscription_id, $trans_id, $respon
  * Silent POST functions
  * *****************************************************************************/
 
+/**
+ * Menu callback to process and verify an Authorize.net Silent POST.
+ *
+ * Verification must happen via Authorize.net MD5Hash or an
+ * immediate HTTP response of 500 is sent.
+ */
 function authnet_arb_entity_silentpost () {
     $hash_key = variable_get('authnet_arb_md5', '');
     $post = array();
