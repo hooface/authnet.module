@@ -5,7 +5,7 @@
  * Authorize.net ARB Entity
  */
 
-/* ******************************************************************************
+/* *****************************************************************************
  * Constants
  * *****************************************************************************/
 
@@ -15,7 +15,7 @@
 define('AUTHNET_ARB_TOTAL_OCCURRENCES_UNLIMITED', 9999);
 
 
-/* ******************************************************************************
+/* *****************************************************************************
  * Drupal hooks
  * *****************************************************************************/
 
@@ -35,7 +35,7 @@ function authnet_arb_entity_menu() {
  * Implements hook_form_FORM_ID_alter().
  */
 function authnet_arb_entity_form_authnet_settings_form_alter(&$form, &$form_state, $form_id) {
-  // ARB settings
+  // ARB settings.
   $form['arb_settings'] = array(
     '#type' => 'fieldset',
     '#title' => t('ARB settings'),
@@ -49,7 +49,7 @@ function authnet_arb_entity_form_authnet_settings_form_alter(&$form, &$form_stat
   );
 }
 
-/* ******************************************************************************
+/* *****************************************************************************
  * Database functions
  * *****************************************************************************/
 
@@ -91,7 +91,7 @@ function authnet_arb_entity_silentpost_save($subscription_id, $trans_id, $respon
   drupal_write_record('authnet_arb_transactions', $record);
 }
 
-/* ******************************************************************************
+/* *****************************************************************************
  * Silent POST functions
  * *****************************************************************************/
 
@@ -125,8 +125,15 @@ function authnet_arb_entity_silentpost () {
       if (is_array($append_post)) {
         $post += $append_post;
       }
+
+      // Save the ARB, allow modules to do their stuff (or update POST data) then send to Rules
       authnet_arb_entity_silentpost_save($post['x_subscription_id'], $post['x_trans_id'], $post['x_response_code']);
       module_invoke_all('arb_silentpost', $post);
+      if (module_exists('rules') && isset($post['uid'])) {
+        $account = user_load($post['uid']);
+        $response_code = (int)$post['x_response_code'];
+        rules_invoke_event('authnet_arb_entity_rule_silentpost', $account, $response_code, $post);
+      }
     }
     else {
       // @todo make a watchdog entry?
@@ -134,4 +141,22 @@ function authnet_arb_entity_silentpost () {
       header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', TRUE, 500);
       exit();
     }
+}
+
+/* *****************************************************************************
+ * Helper functions
+ * *****************************************************************************/
+
+/**
+ * Helper function for option lists related to Authnet responses.
+ *
+ * Used for Rules module integration
+ */
+function authnet_arb_entity_response_options() {
+  return array(
+    AUTHNET_TRANSACTION_APPROVED => t('Approved'),
+    AUTHNET_TRANSACTION_DECLINED => t('Declined'),
+    AUTHNET_TRANSACTION_ERROR => t('Error'),
+    AUTHNET_TRANSACTION_HELD_FOR_REVIEW => t('Held for Review'),
+  );
 }
